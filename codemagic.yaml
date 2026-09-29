@@ -1,0 +1,49 @@
+# gathr: iOS build recipe for Codemagic
+# This file must sit at the TOP LEVEL of the repository, not inside a folder.
+
+workflows:
+  ios-testflight:
+    name: gathr iOS to TestFlight
+    instance_type: mac_mini_m2
+    max_build_duration: 60
+    integrations:
+      # Must match the name you gave your Apple API key in Codemagic
+      app_store_connect: gathr
+    environment:
+      ios_signing:
+        distribution_type: app_store
+        # Must match the App ID you registered with Apple
+        bundle_identifier: com.gathr.app
+      node: 20
+      xcode: latest
+      cocoapods: default
+    scripts:
+      - name: Install Capacitor
+        script: npm install
+      - name: Create the iOS app shell
+        script: |
+          if [ ! -d ios ]; then npx cap add ios; fi
+          npx cap sync ios
+      - name: Add permission messages and build number
+        script: |
+          PLIST=ios/App/App/Info.plist
+          /usr/libexec/PlistBuddy -c "Add :NSLocationWhenInUseUsageDescription string gathr uses your location to show venues near you on the map." $PLIST || true
+          /usr/libexec/PlistBuddy -c "Add :NSPhotoLibraryUsageDescription string gathr uses your photos so you can add a profile picture." $PLIST || true
+          /usr/libexec/PlistBuddy -c "Add :NSCameraUsageDescription string gathr uses the camera so you can take a profile picture." $PLIST || true
+          /usr/libexec/PlistBuddy -c "Add :ITSAppUsesNonExemptEncryption bool false" $PLIST || true
+          /usr/libexec/PlistBuddy -c "Set :CFBundleVersion $BUILD_NUMBER" $PLIST
+      - name: Set up signing
+        script: xcode-project use-profiles
+      - name: Build the app
+        script: |
+          if [ -d ios/App/App.xcworkspace ]; then
+            xcode-project build-ipa --workspace ios/App/App.xcworkspace --scheme App
+          else
+            xcode-project build-ipa --project ios/App/App.xcodeproj --scheme App
+          fi
+    artifacts:
+      - build/ios/ipa/*.ipa
+    publishing:
+      app_store_connect:
+        auth: integration
+        submit_to_testflight: false
