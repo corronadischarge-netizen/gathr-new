@@ -47,3 +47,29 @@ workflows:
       app_store_connect:
         auth: integration
         submit_to_testflight: false
+
+  android-apk:
+    name: gathr Android APK (test)
+    instance_type: linux_x2
+    max_build_duration: 30
+    environment:
+      node: 20
+      java: 21
+    scripts:
+      - name: Install Capacitor
+        script: npm install
+      - name: Create the Android app shell
+        script: |
+          if [ ! -d android ]; then npx cap add android; fi
+          npx cap sync android
+      - name: Allow location for the map
+        script: |
+          MANIFEST=android/app/src/main/AndroidManifest.xml
+          grep -q ACCESS_FINE_LOCATION $MANIFEST || sed -i 's#</manifest>#    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />\n    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />\n</manifest>#' $MANIFEST
+      - name: Build the APK
+        script: |
+          cd android
+          chmod +x gradlew
+          ./gradlew assembleDebug
+    artifacts:
+      - android/app/build/outputs/apk/debug/*.apk
