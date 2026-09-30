@@ -28,6 +28,9 @@ workflows:
         script: |
           if [ ! -d ios ]; then npx cap add ios; fi
           npx cap sync ios
+      - name: Set the app icon
+        # Makes every icon size from assets/icon-only.png
+        script: npx capacitor-assets generate --ios
       - name: Add permission messages and build number
         script: |
           PLIST=ios/App/App/Info.plist
@@ -69,6 +72,9 @@ workflows:
         script: |
           if [ ! -d android ]; then npx cap add android; fi
           npx cap sync android
+      - name: Set the app icon
+        # Makes every icon size from assets/icon-only.png (plus the two layers of Android's adaptive icon)
+        script: npx capacitor-assets generate --android
       - name: Allow location for the map and the camera for the pass scanner
         script: |
           # perl rather than sed: macOS sed treats -i and \n differently from Linux sed

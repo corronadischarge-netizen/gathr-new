@@ -39,3 +39,14 @@ src/assets/           fonts, 3D icons and welcome photos
 
 `codemagic.yaml` has two workflows: **gathr iOS to TestFlight** and **gathr Android APK (test)**.
 Both install with `npm ci`, run `npm run build`, then let Capacitor copy `dist/` into the native app.
+
+## App icon
+
+The icon lives in `assets/`. Every build makes all the iOS and Android sizes from it.
+
+- `icon-only.png`: the icon (1024 × 1024 PNG, no transparency, square corners).
+- `icon-foreground.png` and `icon-background.png`: the two layers Android phones use to cut
+  the icon into their own shape. Here the foreground is the same image and the background is its gradient.
+
+To change the icon, replace `icon-only.png` and `icon-foreground.png` with the new image
+(and `icon-background.png` with its background colour or gradient), then run a new build.
