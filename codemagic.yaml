@@ -54,7 +54,8 @@ workflows:
 
   android-apk:
     name: gathr Android APK (test)
-    instance_type: linux_x2
+    # The free Codemagic plan only includes Mac mini M2 machines; they build Android too
+    instance_type: mac_mini_m2
     max_build_duration: 30
     environment:
       node: 22
@@ -70,9 +71,10 @@ workflows:
           npx cap sync android
       - name: Allow location for the map and the camera for the pass scanner
         script: |
+          # perl rather than sed: macOS sed treats -i and \n differently from Linux sed
           MANIFEST=android/app/src/main/AndroidManifest.xml
-          grep -q ACCESS_FINE_LOCATION $MANIFEST || sed -i 's#</manifest>#    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />\n    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />\n</manifest>#' $MANIFEST
-          grep -q 'permission.CAMERA' $MANIFEST || sed -i 's#</manifest>#    <uses-permission android:name="android.permission.CAMERA" />\n    <uses-feature android:name="android.hardware.camera" android:required="false" />\n</manifest>#' $MANIFEST
+          grep -q ACCESS_FINE_LOCATION $MANIFEST || perl -0pi -e 's#</manifest>#    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />\n    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />\n</manifest>#' $MANIFEST
+          grep -q 'permission.CAMERA' $MANIFEST || perl -0pi -e 's#</manifest>#    <uses-permission android:name="android.permission.CAMERA" />\n    <uses-feature android:name="android.hardware.camera" android:required="false" />\n</manifest>#' $MANIFEST
       - name: Build the APK
         script: |
           cd android
