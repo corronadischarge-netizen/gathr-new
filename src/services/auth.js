@@ -1,22 +1,11 @@
-import { APP_URL, CFG } from '../config';
-import { loadScript } from '../lib/utils';
+import { APP_URL } from '../config';
+import { supabase, supabaseOn } from './supabase';
 
 /* Sign-in: Supabase email code + Google (free). Demo mode shows the code on screen. */
 export const Auth = (() => {
-  var live = !!(CFG.supabase && CFG.supabase.url && CFG.supabase.anonKey),
-    client = null,
+  var live = supabaseOn,
     demo = null;
-  function sb() {
-    if (client) return Promise.resolve(client);
-    return loadScript('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js').then(
-      () => {
-        client = window.supabase.createClient(CFG.supabase.url, CFG.supabase.anonKey, {
-          auth: { persistSession: true, detectSessionInUrl: true, flowType: 'implicit' }
-        });
-        return client;
-      }
-    );
-  }
+  var sb = supabase;
   function friendly(err) {
     var m = (err && (err.message || err.error_description)) || '';
     if (/rate|too many|seconds/i.test(m)) return 'Too many codes asked for. Wait a minute, then try again.';
