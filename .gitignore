@@ -1,0 +1,5 @@
+# Installed packages (recreated by "npm ci")
+node_modules/
+
+# Built web app (recreated by "npm run build")
+dist/

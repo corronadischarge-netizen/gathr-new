@@ -1,5 +1,7 @@
-# gathr: iOS build recipe for Codemagic
+# gathr: iOS and Android build recipes for Codemagic
 # This file must sit at the TOP LEVEL of the repository, not inside a folder.
+# The app is a React + Vite project: "npm run build" makes the web app in dist/,
+# then Capacitor copies dist/ into the iOS and Android shells.
 
 workflows:
   ios-testflight:
@@ -14,22 +16,27 @@ workflows:
         distribution_type: app_store
         # Must match the App ID you registered with Apple
         bundle_identifier: com.gathr.app
-      node: 20
+      node: 22
       xcode: latest
       cocoapods: default
     scripts:
-      - name: Install Capacitor
-        script: npm install
+      - name: Install dependencies
+        script: npm ci
+      - name: Build the web app
+        script: npm run build
       - name: Create the iOS app shell
         script: |
           if [ ! -d ios ]; then npx cap add ios; fi
           npx cap sync ios
+      - name: Set the app icon
+        # Makes every icon size from assets/icon-only.png
+        script: npx capacitor-assets generate --ios
       - name: Add permission messages and build number
         script: |
           PLIST=ios/App/App/Info.plist
           /usr/libexec/PlistBuddy -c "Add :NSLocationWhenInUseUsageDescription string gathr uses your location to show venues near you on the map." $PLIST || true
           /usr/libexec/PlistBuddy -c "Add :NSPhotoLibraryUsageDescription string gathr uses your photos so you can add a profile picture." $PLIST || true
-          /usr/libexec/PlistBuddy -c "Add :NSCameraUsageDescription string gathr uses the camera so you can take a profile picture." $PLIST || true
+          /usr/libexec/PlistBuddy -c "Add :NSCameraUsageDescription string gathr uses the camera to scan guests' passes at the door and to take a profile picture." $PLIST || /usr/libexec/PlistBuddy -c "Set :NSCameraUsageDescription gathr uses the camera to scan guests' passes at the door and to take a profile picture." $PLIST
           /usr/libexec/PlistBuddy -c "Add :ITSAppUsesNonExemptEncryption bool false" $PLIST || true
           /usr/libexec/PlistBuddy -c "Set :CFBundleVersion $BUILD_NUMBER" $PLIST
       - name: Set up signing
@@ -50,22 +57,30 @@ workflows:
 
   android-apk:
     name: gathr Android APK (test)
-    instance_type: linux_x2
+    # The free Codemagic plan only includes Mac mini M2 machines; they build Android too
+    instance_type: mac_mini_m2
     max_build_duration: 30
     environment:
-      node: 20
+      node: 22
       java: 21
     scripts:
-      - name: Install Capacitor
-        script: npm install
+      - name: Install dependencies
+        script: npm ci
+      - name: Build the web app
+        script: npm run build
       - name: Create the Android app shell
         script: |
           if [ ! -d android ]; then npx cap add android; fi
           npx cap sync android
-      - name: Allow location for the map
+      - name: Set the app icon
+        # Makes every icon size from assets/icon-only.png (plus the two layers of Android's adaptive icon)
+        script: npx capacitor-assets generate --android
+      - name: Allow location for the map and the camera for the pass scanner
         script: |
+          # perl rather than sed: macOS sed treats -i and \n differently from Linux sed
           MANIFEST=android/app/src/main/AndroidManifest.xml
-          grep -q ACCESS_FINE_LOCATION $MANIFEST || sed -i 's#</manifest>#    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />\n    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />\n</manifest>#' $MANIFEST
+          grep -q ACCESS_FINE_LOCATION $MANIFEST || perl -0pi -e 's#</manifest>#    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />\n    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />\n</manifest>#' $MANIFEST
+          grep -q 'permission.CAMERA' $MANIFEST || perl -0pi -e 's#</manifest>#    <uses-permission android:name="android.permission.CAMERA" />\n    <uses-feature android:name="android.hardware.camera" android:required="false" />\n</manifest>#' $MANIFEST
       - name: Build the APK
         script: |
           cd android
