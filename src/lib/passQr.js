@@ -82,8 +82,7 @@ export function checkPass(S, id, raw) {
         g.passes +
         (g.passes === 1 ? ' pass' : ' passes') +
         ' · ' +
-        (e.age || 18) +
-        '+ night · check their ID',
+        (e.allAges ? 'all-ages night' : (e.age || 18) + '+ night · check their ID'),
       guest: g,
       admit: true
     };

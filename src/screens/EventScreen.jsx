@@ -144,8 +144,8 @@ export function EventScreen(p) {
           )}
           {fact(
             'Age',
-            e.age ? e.age + '+' : '18+',
-            blocked ? 'not for you' : 'bring ID',
+            e.allAges ? 'All ages' : e.age ? e.age + '+' : '18+',
+            blocked ? 'not for you' : e.allAges ? 'open to everyone' : 'bring ID',
             blocked ? 'limit' : null
           )}
         </div>

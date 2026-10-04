@@ -1,4 +1,4 @@
-/* Real data: Pune listings pulled from District and Sort My Scene on 29 Sep 2026.
+/* Real data: Pune listings pulled from District and Sort My Scene on 29 Sep 2026, plus ten more from District on 4 Oct 2026.
    Crowd levels, friends and group votes are SAMPLE data: no live crowd feed exists yet. */
 const SMS = 'https://assets.sortmyscene.com/img/event-hero/';
 
@@ -97,6 +97,90 @@ export const VENUES = {
     lat: 18.5306,
     lng: 73.8478,
     ic: 'sunglasses',
+    hue: 'red'
+  },
+  /* added 4 Oct 2026, with locations from each listing on District */
+  shisha: {
+    id: 'shisha',
+    name: 'Shisha Jazz Cafe',
+    area: 'The Mills, Bund Garden Road',
+    crowd: 'warming',
+    lat: 18.5338,
+    lng: 73.8706,
+    ic: 'cd',
+    hue: 'blue',
+    cluster: 'mills'
+  },
+  sinonna: {
+    id: 'sinonna',
+    name: 'Si Nonna’s',
+    area: 'FC Road',
+    crowd: 'buzzing',
+    lat: 18.526,
+    lng: 73.8419,
+    ic: 'megaphone',
+    hue: 'yellow'
+  },
+  fcsocial: {
+    id: 'fcsocial',
+    name: 'FC Road Social',
+    area: 'FC Road, Shivaji Nagar',
+    crowd: 'warming',
+    lat: 18.5291,
+    lng: 73.8437,
+    ic: 'mic',
+    hue: 'green'
+  },
+  dimora: {
+    id: 'dimora',
+    name: 'Di Mora',
+    area: 'The Mills, Bund Garden Road',
+    crowd: 'packed',
+    lat: 18.534,
+    lng: 73.8712,
+    ic: 'champagne',
+    hue: 'pink',
+    cluster: 'mills'
+  },
+  cobbler: {
+    id: 'cobbler',
+    name: 'Cobbler & Crew',
+    area: 'Kalyani Nagar',
+    crowd: 'quiet',
+    lat: 18.5495,
+    lng: 73.9027,
+    ic: 'cocktail',
+    hue: 'violet'
+  },
+  themills: {
+    id: 'themills',
+    name: 'The Mills',
+    area: 'Sangamwadi',
+    crowd: 'buzzing',
+    lat: 18.5313,
+    lng: 73.8709,
+    ic: 'spotlight',
+    hue: 'yellow',
+    cluster: 'mills'
+  },
+  kurryleaf: {
+    id: 'kurryleaf',
+    name: 'Kurry Leaf',
+    area: 'Erandwane',
+    crowd: 'warming',
+    lat: 18.5036,
+    lng: 73.8356,
+    ic: 'memories',
+    hue: 'pink'
+  },
+  mahalaxmi: {
+    id: 'mahalaxmi',
+    name: 'Mahalaxmi Lawns',
+    area: 'Karve Nagar',
+    crowd: 'full',
+    lat: 18.4872,
+    lng: 73.8261,
+    ic: 'discoball',
     hue: 'red'
   }
 };
@@ -292,6 +376,201 @@ export const EVENTS = {
     url: 'https://www.district.in/events/fake-resignation-party-antisocial-pune-oct23-2026-buy-tickets',
     friends: ['Zoya', 'Aman', 'Kavya', 'Kabir'],
     nFriends: 4
+  },
+  /* pulled from District on 4 Oct 2026: ten upcoming nights, one per venue */
+  ladiesnight: {
+    id: 'ladiesnight',
+    src: 'district',
+    title: 'Ladies Night at The Game Palacio',
+    venue: 'palacio',
+    day: 'wed',
+    date: 'Wed 7 Oct',
+    time: '7 pm',
+    end: '11:59 pm',
+    leave: '6:30',
+    genre: "Girls' night, commercial",
+    tags: ['ladies', 'commercial'],
+    price: 250,
+    age: 18,
+    img: DIS + '01KYMCAEZTZ952ZA6PKZ0RBQAC.jpg',
+    url: 'https://www.district.in/events/ladies-night-at-the-game-palacio-pune-aug12-2026-buy-tickets',
+    friends: ['Kavya', 'Zoya'],
+    nFriends: 2
+  },
+  offmenu: {
+    id: 'offmenu',
+    src: 'district',
+    title: 'Off The Menu',
+    venue: 'cobbler',
+    day: 'wed',
+    date: 'Wed 7 Oct',
+    time: '6 pm',
+    end: '11:59 pm',
+    leave: '5:30',
+    genre: 'Pre-Prohibition cocktails',
+    tags: ['themed'],
+    price: 747,
+    age: 25,
+    img: DIS + '01M1GZ8Z42NECMRG4NAHNGTMZ5.png',
+    url: 'https://www.district.in/events/off-the-menu-cobbler-crew-sep2-2026-buy-tickets',
+    friends: [],
+    nFriends: 0
+  },
+  drexo: {
+    id: 'drexo',
+    src: 'district',
+    title: 'DreXo’s Block Party',
+    venue: 'sinonna',
+    day: 'fri',
+    date: 'Fri 9 Oct',
+    time: '6 pm',
+    end: '10 pm',
+    leave: '5:30',
+    genre: 'House music, DJ',
+    tags: ['edm'],
+    price: 299,
+    age: 18,
+    img: DIS + '01M2ZDE5PE9RKRSX2D2P93SEFT.jpg',
+    url: 'https://www.district.in/events/drexos-block-party-oct9-2026-buy-tickets',
+    friends: ['Kabir'],
+    nFriends: 1
+  },
+  basstapri: {
+    id: 'basstapri',
+    src: 'district',
+    title: 'Bass Tapri Vol. 2',
+    venue: 'antisocial',
+    day: 'fri',
+    date: 'Fri 9 Oct',
+    time: '7 pm',
+    end: '1 am',
+    leave: '6:30',
+    genre: 'Bass music, DJ lineup',
+    tags: ['edm'],
+    price: 299,
+    age: 21,
+    img: DIS + '01M3BXKJ8RBYKYMD6RNZRCD9C6.jpg',
+    url: 'https://www.district.in/events/bass-tapri-vol2-ft-beeptya-rumi-nihala-oct9-2026-buy-tickets',
+    artist: 'Mr. Green, Beeptya, Rumi and Nihala',
+    friends: ['Aman', 'Kabir'],
+    nFriends: 2
+  },
+  chuckberry: {
+    id: 'chuckberry',
+    src: 'district',
+    title: 'Tribute to Chuck Berry by Sunfrost',
+    venue: 'shisha',
+    day: 'fri',
+    date: 'Fri 9 Oct',
+    time: '8 pm',
+    end: '10 pm',
+    leave: '7:30',
+    genre: 'Rock & roll tribute (live)',
+    tags: ['live'],
+    price: 375,
+    allAges: true,
+    img: DIS + '01M3KQHWYD340EQBDDY1221BBT.jpg',
+    url: 'https://www.district.in/events/chuck-berry-tribute-by-sunfrost-oct9-2026-buy-tickets',
+    artist: 'Sunfrost',
+    friends: [],
+    nFriends: 0
+  },
+  jamming: {
+    id: 'jamming',
+    src: 'district',
+    title: 'Jamming Night',
+    venue: 'fcsocial',
+    day: 'sat',
+    date: 'Sat 10 Oct',
+    time: '8 pm',
+    end: '9 pm',
+    leave: '7:30',
+    genre: 'Open jam, live music',
+    tags: ['live'],
+    price: 299,
+    age: 18,
+    img: DIS + '01M377PWDR036V4K0N9DB7V4PA.jpeg',
+    url: 'https://www.district.in/events/jamming-night-pune-sep19-2026-buy-tickets',
+    friends: ['Zoya'],
+    nFriends: 1
+  },
+  dandiyaunited: {
+    id: 'dandiyaunited',
+    src: 'district',
+    title: 'Dandiya United (East Pune)',
+    venue: 'themills',
+    day: 'later',
+    date: 'Fri 16 Oct',
+    time: '6 pm',
+    end: '10:30 pm',
+    leave: '5:30',
+    genre: 'Dandiya, garba',
+    tags: ['themed'],
+    price: 100,
+    allAges: true,
+    img: DIS + '01M1TGY4MD104E1GTHFKDYCW1E.png',
+    url: 'https://www.district.in/events/dandiya-united-ep-oct16-2026-buy-tickets',
+    friends: ['Kavya', 'Aman', 'Zoya'],
+    nFriends: 3
+  },
+  royalraas: {
+    id: 'royalraas',
+    src: 'district',
+    title: 'Royal Raas 2.0',
+    venue: 'kurryleaf',
+    day: 'later',
+    date: 'Fri 16 Oct',
+    time: '6 pm',
+    end: '10 pm',
+    leave: '5:30',
+    genre: 'Garba, dandiya, live music',
+    tags: ['themed'],
+    price: 399,
+    allAges: true,
+    img: DIS + '01M11GAZPBJDNE5KVYZ3H7RNE4.jpg',
+    url: 'https://www.district.in/events/royal-raas-20-oct16-2026-buy-tickets',
+    friends: [],
+    nFriends: 0
+  },
+  punedandiya: {
+    id: 'punedandiya',
+    src: 'district',
+    title: 'Pune’s Biggest Dandiya Nights',
+    venue: 'mahalaxmi',
+    day: 'later',
+    date: 'Fri 16 Oct',
+    time: '7 pm',
+    end: '10 pm',
+    leave: '6:30',
+    genre: 'Dandiya, garba · runs to 19 Oct',
+    tags: ['themed'],
+    price: 1000,
+    allAges: true,
+    img: DIS + '01M2T5G797HHTHRWG0E9RZ3MN1.jpg',
+    url: 'https://www.district.in/events/punes-biggest-dandiya-nights-2026-buy-tickets',
+    friends: ['Kabir', 'Kavya'],
+    nFriends: 2
+  },
+  jasmin: {
+    id: 'jasmin',
+    src: 'district',
+    title: 'Jasmin Walia Live',
+    venue: 'dimora',
+    day: 'later',
+    date: 'Fri 23 Oct',
+    time: '9 pm',
+    end: '1:30 am',
+    leave: '8:30',
+    genre: 'Live performance, party',
+    tags: ['live', 'commercial'],
+    price: 1000,
+    age: 21,
+    dress: 'Dress to impress',
+    img: DIS + '01M3S8B5AWC4NX5T1P4TVC88NX.jpeg',
+    url: 'https://www.district.in/events/jasmin-walia-live-oct23-2026-buy-tickets',
+    artist: 'Jasmin Walia',
+    friends: ['Zoya', 'Kavya'],
+    nFriends: 2
   }
 };
 
@@ -305,7 +584,17 @@ export const ORDER = [
   'scandalous',
   'yellow',
   'twin',
-  'resign'
+  'resign',
+  'ladiesnight',
+  'offmenu',
+  'drexo',
+  'basstapri',
+  'chuckberry',
+  'jamming',
+  'dandiyaunited',
+  'royalraas',
+  'punedandiya',
+  'jasmin'
 ];
 
 /* real start times (IST). Past nights drop off the feed on their own; "this week" is worked out from today. */
@@ -319,37 +608,18 @@ const ISO = {
   scandalous: '2026-10-03T22:00',
   yellow: '2026-10-04T18:00',
   twin: '2026-10-09T21:30',
-  resign: '2026-10-23T21:00'
+  resign: '2026-10-23T21:00',
+  ladiesnight: '2026-10-07T19:00',
+  offmenu: '2026-10-07T18:00',
+  drexo: '2026-10-09T18:00',
+  basstapri: '2026-10-09T19:00',
+  chuckberry: '2026-10-09T20:00',
+  jamming: '2026-10-10T20:00',
+  dandiyaunited: '2026-10-16T18:00',
+  royalraas: '2026-10-16T18:00',
+  punedandiya: '2026-10-16T19:00',
+  jasmin: '2026-10-23T21:00'
 };
-
-/* SAMPLE nights: the next editions of the weekly club nights above, so there are upcoming nights to browse,
-   book and check in at the door once the real listings have passed. Same organisers, venues and posters;
-   the dates are made up and there's no ticket page for them yet (sample: true hides that link).
-   [new id, the night it repeats, start (IST), date label, day, friends going] */
-const NEXT = [
-  ['dearwed-7oct', 'dearwed', '2026-10-07T20:00', 'Wed 7 Oct', 'wed', ['Kabir']],
-  ['gossip-7oct', 'gossip', '2026-10-07T20:00', 'Wed 7 Oct', 'wed', ['Kavya', 'Zoya']],
-  ['illegal-8oct', 'illegal', '2026-10-08T20:00', 'Thu 8 Oct', 'thu', ['Zoya', 'Aman']],
-  ['twilight-8oct', 'twilight', '2026-10-08T20:00', 'Thu 8 Oct', 'thu', []],
-  ['lavish-9oct', 'lavish', '2026-10-09T20:00', 'Fri 9 Oct', 'fri', ['Aman', 'Kavya', 'Kabir']],
-  ['scandalous-10oct', 'scandalous', '2026-10-10T22:00', 'Sat 10 Oct', 'sat', ['Kabir']],
-  ['bollywood-10oct', 'bollywood', '2026-10-10T20:00', 'Sat 10 Oct', 'sat', []],
-  ['gossip-14oct', 'gossip', '2026-10-14T20:00', 'Wed 14 Oct', 'later', ['Kavya']],
-  ['illegal-15oct', 'illegal', '2026-10-15T20:00', 'Thu 15 Oct', 'later', ['Zoya', 'Aman', 'Kabir']]
-];
-NEXT.forEach((n) => {
-  EVENTS[n[0]] = Object.assign({}, EVENTS[n[1]], {
-    id: n[0],
-    date: n[3],
-    day: n[4],
-    url: null,
-    sample: true,
-    friends: n[5],
-    nFriends: n[5].length
-  });
-  ISO[n[0]] = n[2];
-  ORDER.push(n[0]);
-});
 
 Object.keys(ISO).forEach((k) => {
   EVENTS[k].iso = ISO[k] + ':00+05:30';

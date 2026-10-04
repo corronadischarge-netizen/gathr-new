@@ -12,7 +12,11 @@ export function RulesSheet(p) {
     v = c.ven;
   var blocked = blockedFor(e, S.age);
   var rows = [
-    ['user', 'Age', e.age ? e.age + '+ to enter.' + (e.age >= 21 ? ' Spirits 25+ by law.' : '') : null],
+    [
+      'user',
+      'Age',
+      e.allAges ? 'Open to all ages.' : e.age ? e.age + '+ to enter.' + (e.age >= 21 ? ' Spirits 25+ by law.' : '') : null
+    ],
     ['user', 'ID', e.idNote || 'Government ID or DigiLocker (Pune rule)'],
     ['ticket', 'Entry', priceTxt(e) + (e.price ? ' per person' : '')],
     ['sparkles', 'Dress code', e.dress || (e.org ? 'No dress code' : null)],
@@ -91,7 +95,7 @@ export function RulesSheet(p) {
       >
         Ask gathr to check with the venue
       </Button>
-      {e.org || e.sample ? null : (
+      {e.org ? null : (
         <a
           className="rule-link"
           style={{ justifyContent: 'center', fontSize: '13px', color: 'var(--ink-muted)' }}
