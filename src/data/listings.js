@@ -322,6 +322,35 @@ const ISO = {
   resign: '2026-10-23T21:00'
 };
 
+/* SAMPLE nights: the next editions of the weekly club nights above, so there are upcoming nights to browse,
+   book and check in at the door once the real listings have passed. Same organisers, venues and posters;
+   the dates are made up and there's no ticket page for them yet (sample: true hides that link).
+   [new id, the night it repeats, start (IST), date label, day, friends going] */
+const NEXT = [
+  ['dearwed-7oct', 'dearwed', '2026-10-07T20:00', 'Wed 7 Oct', 'wed', ['Kabir']],
+  ['gossip-7oct', 'gossip', '2026-10-07T20:00', 'Wed 7 Oct', 'wed', ['Kavya', 'Zoya']],
+  ['illegal-8oct', 'illegal', '2026-10-08T20:00', 'Thu 8 Oct', 'thu', ['Zoya', 'Aman']],
+  ['twilight-8oct', 'twilight', '2026-10-08T20:00', 'Thu 8 Oct', 'thu', []],
+  ['lavish-9oct', 'lavish', '2026-10-09T20:00', 'Fri 9 Oct', 'fri', ['Aman', 'Kavya', 'Kabir']],
+  ['scandalous-10oct', 'scandalous', '2026-10-10T22:00', 'Sat 10 Oct', 'sat', ['Kabir']],
+  ['bollywood-10oct', 'bollywood', '2026-10-10T20:00', 'Sat 10 Oct', 'sat', []],
+  ['gossip-14oct', 'gossip', '2026-10-14T20:00', 'Wed 14 Oct', 'later', ['Kavya']],
+  ['illegal-15oct', 'illegal', '2026-10-15T20:00', 'Thu 15 Oct', 'later', ['Zoya', 'Aman', 'Kabir']]
+];
+NEXT.forEach((n) => {
+  EVENTS[n[0]] = Object.assign({}, EVENTS[n[1]], {
+    id: n[0],
+    date: n[3],
+    day: n[4],
+    url: null,
+    sample: true,
+    friends: n[5],
+    nFriends: n[5].length
+  });
+  ISO[n[0]] = n[2];
+  ORDER.push(n[0]);
+});
+
 Object.keys(ISO).forEach((k) => {
   EVENTS[k].iso = ISO[k] + ':00+05:30';
 });
