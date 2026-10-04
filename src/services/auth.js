@@ -26,6 +26,9 @@ export const Auth = (() => {
   }
   return {
     live: live,
+    /* Digits in an email code. The form checks the code by itself once this many are in, so keep it equal to
+       Supabase → Authentication → Sign In / Providers → Email → "Email OTP Length". */
+    codeLength: 6,
     sendCode: (email) => {
       if (!live) {
         demo = {

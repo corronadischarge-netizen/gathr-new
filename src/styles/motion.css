@@ -11,6 +11,7 @@
   --motion-normal: 200ms; /* chip select, sheet close, fades */
   --motion-slow: 300ms; /* screen slide, sheet open */
   --motion-slower: 450ms; /* booking tick, celebration */
+  --motion-step: 150ms; /* a number rolling to its next value */
   --motion-back: 250ms; /* going back: the reverse of a 300ms push, a little faster */
   --ease-standard: cubic-bezier(0.2, 0, 0, 1);
   --ease-enter: cubic-bezier(0, 0, 0.2, 1);
@@ -81,10 +82,27 @@
 .host-tabbar .g-tab-ind { background: var(--green-300); }
 
 /* ---------- sheets, poster, toasts ---------- */
-.overlay { animation: g-fade var(--motion-normal) var(--ease-standard); }
+/* Sheets slide up in 300ms as the scrim fades in; closing, a frozen copy slides down in 200ms (useSheetExit),
+   so the screen underneath can be tapped straight away. The handle and header drag the sheet down. */
+.overlay { animation: g-fade var(--motion-slow) var(--ease-standard); }
 .sheet-slot.rise { animation: sheet-in var(--motion-slow) var(--ease-enter); }
-@keyframes sheet-in { from { transform: translateY(40%); opacity: 0; } to { transform: none; opacity: 1; } }
-.poster-layer { animation: g-fade var(--motion-normal) var(--ease-standard); }
+@keyframes sheet-in { from { transform: translateY(100%); } to { transform: none; } }
+.sheet-exit { position: absolute; inset: 0; z-index: 6; pointer-events: none; }
+.sheet-exit:empty { display: none; }
+.sheet-leaving .overlay, .sheet-leaving.poster-layer { animation: fade-out var(--motion-normal) var(--ease-exit) forwards; }
+.sheet-leaving .sheet-slot { animation: sheet-out var(--motion-normal) var(--ease-exit) forwards; }
+@keyframes sheet-out { to { transform: translateY(100%); } }
+.g-sheet-head, .g-grabber { touch-action: none; cursor: grab; -webkit-user-select: none; user-select: none; }
+.g-grabber { position: relative; }
+.g-grabber::after { content: ""; position: absolute; inset: -14px -48px; } /* a handle you can actually catch */
+.sheet-slot.dragging { transition: none; }
+.sheet-slot.settling { transition: transform var(--motion-normal) var(--ease-standard); }
+/* the poster grows from its place on the event page (the motion runs from PosterLayer) */
+.poster-layer { animation: g-fade var(--motion-slow) var(--ease-standard); }
+.poster-img { transform-origin: center; }
+/* a changed verdict ("Who gets in") cross-fades to its new words and colour */
+.g-badge { transition: background-color var(--motion-normal) var(--ease-standard), color var(--motion-normal) var(--ease-standard); }
+.swap-in { animation: g-fade var(--motion-normal) var(--ease-standard); }
 .toast { animation: toast-in var(--motion-normal) var(--ease-enter); }
 @keyframes toast-in { from { opacity: 0; transform: translate(-50%, 12px); } to { opacity: 1; transform: translate(-50%, 0); } }
 
@@ -128,18 +146,27 @@
 .loc-btn { transition: scale var(--motion-fast) var(--ease-standard), box-shadow var(--motion-normal) var(--ease-standard); }
 .card { transition: scale var(--motion-fast) var(--ease-standard), box-shadow var(--motion-normal) var(--ease-standard), opacity var(--motion-normal) var(--ease-standard); }
 .vpin-bub { transition: transform var(--motion-normal) var(--ease-standard); }
-.tick { display: inline-block; animation: tick var(--motion-normal) var(--ease-enter); }
-@keyframes tick { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: none; } }
+/* the pass count and total roll to their new number: up when it grows, down when it shrinks */
+.roll-up, .roll-down { display: inline-block; }
+.roll-up { animation: roll-up var(--motion-step) var(--ease-standard); }
+.roll-down { animation: roll-down var(--motion-step) var(--ease-standard); }
+@keyframes roll-up { from { opacity: 0; transform: translateY(60%); } to { opacity: 1; transform: none; } }
+@keyframes roll-down { from { opacity: 0; transform: translateY(-60%); } to { opacity: 1; transform: none; } }
+/* a wrong code: three small shakes */
+.shake { animation: shake var(--motion-slower) var(--ease-standard); }
+@keyframes shake { 0%, 100% { translate: 0 0; } 16%, 50%, 84% { translate: -6px 0; } 33%, 67% { translate: 6px 0; } }
 .vote-bar i { transition: width var(--motion-slow) var(--ease-standard); }
 .ob-steps i.now::after { animation: fill var(--motion-slow) var(--motion-fast) var(--ease-standard) forwards; }
 @keyframes fill { to { transform: none; } }
 
-/* ---------- booking confirmed: the tick draws, the pass rises ---------- */
-.ok-tick { animation: tag-pop var(--motion-slow) var(--ease-settle) both; }
-.ok-tick path { stroke-dasharray: 24; stroke-dashoffset: 24; animation: draw var(--motion-slower) var(--motion-normal) var(--ease-standard) forwards; }
-@keyframes draw { to { stroke-dashoffset: 0; } }
-.pass-card { animation: rise var(--motion-slower) var(--motion-normal) var(--ease-enter) both; }
-.qr { animation: g-fade var(--motion-normal) var(--motion-slower) var(--ease-standard) both; }
+/* ---------- booked: the tick draws itself, then the pass rises and the wristband drops onto it ----------
+   Only right after booking (.celebrate); opening a pass later just shows it. */
+.celebrate .ok-tick { animation: tag-pop var(--motion-slow) var(--ease-settle) both; }
+.celebrate .ok-tick path { stroke-dasharray: 24; animation: draw var(--motion-slower) var(--motion-fast) var(--ease-standard) both; }
+@keyframes draw { from { stroke-dashoffset: 24; } to { stroke-dashoffset: 0; } }
+.celebrate .pass-card { animation: rise var(--motion-slower) var(--motion-slow) var(--ease-enter) both; }
+.celebrate .pass-ic { animation: drop-on var(--motion-slow) calc(var(--motion-slow) + var(--motion-slower)) var(--ease-settle) both; }
+@keyframes drop-on { from { opacity: 0; translate: 0 -48px; } to { opacity: 1; translate: 0 0; } }
 
 /* ---------- reduced motion: no slide, scale, bounce or bob. Only fades and instant changes. ---------- */
 @media (prefers-reduced-motion: reduce) {
@@ -147,10 +174,13 @@
   .screen.under { transform: none; }
   .g-tab-ind { transition: none; }
   .screen.nav-fwd, .screen.nav-back, .sheet-slot.rise, .toast, .w-in, .w-card, .w-tag, .w-3d, .w-fade, .fade-up,
-  .mood, .vibe-tile, .ok-tick, .pass-card, .tick { animation-name: g-fade !important; }
+  .mood, .vibe-tile, .celebrate .ok-tick, .celebrate .pass-card, .celebrate .pass-ic, .roll-up, .roll-down { animation-name: g-fade !important; }
+  .sheet-leaving .sheet-slot { animation-name: fade-out !important; }
+  .shake { animation: none !important; }
+  .sheet-slot.settling { transition: none; }
   .w-3d { transform: rotate(var(--r, 0deg)); }
   .bob, .feature-ic.float-ic, .g-chip.is-selected span, .g-ibtn.is-active svg { animation: none !important; }
-  .ok-tick path, .ob-steps i.now::after { animation: none !important; stroke-dashoffset: 0; transform: none; }
+  .celebrate .ok-tick path, .ob-steps i.now::after { animation: none !important; stroke-dashoffset: 0; transform: none; }
   :is(button, [role='button'], .tap):active, .vpin-wrap:active .vpin { scale: none !important; }
   .mood-ic, .vibe-tile .i3, .vpin-bub, .switch span, .vote-bar i, .g-progress span { transition: none !important; }
 }

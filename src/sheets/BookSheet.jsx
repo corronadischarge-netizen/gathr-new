@@ -1,10 +1,22 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { AuthForm } from '../components/AuthForm';
 import { Switch } from '../components/Switch';
 import { rupees } from '../data/format';
 import { Button, Sheet } from '../design-system';
+import { haptic } from '../lib/haptics';
+import { useMachine } from '../lib/machine';
 import { Pay } from '../services/payments';
 import { meta, svgIcon } from '../ui/helpers';
+
+/* Booking runs as one line of steps: idle → sending code → code entry (both in AuthForm, first time only)
+   → paying → success or error. Paying can only start from ready or after an error, so a second tap
+   can never charge twice; an error keeps everything you chose and offers "Try again". */
+const PAY_FLOW = {
+  ready: { PAY: 'paying' },
+  paying: { PAID: 'success', FAIL: 'error' },
+  error: { PAY: 'paying' },
+  success: {}
+};
 
 /* One-sheet booking: guests, rules, price, pay (and phone, first time only) */
 export function BookSheet(p) {
@@ -21,6 +33,15 @@ export function BookSheet(p) {
     each = e.door ? 0 : e.price || 0,
     gross = each * n;
   const [useCredit, setUseCredit] = useState(false);
+  var pay = useMachine(PAY_FLOW, 'ready', { err: null });
+  // the pass count rolls up or down to its new number, and the total rolls with it
+  var lastN = useRef(n),
+    rollDir = useRef('');
+  if (n !== lastN.current) {
+    rollDir.current = n > lastN.current ? 'roll-up' : 'roll-down';
+    lastN.current = n;
+  }
+  var roll = rollDir.current;
   var credit = each && S.credit > 0 && useCredit ? Math.min(S.credit, gross) : 0,
     total = gross - credit;
   var payLabel = e.rsvp
@@ -34,6 +55,7 @@ export function BookSheet(p) {
     var earned = n >= 3 && each ? 50 : 0;
     c.set((o) => ({
       busy: null,
+      celebrate: Date.now(), // the pass screen plays the booking tick only right after booking
       onList: true,
       planned: e.id,
       guests: n,
@@ -44,6 +66,7 @@ export function BookSheet(p) {
       gp: gpb ? Object.assign({}, o.gp, { stage: 'booked', booked: e.id, fresh: false }) : o.gp,
       gpBook: null
     }));
+    haptic.success();
     c.go('pass');
     if (earned)
       setTimeout(() => {
@@ -51,8 +74,9 @@ export function BookSheet(p) {
       }, 900);
   }
   function book() {
-    if (S.busy) return;
+    if (!pay.send('PAY', { err: null })) return;
     if (!total) {
+      pay.send('PAID');
       done(null);
       return;
     }
@@ -64,11 +88,13 @@ export function BookSheet(p) {
       phone: S.phone
     }).then(
       (r) => {
+        pay.send('PAID');
         done(r.id);
       },
       (err) => {
+        pay.send('FAIL', { err: err.message || 'The payment didn’t go through. You haven’t been charged.' });
         c.set({ busy: null });
-        c.toast(err.message);
+        haptic.error();
       }
     );
   }
@@ -100,7 +126,7 @@ export function BookSheet(p) {
             </button>
             <span
               key={n}
-              className="step-n tick"
+              className={'step-n ' + roll}
               aria-live="polite"
               aria-label={n + (n === 1 ? ' pass' : ' passes')}
             >
@@ -137,7 +163,7 @@ export function BookSheet(p) {
                 : 'Total'
               : 'Pay at the door'}
         </span>
-        <span className="price-big">
+        <span key={total} className={'price-big ' + roll}>
           {e.rsvp
             ? '₹0'
             : each
@@ -147,9 +173,21 @@ export function BookSheet(p) {
                 : 'Not listed'}
         </span>
       </div>
+      {pay.state === 'error' ? (
+        <p className="meta err-txt pay-err" role="alert" style={{ margin: 0 }}>
+          {pay.data.err + ' Your passes are still saved here, so you can try again.'}
+        </p>
+      ) : null}
       {S.signedIn ? (
-        <Button variant="primary" size="lg" block icon="ticket" disabled={!!S.busy} onClick={book}>
-          {S.busy ? 'Opening payment…' : payLabel}
+        <Button
+          variant="primary"
+          size="lg"
+          block
+          icon="ticket"
+          disabled={pay.state === 'paying' || pay.state === 'success' || !!S.busy}
+          onClick={book}
+        >
+          {pay.state === 'paying' ? 'Paying…' : pay.state === 'error' ? 'Try again · ' + payLabel : payLabel}
         </Button>
       ) : (
         <div className="col" style={{ gap: '8px' }}>

@@ -7,6 +7,7 @@ import { EVENTS, VENUES, isPast } from './data/listings';
 import { orgLoad } from './data/organisers';
 import { TabBar } from './design-system';
 import { useEdgeSwipe } from './hooks/useEdgeSwipe';
+import { useSheetExit } from './hooks/useSheetExit';
 import { useScreenTransition } from './hooks/useScreenTransition';
 import { store } from './lib/utils';
 import { TABS } from './navigation';
@@ -334,6 +335,9 @@ export function App() {
     underRef = useRef(null),
     phoneRef = useRef(null);
   useScreenTransition(scrKey, S.dir, screenRef, ghostRef);
+  var sheetRef = useRef(null),
+    sheetExitRef = useRef(null);
+  useSheetExit(S.sheet, sheetRef, sheetExitRef);
   /* swipe back from the left edge (iPhone and web; Android uses its own back gesture, handled below) */
   const [under, setUnder] = useState(false);
   var Under = under && S.stack.length > 1 ? screens[S.stack[S.stack.length - 2]] || Tonight : null;
@@ -417,7 +421,8 @@ export function App() {
             </div>
           ) : null}
           {S.scanning ? <Scanner ctx={ctx} /> : null}
-          {S.sheet ? <SheetLayer ctx={ctx} /> : null}
+          {S.sheet ? <SheetLayer ctx={ctx} hostRef={sheetRef} /> : null}
+          <div ref={sheetExitRef} className="sheet-exit" aria-hidden="true" />
           <div className="toast-live" role="status" aria-live="polite">
             {S.toast ? (
               <div key={S.toast} className="toast">

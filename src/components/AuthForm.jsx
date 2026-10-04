@@ -1,54 +1,64 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Button } from '../design-system';
+import { haptic } from '../lib/haptics';
+import { useMachine } from '../lib/machine';
+import { replay } from '../lib/motion';
 import { okEmail, store } from '../lib/utils';
 import { Auth } from '../services/auth';
+
+/* Sign-in steps. Typing (EDIT) is only accepted while a field is open, and nothing can be sent twice. */
+const FLOW = {
+  email: { EDIT: 'email', SEND: 'sending' },
+  sending: { SENT: 'code', FAIL: 'email' },
+  code: { EDIT: 'code', VERIFY: 'verifying', RESEND: 'resending', CHANGE_EMAIL: 'email' },
+  resending: { SENT: 'code', FAIL: 'code' },
+  verifying: { OK: 'done', WRONG: 'code' },
+  done: {}
+};
 
 /* Sign-in form: email code (Supabase, free) or Google. Used on the sign-in screen and inside the booking sheet. */
 export function AuthForm(p) {
   var c = p.ctx,
     S = c.S;
-  const [F, setF] = useState({
-    email: S.email || '',
-    code: '',
-    step: 'email',
-    err: null,
-    busy: false,
-    demo: null,
-    wait: 0
-  });
-  function upd(x) {
-    setF((o) => Object.assign({}, o, x));
-  }
+  var m = useMachine(FLOW, 'email', { email: S.email || '', code: '', err: null, demo: null }),
+    F = m.data,
+    step = m.state === 'email' || m.state === 'sending' ? 'email' : 'code',
+    busy = m.state === 'sending' || m.state === 'resending' || m.state === 'verifying';
+  var codeRow = useRef(null),
+    codeIn = useRef(null);
+  const [wait, setWait] = useState(0); // seconds until "Resend code" works again (a timer, not a step)
   useEffect(() => {
-    if (!F.wait) return;
+    if (!wait) return;
     var t = setTimeout(() => {
-      upd({ wait: F.wait - 1 });
+      setWait(wait - 1);
     }, 1000);
     return () => {
       clearTimeout(t);
     };
-  }, [F.wait]);
+  }, [wait]);
   var okE = okEmail(F.email),
     okC = /^\d{6,8}$/.test(F.code.trim());
   function send() {
-    if (!okE || F.busy) return;
-    upd({ busy: true, err: null });
+    var resend = m.state === 'code';
+    if (!okE || !m.send(resend ? 'RESEND' : 'SEND', { err: null })) return;
     Auth.sendCode(F.email.trim().toLowerCase()).then(
       (r) => {
-        upd({ busy: false, step: 'code', code: '', demo: r.demoCode || null, wait: 30 });
+        m.send('SENT', { code: '', demo: r.demoCode || null });
+        setWait(30);
         c.toast(r.demoCode ? 'Demo mode: your code is on screen' : 'Code sent to ' + F.email.trim());
       },
       (e) => {
-        upd({ busy: false, err: e.message });
+        m.send('FAIL', { err: e.message });
+        haptic.error();
       }
     );
   }
-  function verify() {
-    if (!okC || F.busy) return;
-    upd({ busy: true, err: null });
-    Auth.verify(F.email.trim().toLowerCase(), F.code.trim()).then(
+  function verify(code) {
+    code = (code || F.code).trim();
+    if (!/^\d{6,8}$/.test(code) || !m.send('VERIFY', { err: null })) return;
+    Auth.verify(F.email.trim().toLowerCase(), code).then(
       (u) => {
-        upd({ busy: false });
+        m.send('OK');
         c.set((o) => ({
           signedIn: true,
           email: u.email,
@@ -60,22 +70,31 @@ export function AuthForm(p) {
         p.onDone && p.onDone(u);
       },
       (e) => {
-        upd({ busy: false, err: e.message, code: '' });
+        // wrong code: shake, clear the box, keep the cursor in it, buzz
+        m.send('WRONG', { err: e.message, code: '' });
+        replay(codeRow.current, 'shake');
+        haptic.error();
+        if (codeIn.current) codeIn.current.focus({ preventScroll: true });
       }
     );
   }
+  function typeCode(v) {
+    var code = v.replace(/\D/g, '').slice(0, 8);
+    if (!m.send('EDIT', { code: code, err: null })) return;
+    if (code.length === Auth.codeLength) verify(code); // the last digit is in (typed or pasted): check it straight away
+  }
   function google() {
-    upd({ err: null });
+    m.send('EDIT', { err: null });
     if (p.resume) store('gathr.resume', p.resume);
     Auth.google().catch((e) => {
       store('gathr.resume', null);
-      upd({ err: e.message });
+      m.send('EDIT', { err: e.message });
     });
   }
   var btnSize = p.compact ? 'md' : 'lg';
   return (
     <div className="col" style={{ gap: '14px' }}>
-      {F.step === 'email' ? (
+      {step === 'email' ? (
         <div className="col" style={{ gap: '14px' }}>
           <button
             type="button"
@@ -123,7 +142,7 @@ export function AuthForm(p) {
                 value={F.email}
                 aria-invalid={!!F.err}
                 aria-describedby={p.id + '-msg'}
-                onChange={(e) => upd({ email: e.target.value, err: null })}
+                onChange={(e) => m.send('EDIT', { email: e.target.value, err: null })}
                 onKeyDown={(e) => {
                   if (e.key === 'Enter') send();
                 }}
@@ -135,8 +154,8 @@ export function AuthForm(p) {
               </span>
             ) : null}
           </div>
-          <Button variant="primary" size={btnSize} block disabled={!okE || F.busy} onClick={send}>
-            {F.busy ? 'Sending…' : 'Send me a code'}
+          <Button variant="primary" size={btnSize} block disabled={!okE || busy} onClick={send}>
+            {busy ? 'Sending…' : 'Send me a code'}
           </Button>
         </div>
       ) : (
@@ -151,40 +170,44 @@ export function AuthForm(p) {
           <label className="meta" htmlFor={p.id + '-code'}>
             {'Code sent to ' + F.email.trim()}
           </label>
-          <div className={'field-row' + (F.err ? ' has-err' : '')}>
-            <input
-              id={p.id + '-code'}
-              inputMode="numeric"
-              autoComplete="one-time-code"
-              placeholder="6-digit code"
-              value={F.code}
-              maxLength={8}
-              autoFocus
-              aria-invalid={!!F.err}
-              aria-describedby={p.id + '-msg'}
-              onChange={(e) => upd({ code: e.target.value.replace(/\D/g, ''), err: null })}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter') verify();
-              }}
-            />
+          <div ref={codeRow}>{/* shakes on a wrong code; React never rewrites its class */}
+            <div className={'field-row' + (F.err ? ' has-err' : '')}>
+              <input
+                ref={codeIn}
+                id={p.id + '-code'}
+                inputMode="numeric"
+                autoComplete="one-time-code"
+                placeholder="6-digit code"
+                value={F.code}
+                maxLength={12}
+                autoFocus
+                readOnly={m.state === 'verifying'}
+                aria-invalid={!!F.err}
+                aria-describedby={p.id + '-msg'}
+                onChange={(e) => typeCode(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') verify();
+                }}
+              />
+            </div>
           </div>
           <div className="rowc between">
             <button
               type="button"
               className="link-btn"
               style={{ color: 'var(--ink-muted)' }}
-              onClick={() => upd({ step: 'email', code: '', err: null, demo: null })}
+              onClick={() => m.send('CHANGE_EMAIL', { code: '', err: null, demo: null })}
             >
               Change email
             </button>
             <button
               type="button"
               className="link-btn"
-              style={{ color: F.wait ? 'var(--ink-faint)' : 'var(--ink)' }}
-              disabled={!!F.wait || F.busy}
+              style={{ color: wait ? 'var(--ink-faint)' : 'var(--ink)' }}
+              disabled={!!wait || busy}
               onClick={send}
             >
-              {F.wait ? 'Resend in ' + F.wait + 's' : 'Resend code'}
+              {wait ? 'Resend in ' + wait + 's' : 'Resend code'}
             </button>
           </div>
           <Button
@@ -192,10 +215,10 @@ export function AuthForm(p) {
             size={btnSize}
             block
             icon={p.payIcon ? 'ticket' : null}
-            disabled={!okC || F.busy}
-            onClick={verify}
+            disabled={!okC || busy}
+            onClick={() => verify()}
           >
-            {F.busy ? 'Checking…' : p.verifyLabel || 'Verify'}
+            {m.state === 'verifying' ? 'Checking…' : p.verifyLabel || 'Verify'}
           </Button>
         </div>
       )}
@@ -204,7 +227,7 @@ export function AuthForm(p) {
           {F.err}
         </p>
       ) : null}
-      {!Auth.live && F.step === 'email' ? (
+      {!Auth.live && step === 'email' ? (
         <p className="note" style={{ textAlign: 'center' }}>
           Demo mode: codes show on screen until email sign-in is connected.
         </p>

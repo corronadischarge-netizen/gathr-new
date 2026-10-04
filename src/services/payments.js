@@ -12,7 +12,9 @@ export const Pay = {
           ok({ id: 'demo_' + Date.now().toString(36) });
         }, 1100);
       });
-    return loadScript('https://checkout.razorpay.com/v1/checkout.js').then(
+    return loadScript('https://checkout.razorpay.com/v1/checkout.js').catch(() => {
+      throw new Error('Couldn’t open the payment window. Check your internet connection. You haven’t been charged.');
+    }).then(
       () =>
         new Promise((ok, no) => {
           var rz = new window.Razorpay({

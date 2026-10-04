@@ -7,8 +7,10 @@ export function Pass(p) {
   var c = p.ctx,
     e = c.plan || c.ev,
     v = VENUES[e.venue];
+  // right after booking: the tick draws, then the pass rises and the wristband drops onto it
+  var fresh = c.S.celebrate && Date.now() - c.S.celebrate < 4000;
   return (
-    <div className="full col pad-top" style={{ paddingTop: '52px' }}>
+    <div className={'full col pad-top' + (fresh ? ' celebrate' : '')} style={{ paddingTop: '52px' }}>
       <div className="rowc" style={{ justifyContent: 'flex-end' }}>
         <IconButton icon="x" label="Close" variant="solid" onClick={() => c.tab('plans')} />
       </div>

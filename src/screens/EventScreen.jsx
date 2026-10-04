@@ -1,3 +1,4 @@
+import { useRef } from 'react';
 import { APP_URL } from '../config';
 import { MO, WD } from '../data/dates';
 import { kindOf } from '../data/eventKind';
@@ -35,6 +36,10 @@ export function EventScreen(p) {
     : unknown
       ? ['Check ' + unknown + (unknown === 1 ? ' thing' : ' things'), 'now']
       : ['Confirmed', 'go'];
+  // when the verdict changes (your age was just set), its words fade in while the badge colour shifts
+  var lastVerdict = useRef({ v: verdict[0], at: 0 });
+  if (lastVerdict.current.v !== verdict[0]) lastVerdict.current = { v: verdict[0], at: Date.now() };
+  var verdictChanged = Date.now() - lastVerdict.current.at < 400;
   var doorLine = blocked
     ? 'This night is ' + e.age + '+. You’re ' + S.age + '.'
     : e.org
@@ -169,7 +174,11 @@ export function EventScreen(p) {
             <span className="col" style={{ gap: '4px', flexGrow: 1, minWidth: 0, textAlign: 'left' }}>
               <span className="rowc" style={{ gap: '8px' }}>
                 <span className="title15">Who gets in</span>
-                <Badge tone={verdict[1]}>{verdict[0]}</Badge>
+                <Badge tone={verdict[1]}>
+                  <span key={verdict[0]} className={verdictChanged ? 'swap-in' : undefined}>
+                    {verdict[0]}
+                  </span>
+                </Badge>
               </span>
               <span className="meta">{doorLine}</span>
             </span>

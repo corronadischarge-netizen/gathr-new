@@ -1,4 +1,3 @@
-import { useRef } from 'react';
 import { useDialog } from '../hooks/useDialog';
 import { AgeSheet } from './AgeSheet';
 import { BookSheet } from './BookSheet';
@@ -24,7 +23,7 @@ export function SheetLayer(p) {
   var close = () => {
     if (!S.busy) c.set({ sheet: null });
   };
-  var ref = useRef(null);
+  var ref = p.hostRef; // App keeps this, so it can copy the sheet as it closes
   useDialog(ref, S.sheet, close);
   if (S.sheet === 'poster') return <PosterLayer ctx={c} close={close} layerRef={ref} />;
   var Body = SHEETS[S.sheet];
