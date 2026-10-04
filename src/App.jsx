@@ -278,11 +278,11 @@ export function App() {
     set({ sheet: e.age >= 21 && !S.age ? 'age' : 'list', after: 'list' });
   };
   ctx.toHost = () => {
-    set({ mode: 'host', stack: ['hostdoor'], sheet: null, dir: 'tab', seen: true });
+    set({ mode: 'host', stack: ['hostdoor'], sheet: null, dir: 'mode', seen: true });
     toast('Hosting mode · ' + ((S.org.profile || {}).name || ''));
   };
   ctx.toGuest = () => {
-    set({ mode: 'guest', stack: ['you'], sheet: null, dir: 'tab', scanning: false });
+    set({ mode: 'guest', stack: ['you'], sheet: null, dir: 'mode', scanning: false });
     toast('Back to going out');
   };
   ctx.toggleSave = (id) => {
@@ -424,7 +424,10 @@ export function App() {
           {canEdgeSwipe ? <div className="edge-swipe" aria-hidden="true" {...swipe} /> : null}
           {showTabs ? <div className="tab-fade" /> : null}
           {showTabs ? (
-            <div className="tabwrap">
+            <div
+              key={hostTabs ? 'host' : 'guest'}
+              className={'tabwrap' + (S.dir === 'mode' ? ' mode-in' : '')}
+            >
               {hostTabs ? <HostTabBar active={scr} onChange={tab} /> : <TabBar active={scr} onChange={tab} />}
             </div>
           ) : null}

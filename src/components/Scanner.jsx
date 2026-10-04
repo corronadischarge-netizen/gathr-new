@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState } from 'react';
-import { haptic } from '../lib/haptics';
 import jsQR from 'jsqr';
 import { ScanResult } from './ScanResult';
 import { hostCur } from '../data/hostNights';
@@ -68,7 +67,6 @@ export function Scanner(p) {
             var found = (txt) => {
               busy.current = false;
               if (txt && !resRef.current) {
-                haptic.select();
                 setRes(checkPass(sRef.current, id, txt));
               }
             };
@@ -119,6 +117,8 @@ export function Scanner(p) {
   return (
     <div className="scanner" ref={ref} role="dialog" aria-modal="true" aria-label="Scan a pass">
       <video ref={vid} className="scan-video" playsInline muted aria-hidden />
+      {/* the result fills the screen in its colour, so it reads from across the door */}
+      <div className={'scan-wash' + (res ? ' tone-' + res.tone : '')} aria-hidden />
       <div className="scan-frame" aria-hidden>
         <i />
         <i />

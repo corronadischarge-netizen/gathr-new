@@ -1,13 +1,20 @@
 import { ORG_KEY, orgLoad, setCheckin } from '../data/organisers';
+import { useEffect } from 'react';
 import { haptic } from '../lib/haptics';
 import { Button } from '../design-system';
 import { store } from '../lib/utils';
 import { svgIcon } from '../ui/helpers';
 
+/* Door staff feel the result before they read it: green = two short buzzes, amber = one long, red = a hard double */
+const BUZZ = { green: haptic.success, amber: haptic.warning, red: haptic.error };
+
 export function ScanResult(p) {
   var c = p.ctx,
     r = p.res,
     id = p.id;
+  useEffect(() => {
+    (BUZZ[r.tone] || haptic.select)();
+  }, [r]);
   function admit() {
     if (r.walkin) {
       var cur = orgLoad();

@@ -9,7 +9,7 @@ export function useScreenTransition(key, dir, screenRef, layerRef) {
   // Copy the outgoing screen while rendering, before React swaps it out.
   if (last.current.key !== key) {
     var el = screenRef.current;
-    var animated = dir === 'fwd' || dir === 'back' || dir === 'tab';
+    var animated = dir === 'fwd' || dir === 'back' || dir === 'tab' || dir === 'mode';
     last.current = { key: key, node: el && animated ? el.cloneNode(true) : null, top: el ? el.scrollTop : 0, dir: dir };
   }
   useLayoutEffect(() => {

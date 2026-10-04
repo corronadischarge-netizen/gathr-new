@@ -58,7 +58,7 @@ export function OrgSetup(p) {
       c.back();
       c.toast('Profile saved');
     } else {
-      c.set({ mode: 'host', stack: ['orghome'], dir: 'fwd' });
+      c.set({ mode: 'host', stack: ['orghome'], dir: 'mode' });
       c.toast('You’re set up. This is hosting mode');
     }
   }

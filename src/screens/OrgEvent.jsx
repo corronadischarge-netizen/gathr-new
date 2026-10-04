@@ -112,7 +112,7 @@ export function OrgEvent(p) {
               size="sm"
               block
               icon="arrow-up-right"
-              onClick={() => c.set({ mode: 'guest', stack: ['tonight', 'event'], cur: id, dir: 'fwd' })}
+              onClick={() => c.set({ mode: 'guest', stack: ['tonight', 'event'], cur: id, dir: 'mode' })}
             >
               See it as a guest
             </Button>

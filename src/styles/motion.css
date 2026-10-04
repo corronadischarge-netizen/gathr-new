@@ -193,6 +193,22 @@
 .celebrate .pass-ic { animation: drop-on var(--motion-slow) calc(var(--motion-slow) + var(--motion-slower)) var(--ease-settle) both; }
 @keyframes drop-on { from { opacity: 0; translate: 0 -48px; } to { opacity: 1; translate: 0 0; } }
 
+/* ---------- host mode and the door ----------
+   Switching between going out and hosting is a slow, full-screen cross-fade (the old screen fades out on top,
+   the new tab bar fades in), so the change of mode can't be missed. */
+.screen.nav-mode { animation: g-fade var(--motion-slow) var(--ease-standard); }
+.ghost-mode { animation: fade-out var(--motion-slow) var(--ease-standard) forwards; }
+.ghost-layer-mode { z-index: 1; }
+.tabwrap.mode-in { animation: g-fade var(--motion-slow) var(--ease-standard); }
+/* a scan result washes the whole camera view in its colour; the result card and top bar stay dark and readable */
+.scan-wash { position: absolute; inset: 0; opacity: 0; pointer-events: none; transition: opacity var(--motion-normal) var(--ease-standard), background-color var(--motion-normal) var(--ease-standard); }
+.scan-wash.tone-green { background-color: var(--green-300); opacity: 0.85; }
+.scan-wash.tone-amber { background-color: var(--yellow-300); opacity: 0.85; }
+.scan-wash.tone-red { background-color: var(--red-300); opacity: 0.85; }
+/* "Just in": the guest you just let in slides in at the top */
+.row-in { animation: row-in var(--motion-slow) var(--ease-enter); }
+@keyframes row-in { from { opacity: 0; transform: translateY(-12px); } to { opacity: 1; transform: none; } }
+
 /* ---------- reduced motion: no slide, scale, bounce or bob. Only fades and instant changes. ---------- */
 @media (prefers-reduced-motion: reduce) {
   .ghost-fwd, .ghost-back { animation-name: fade-out !important; }
@@ -207,7 +223,7 @@
   .bob, .feature-ic.float-ic, .g-chip.is-selected span, .g-ibtn.is-active svg { animation: none !important; }
   .celebrate .ok-tick path, .ob-steps i.now::after { animation: none !important; stroke-dashoffset: 0; transform: none; }
   :is(button, [role='button'], .tap):active, .vpin-wrap:active .vpin { scale: none !important; }
-  .w-next, .w-prev { animation-name: g-fade !important; }
+  .w-next, .w-prev, .row-in { animation-name: g-fade !important; }
   .welcome .g-pager-seg { transition: background-color var(--motion-normal) var(--ease-standard); }
   .mood-ic, .vibe-tile .i3, .vpin-bub, .vpin-bub::after, .switch span, .vote-bar i, .g-progress span { transition: none !important; }
 }

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { HostBar } from '../components/HostBar';
 import { SCAN_IC } from '../components/HostTabBar';
 import { NightPicker } from '../components/NightPicker';
@@ -124,28 +124,42 @@ export function HostDoor(p) {
           ) : null}
         </div>
       ) : null}
-      {recent.length ? (
-        <div className="col" style={{ gap: '4px' }}>
-          <span className="g-section-title">Just in</span>
-          {recent.map((g) => (
-            <div key={g.name} className="rowc list-row" style={{ gap: '12px' }}>
-              {fav(g.name.split(' ')[0], 36)}
-              <div className="col" style={{ gap: '2px', flexGrow: 1 }}>
-                <span className="title15">{g.name}</span>
-                {meta(
-                  g.passes +
-                    (g.passes === 1 ? ' pass' : ' passes') +
-                    ' · ' +
-                    new Date(st.ci[g.name]).toLocaleTimeString('en-IN', {
-                      hour: 'numeric',
-                      minute: '2-digit'
-                    })
-                )}
-              </div>
+      {st ? <JustIn recent={recent} ci={st.ci} scanning={S.scanning} /> : null}
+    </div>
+  );
+}
+
+/* Guests let in most recently. A new arrival slides in at the top, but only once the scanner is closed
+   (adding the class then starts the animation), so door staff see it happen. */
+function JustIn(p) {
+  var seen = useRef(null);
+  if (!seen.current) seen.current = new Map(p.recent.map((g) => [g.name, 0])); // already here: no animation
+  if (!p.recent.length) return null;
+  var now = Date.now();
+  return (
+    <div className="col" style={{ gap: '4px' }}>
+      <span className="g-section-title">Just in</span>
+      {p.recent.map((g) => {
+        if (!p.scanning && !seen.current.has(g.name)) seen.current.set(g.name, now);
+        var fresh = now - (seen.current.get(g.name) || 0) < 400;
+        return (
+          <div key={g.name} className={'rowc list-row' + (fresh ? ' row-in' : '')} style={{ gap: '12px' }}>
+            {fav(g.name.split(' ')[0], 36)}
+            <div className="col" style={{ gap: '2px', flexGrow: 1 }}>
+              <span className="title15">{g.name}</span>
+              {meta(
+                g.passes +
+                  (g.passes === 1 ? ' pass' : ' passes') +
+                  ' · ' +
+                  new Date(p.ci[g.name]).toLocaleTimeString('en-IN', {
+                    hour: 'numeric',
+                    minute: '2-digit'
+                  })
+              )}
             </div>
-          ))}
-        </div>
-      ) : null}
+          </div>
+        );
+      })}
     </div>
   );
 }

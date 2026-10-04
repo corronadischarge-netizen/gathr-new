@@ -9,6 +9,7 @@ function buzz(pattern) {
 export const haptic = {
   select: () => buzz(10), // a choice was made: chip, tile, switch, option
   success: () => buzz([15, 40, 15]), // it worked: booked, checked in
+  warning: () => buzz(80), // look again: a door result that needs a check
   error: () => buzz([40, 30, 40]) // it didn't: wrong code, refused at the door
 };
 
