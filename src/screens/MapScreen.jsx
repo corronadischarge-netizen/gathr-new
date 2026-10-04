@@ -4,6 +4,8 @@ import { IMAGES_3D } from '../assets/images';
 import { priceTxt } from '../data/format';
 import { EVENTS, VENUES, upcoming } from '../data/listings';
 import { Button, CrowdMeter, SearchField, Sheet } from '../design-system';
+import { useSheetExit } from '../hooks/useSheetExit';
+import { ms } from '../lib/motion';
 import { Share } from '../services/share';
 import { i3, icon, meta, note, sampleTag, svgIcon, thumb } from '../ui/helpers';
 import { Tap } from '../ui/Tap';
@@ -49,6 +51,10 @@ export function MapScreen(p) {
     setRef = useRef(c.set);
   setRef.current = c.set;
   const [failed, setFailed] = useState(false);
+  // the venue card slides away when closed, like the other sheets
+  var slot = useRef(null),
+    slotExit = useRef(null);
+  useSheetExit(S.mapSel, slot, slotExit);
   /* open-source map: MapLibre GL + OpenFreeMap vector tiles (OpenStreetMap data). No API key. */
   useEffect(() => {
     var ML = maplibregl;
@@ -202,7 +208,7 @@ export function MapScreen(p) {
               g.ks.length
             ),
             () => {
-              m.fitBounds(b, { padding: 120, maxZoom: 16, duration: 600 });
+              m.fitBounds(b, { padding: 120, maxZoom: 16, duration: ms('--motion-slower') });
             },
             (same ? areas[0] + ', ' : '') + g.ks.length + ' venues. Zoom in'
           ),
@@ -235,9 +241,11 @@ export function MapScreen(p) {
   useEffect(() => {
     var r = mr.current;
     if (!r) return;
+    // switch the pin's state in place (not redraw it), so it grows and turns violet while the last one shrinks back
     Object.keys(r.mk).forEach((k) => {
-      var el2 = r.mk[k].getElement();
-      el2.innerHTML = pinHtml(VENUES[k], S.mapSel === k);
+      var el2 = r.mk[k].getElement(),
+        pin = el2.querySelector('.vpin');
+      if (pin) pin.classList.toggle('is-sel', S.mapSel === k);
       el2.style.zIndex = S.mapSel === k ? 10 : 1;
     });
     if (S.mapSel) {
@@ -246,7 +254,7 @@ export function MapScreen(p) {
         center: [x.lng, x.lat],
         zoom: Math.max(r.m.getZoom(), 15),
         offset: [0, -170],
-        duration: 600
+        duration: ms('--motion-slower')
       });
     }
   }, [S.mapSel]);
@@ -259,7 +267,10 @@ export function MapScreen(p) {
       Object.keys(VENUES).forEach((k) => {
         b.extend([VENUES[k].lng, VENUES[k].lat]);
       });
-      r.m.fitBounds(b, { padding: { top: 130, bottom: 150, left: 40, right: 70 }, duration: 700 });
+      r.m.fitBounds(b, {
+        padding: { top: 130, bottom: 150, left: 40, right: 70 },
+        duration: ms('--motion-slower')
+      });
     }
   }
   function locate() {
@@ -270,7 +281,11 @@ export function MapScreen(p) {
     }
     navigator.geolocation.getCurrentPosition(
       (pos) => {
-        r.m.flyTo({ center: [pos.coords.longitude, pos.coords.latitude], zoom: 14 });
+        r.m.flyTo({
+          center: [pos.coords.longitude, pos.coords.latitude],
+          zoom: 14,
+          duration: ms('--motion-slower')
+        });
         c.toast('Showing where you are');
       },
       () => {
@@ -321,7 +336,7 @@ export function MapScreen(p) {
         </div>
       ) : null}
       {v ? (
-        <div className="sheet-slot" style={{ zIndex: 20 }}>
+        <div ref={slot} className="sheet-slot rise" style={{ zIndex: 20 }}>
           <Sheet
             title={v.name}
             subtitle={v.area + ' · ' + evs.length + (evs.length === 1 ? ' night' : ' nights') + ' listed'}
@@ -332,6 +347,7 @@ export function MapScreen(p) {
               {sampleTag()}
             </div>
             {note('Crowd is sample data.')}
+            {!evs.length ? meta('No nights listed here right now. See what’s on elsewhere this week.') : null}
             {evs.map((x) => (
               <Tap
                 onClick={() => c.openEvent(x.id)}
@@ -353,14 +369,21 @@ export function MapScreen(p) {
                 Directions
               </Button>
               <div style={{ flexGrow: 1 }}>
-                <Button variant="primary" icon="ticket" block onClick={() => c.openEvent(e.id, 'list')}>
-                  {e.rsvp ? 'RSVP' : e.src === 'district' ? 'Get tickets' : 'Get on the list'}
-                </Button>
+                {e ? (
+                  <Button variant="primary" icon="ticket" block onClick={() => c.openEvent(e.id, 'list')}>
+                    {e.rsvp ? 'RSVP' : e.src === 'district' ? 'Get tickets' : 'Get on the list'}
+                  </Button>
+                ) : (
+                  <Button variant="primary" icon="arrow-right" block onClick={() => c.tab('tonight')}>
+                    See what’s on this week
+                  </Button>
+                )}
               </div>
             </div>
           </Sheet>
         </div>
       ) : null}
+      <div ref={slotExit} className="sheet-exit" aria-hidden="true" />
     </div>
   );
 }

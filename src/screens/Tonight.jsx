@@ -1,3 +1,4 @@
+import { useRef } from 'react';
 import { BookedStrip } from '../cards/BookedStrip';
 import { GroupPlanCard } from '../cards/GroupPlanCard';
 import { HostCtaCard } from '../cards/HostCtaCard';
@@ -31,6 +32,10 @@ export function Tonight(p) {
     if (g) g[1].push(k);
     else groups.push([d, [k]]);
   });
+  // picking a mood: the nights below cross-fade to the new list (not on first show)
+  var lastFilter = useRef({ f: S.filter, at: 0 });
+  if (lastFilter.current.f !== S.filter) lastFilter.current = { f: S.filter, at: Date.now() };
+  var swapped = Date.now() - lastFilter.current.at < 400;
   return (
     <div className="col" style={{ paddingTop: '48px', paddingBottom: '140px' }}>
       <div className="rowc between px">
@@ -93,30 +98,32 @@ export function Tonight(p) {
       <div className="px col" style={{ paddingTop: '32px', gap: '10px' }}>
         <PickCard ctx={c} />
       </div>
-      {groups.length ? (
-        groups.map((g) => (
-          <div key={g[0][0]} className="col">
-            <div className="px" style={{ paddingTop: '36px', paddingBottom: '14px' }}>
-              <div className="sec-row">
-                <div className="rowc" style={{ gap: '10px' }}>
-                  <span className={'day-tag hue-' + g[0][4]}>{g[0][2]}</span>
-                  <span className="g-section-title">{g[0][3]}</span>
+      <div key={'feed-' + S.filter} className={'col' + (swapped ? ' feed-swap' : '')}>
+        {groups.length ? (
+          groups.map((g) => (
+            <div key={g[0][0]} className="col">
+              <div className="px" style={{ paddingTop: '36px', paddingBottom: '14px' }}>
+                <div className="sec-row">
+                  <div className="rowc" style={{ gap: '10px' }}>
+                    <span className={'day-tag hue-' + g[0][4]}>{g[0][2]}</span>
+                    <span className="g-section-title">{g[0][3]}</span>
+                  </div>
+                  {meta(g[1].length + (g[1].length === 1 ? ' night' : ' nights'))}
                 </div>
-                {meta(g[1].length + (g[1].length === 1 ? ' night' : ' nights'))}
+              </div>
+              <div className="hscroll cards">
+                {g[1].map((k) => (
+                  <WeekEventCard key={k} ctx={c} e={EVENTS[k]} />
+                ))}
               </div>
             </div>
-            <div className="hscroll cards">
-              {g[1].map((k) => (
-                <WeekEventCard key={k} ctx={c} e={EVENTS[k]} />
-              ))}
-            </div>
+          ))
+        ) : (
+          <div className="px" style={{ paddingTop: '28px' }}>
+            <NoMatchCard ctx={c} />
           </div>
-        ))
-      ) : (
-        <div className="px" style={{ paddingTop: '28px' }}>
-          <NoMatchCard ctx={c} />
-        </div>
-      )}
+        )}
+      </div>
       <div className="px" style={{ paddingTop: '44px' }}>
         <GroupPlanCard ctx={c} />
       </div>

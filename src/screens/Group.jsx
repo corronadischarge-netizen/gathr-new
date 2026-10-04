@@ -1,8 +1,10 @@
+import { useLayoutEffect, useRef } from 'react';
 import { BookedNightCard } from '../cards/BookedNightCard';
 import { VoteOptionCard } from '../cards/VoteOptionCard';
 import { EVENTS, VENUES } from '../data/listings';
 import { gpVoted, gpWinner, planLink } from '../data/sample';
 import { Button, IconButton } from '../design-system';
+import { ms, phoneScale, reducedMotion } from '../lib/motion';
 import { shareToast } from '../lib/utils';
 import { Share } from '../services/share';
 import { eyebrow, fav, i3, meta, note, statusChip, stop } from '../ui/helpers';
@@ -86,11 +88,11 @@ export function Group(p) {
           </Button>
         </div>
       ) : (
-        <div className="col" style={{ gap: '12px' }}>
+        <VoteList winner={win}>
           {gp.opts.map((k) => (
             <VoteOptionCard key={k} ctx={c} id={k} winner={win} groupSize={all.length} />
           ))}
-        </div>
+        </VoteList>
       )}
       {!booked
         ? meta(
@@ -145,6 +147,48 @@ export function Group(p) {
           </Button>
         </div>
       ) : null}
+    </div>
+  );
+}
+
+/* The nights up for the vote. When a different night takes the lead, the "Leading" badge travels from the
+   old card to the new one (in a layer above the cards, which would otherwise clip it). */
+function VoteList(p) {
+  var box = useRef(null),
+    layer = useRef(null),
+    last = useRef(null);
+  useLayoutEffect(() => {
+    var el = box.current && box.current.querySelector('.vote-lead');
+    if (!el) {
+      last.current = null;
+      return;
+    }
+    var b = box.current.getBoundingClientRect(),
+      r = el.getBoundingClientRect(),
+      k = phoneScale(),
+      now = { x: (r.left - b.left) / k, y: (r.top - b.top) / k, id: p.winner },
+      prev = last.current;
+    last.current = now;
+    if (!prev || prev.id === now.id || reducedMotion() || !el.animate) return;
+    var fly = el.cloneNode(true);
+    fly.className += ' vote-lead-fly';
+    fly.style.left = now.x + 'px';
+    fly.style.top = now.y + 'px';
+    layer.current.appendChild(fly);
+    el.style.visibility = 'hidden';
+    var a = fly.animate(
+      [{ transform: 'translate(' + (prev.x - now.x) + 'px, ' + (prev.y - now.y) + 'px)' }, { transform: 'none' }],
+      { duration: ms('--motion-slow'), easing: 'cubic-bezier(0.2, 0, 0, 1)' }
+    );
+    a.onfinish = a.oncancel = () => {
+      fly.remove();
+      el.style.visibility = '';
+    };
+  }, [p.winner]);
+  return (
+    <div ref={box} className="col vote-list" style={{ gap: '12px' }}>
+      {p.children}
+      <div ref={layer} className="vote-fly" aria-hidden="true" />
     </div>
   );
 }

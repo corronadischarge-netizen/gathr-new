@@ -206,8 +206,9 @@ export function App() {
   function tab(t) {
     set({ stack: [t], sheet: null, dir: 'tab', seen: true });
   }
-  function toast(t) {
-    set({ toast: t });
+  /* a short message at the top; with an action (e.g. Undo) it stays 4s instead of 2.4s */
+  function toast(t, action) {
+    set({ toast: t, toastAct: action ? Object.assign({ for: t }, action) : null });
   }
   useEffect(
     () => {
@@ -247,7 +248,7 @@ export function App() {
     if (!S.toast) return;
     var id = setTimeout(() => {
       set({ toast: null });
-    }, 2400);
+    }, S.toastAct && S.toastAct.for === S.toast ? 4000 : 2400);
     return () => {
       clearTimeout(id);
     };
@@ -292,7 +293,14 @@ export function App() {
       else x[id] = 1;
       return { saved: x };
     });
-    toast(was ? 'Removed from Plans' : 'Saved to Plans');
+    if (was)
+      toast('Removed from Plans', {
+        label: 'Undo',
+        run: () => {
+          set((o) => ({ saved: Object.assign({}, o.saved, { [id]: 1 }), toast: null }));
+        }
+      });
+    else toast('Saved to Plans');
   };
   var screens = {
     hostdoor: HostDoor,
@@ -427,6 +435,11 @@ export function App() {
             {S.toast ? (
               <div key={S.toast} className="toast">
                 {S.toast}
+                {S.toastAct && S.toastAct.for === S.toast ? (
+                  <button type="button" className="toast-act" onClick={S.toastAct.run}>
+                    {S.toastAct.label}
+                  </button>
+                ) : null}
               </div>
             ) : null}
           </div>

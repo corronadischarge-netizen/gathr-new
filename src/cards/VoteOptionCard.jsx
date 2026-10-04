@@ -28,7 +28,11 @@ export function VoteOptionCard(p) {
           <span className="title16">{v.name + ' · ' + e.title}</span>
           {meta(e.date + ' · ' + priceTxt(e) + (e.age ? ' · ' + e.age + '+' : ''))}
         </div>
-        {lead ? <Badge tone="go">Leading</Badge> : null}
+        {lead ? (
+          <Badge tone="go" className="vote-lead">
+            Leading
+          </Badge>
+        ) : null}
       </div>
       <div className="vote-bar">
         <i style={{ width: (names.length / p.groupSize) * 100 + '%' }} />

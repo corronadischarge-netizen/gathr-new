@@ -34,7 +34,8 @@ function copyOf(el) {
   g.setAttribute('aria-hidden', 'true');
   g.setAttribute('inert', '');
   g.querySelectorAll('[id]').forEach((n) => n.removeAttribute('id'));
-  g.querySelectorAll('.sheet-slot').forEach((n) => n.classList.remove('rise', 'settling'));
+  var slots = [g].concat([].slice.call(g.querySelectorAll('.sheet-slot'))); // the copy may itself be the slot
+  slots.forEach((n) => n.classList.remove('rise', 'settling'));
   // typed text lives on the live inputs, not in the markup: carry it over so the copy looks the same
   var from = el.querySelectorAll('input, textarea'),
     to = g.querySelectorAll('input, textarea');

@@ -12,6 +12,7 @@
   --motion-slow: 300ms; /* screen slide, sheet open */
   --motion-slower: 450ms; /* booking tick, celebration */
   --motion-step: 150ms; /* a number rolling to its next value */
+  --motion-pop: 250ms; /* the heart filling when you save */
   --motion-back: 250ms; /* going back: the reverse of a 300ms push, a little faster */
   --ease-standard: cubic-bezier(0.2, 0, 0, 1);
   --ease-enter: cubic-bezier(0, 0, 0.2, 1);
@@ -90,7 +91,7 @@
 .sheet-exit { position: absolute; inset: 0; z-index: 6; pointer-events: none; }
 .sheet-exit:empty { display: none; }
 .sheet-leaving .overlay, .sheet-leaving.poster-layer { animation: fade-out var(--motion-normal) var(--ease-exit) forwards; }
-.sheet-leaving .sheet-slot { animation: sheet-out var(--motion-normal) var(--ease-exit) forwards; }
+.sheet-leaving .sheet-slot, .sheet-slot.sheet-leaving { animation: sheet-out var(--motion-normal) var(--ease-exit) forwards; }
 @keyframes sheet-out { to { transform: translateY(100%); } }
 .g-sheet-head, .g-grabber { touch-action: none; cursor: grab; -webkit-user-select: none; user-select: none; }
 .g-grabber { position: relative; }
@@ -110,8 +111,17 @@
 .w-in { animation: rise var(--motion-slower) var(--ease-enter) both; animation-delay: var(--d, 0ms); }
 .w-card { animation: deal var(--motion-slower) var(--ease-enter) both; animation-delay: var(--d, 0ms); }
 .w-tag { animation: tag-pop var(--motion-slow) var(--ease-settle) both; animation-delay: var(--d, 0ms); }
-.w-3d { opacity: 0; animation: pop-3d var(--motion-slower) var(--ease-enter) forwards; animation-delay: var(--d, 0ms); }
+.w-3d { opacity: 0; animation: pop-3d var(--motion-slower) var(--ease-settle) forwards; animation-delay: var(--d, 0ms); }
 .w-fade { animation: rise var(--motion-slow) var(--ease-enter) both; }
+/* swiping between welcome steps: the step follows the finger, the next one slides in from that side */
+.w-swipe { flex: none; touch-action: pan-y; }
+.w-next { animation: step-from-right var(--motion-slow) var(--ease-enter) both; }
+.w-prev { animation: step-from-left var(--motion-slow) var(--ease-enter) both; }
+@keyframes step-from-right { from { opacity: 0; transform: translateX(48px); } to { opacity: 1; transform: none; } }
+@keyframes step-from-left { from { opacity: 0; transform: translateX(-48px); } to { opacity: 1; transform: none; } }
+/* the page dots: the active one stretches */
+.welcome .g-pager-seg { transition: flex-grow var(--motion-slow) var(--ease-standard), background-color var(--motion-slow) var(--ease-standard); }
+.welcome .g-pager-seg.is-active { flex-grow: 2.4; }
 .fade-up { animation: rise var(--motion-slow) var(--ease-enter) both; animation-delay: var(--d, 0ms); }
 @keyframes rise { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
 @keyframes deal { from { opacity: 0; transform: translateY(40px) scale(0.9); } to { opacity: 1; transform: none; } }
@@ -126,26 +136,41 @@
 /* ---------- selections settle ---------- */
 .g-chip.is-selected span { animation: chip-in var(--motion-normal) var(--ease-standard); }
 @keyframes chip-in { from { transform: scale(0.9); } to { transform: none; } }
-.g-ibtn.is-active svg { animation: heart var(--motion-slow) var(--ease-settle); }
-@keyframes heart { 0% { transform: scale(0.6); } 60% { transform: scale(1.2); } 100% { transform: none; } }
+.g-ibtn.is-active svg { animation: heart var(--motion-pop) var(--ease-standard); }
+@keyframes heart { 0%, 100% { transform: none; } 45% { transform: scale(1.15); } }
+/* mood and music tiles settle into violet (150ms); the music tile's sticker nudges up 2px */
 .mood {
-  transition: scale var(--motion-fast) var(--ease-standard), box-shadow var(--motion-normal) var(--ease-standard);
+  transition: scale var(--motion-fast) var(--ease-standard), background-color var(--motion-step) var(--ease-standard), color var(--motion-step) var(--ease-standard), box-shadow var(--motion-step) var(--ease-standard);
   animation: tile-in var(--motion-slow) var(--ease-enter) both;
   animation-delay: var(--d, 0ms);
 }
 .mood-ic { transition: transform var(--motion-slow) var(--ease-settle); }
 .vibe-tile {
-  transition: scale var(--motion-fast) var(--ease-standard), background-color var(--motion-normal) var(--ease-standard), color var(--motion-normal) var(--ease-standard);
+  transition: scale var(--motion-fast) var(--ease-standard), background-color var(--motion-step) var(--ease-standard), color var(--motion-step) var(--ease-standard);
   animation: tile-in var(--motion-slow) var(--ease-enter) both;
   animation-delay: var(--d, 0ms);
 }
-.vibe-tile .i3 { transition: transform var(--motion-normal) var(--ease-standard); }
+.vibe-tile .i3 { transition: transform var(--motion-normal) var(--ease-settle); }
+.vibe-tile.on .i3 { transform: translateY(-2px) scale(1.14) rotate(-8deg); }
 @keyframes tile-in { from { opacity: 0; translate: 0 10px; } to { opacity: 1; translate: 0 0; } }
 .switch { transition: scale var(--motion-fast) var(--ease-standard), background-color var(--motion-normal) var(--ease-standard); }
 .switch span { transition: transform var(--motion-normal) var(--ease-standard); }
 .loc-btn { transition: scale var(--motion-fast) var(--ease-standard), box-shadow var(--motion-normal) var(--ease-standard); }
 .card { transition: scale var(--motion-fast) var(--ease-standard), box-shadow var(--motion-normal) var(--ease-standard), opacity var(--motion-normal) var(--ease-standard); }
-.vpin-bub { transition: transform var(--motion-normal) var(--ease-standard); }
+/* map pins: the tapped one grows and turns violet with a white label; the last one shrinks back */
+.vpin-bub, .vpin-bub::after { transition: transform var(--motion-normal) var(--ease-standard), background-color var(--motion-normal) var(--ease-standard), box-shadow var(--motion-normal) var(--ease-standard); }
+.vpin-lbl { transition: background-color var(--motion-normal) var(--ease-standard); }
+.vpin-lbl b, .vpin-crowd { transition: color var(--motion-normal) var(--ease-standard); }
+/* the "Leading" badge travelling to a new leader */
+.vote-list { position: relative; }
+.vote-fly { position: absolute; inset: 0; pointer-events: none; z-index: 2; }
+.vote-fly:empty { display: none; }
+.vote-lead-fly { position: absolute; margin: 0; }
+/* the home feed cross-fades to a new filter's nights */
+.feed-swap { animation: g-fade var(--motion-normal) var(--ease-standard); }
+/* a toast's action (Undo): compact, with a full 44px tap area */
+.toast-act { position: relative; margin-left: 10px; padding: 0 2px; border: 0; background: none; color: var(--ink); font: inherit; font-weight: 700; text-decoration: underline; cursor: pointer; }
+.toast-act::after { content: ''; position: absolute; top: -12px; bottom: -12px; left: -12px; right: -12px; }
 /* the pass count and total roll to their new number: up when it grows, down when it shrinks */
 .roll-up, .roll-down { display: inline-block; }
 .roll-up { animation: roll-up var(--motion-step) var(--ease-standard); }
@@ -175,12 +200,14 @@
   .g-tab-ind { transition: none; }
   .screen.nav-fwd, .screen.nav-back, .sheet-slot.rise, .toast, .w-in, .w-card, .w-tag, .w-3d, .w-fade, .fade-up,
   .mood, .vibe-tile, .celebrate .ok-tick, .celebrate .pass-card, .celebrate .pass-ic, .roll-up, .roll-down { animation-name: g-fade !important; }
-  .sheet-leaving .sheet-slot { animation-name: fade-out !important; }
+  .sheet-leaving .sheet-slot, .sheet-slot.sheet-leaving { animation-name: fade-out !important; }
   .shake { animation: none !important; }
   .sheet-slot.settling { transition: none; }
   .w-3d { transform: rotate(var(--r, 0deg)); }
   .bob, .feature-ic.float-ic, .g-chip.is-selected span, .g-ibtn.is-active svg { animation: none !important; }
   .celebrate .ok-tick path, .ob-steps i.now::after { animation: none !important; stroke-dashoffset: 0; transform: none; }
   :is(button, [role='button'], .tap):active, .vpin-wrap:active .vpin { scale: none !important; }
-  .mood-ic, .vibe-tile .i3, .vpin-bub, .switch span, .vote-bar i, .g-progress span { transition: none !important; }
+  .w-next, .w-prev { animation-name: g-fade !important; }
+  .welcome .g-pager-seg { transition: background-color var(--motion-normal) var(--ease-standard); }
+  .mood-ic, .vibe-tile .i3, .vpin-bub, .vpin-bub::after, .switch span, .vote-bar i, .g-progress span { transition: none !important; }
 }

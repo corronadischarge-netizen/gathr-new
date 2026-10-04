@@ -18,14 +18,72 @@ export function Welcome(p) {
     ['know who gets in', 'Age, ID, dress and stag rules on every night, before you pay.'],
     ['go out together', 'Vote with friends, book once, send everyone their pass.']
   ];
+  /* Steps move sideways: swipe (the step follows your finger), Next and Skip all do the same thing.
+     The new step slides in from the side you're heading to. */
+  var dir = useRef('');
   function go(n) {
-    c.set({ wstep: Math.max(0, Math.min(2, n)) });
+    n = Math.max(0, Math.min(2, n));
+    if (n === i) return;
+    dir.current = n > i ? 'w-next' : 'w-prev';
+    c.set({ wstep: n });
   }
-  var sx = useRef(null);
+  var swipeBox = useRef(null),
+    sx = useRef(null);
+  function follow(dx) {
+    var el = swipeBox.current;
+    if (!el) return;
+    // past the first or last step it only gives a little
+    if ((i === 0 && dx > 0) || (i === 2 && dx < 0)) dx *= 0.3;
+    el.style.transition = 'none';
+    el.style.transform = dx ? 'translateX(' + dx + 'px)' : '';
+  }
+  function settle() {
+    var el = swipeBox.current;
+    if (!el) return;
+    el.style.transition = 'transform var(--motion-normal) var(--ease-standard)';
+    el.style.transform = '';
+  }
+  var swipe = {
+    onPointerDown: (ev) => {
+      if (ev.pointerType === 'mouse' && ev.button !== 0) return;
+      sx.current = { x: ev.clientX, y: ev.clientY, t: ev.timeStamp, on: false, dx: 0, k: ev.currentTarget.getBoundingClientRect().width / ev.currentTarget.offsetWidth || 1 };
+    },
+    onPointerMove: (ev) => {
+      var s = sx.current;
+      if (!s) return;
+      var dx = (ev.clientX - s.x) / s.k,
+        dy = (ev.clientY - s.y) / s.k;
+      if (!s.on) {
+        if (Math.abs(dx) > 8 && Math.abs(dx) > Math.abs(dy)) {
+          s.on = true;
+          ev.currentTarget.setPointerCapture(ev.pointerId);
+        } else if (Math.abs(dy) > 8) sx.current = null;
+        return;
+      }
+      s.dx = dx;
+      follow(dx);
+    },
+    onPointerUp: (ev) => {
+      var s = sx.current;
+      sx.current = null;
+      if (!s || !s.on) return;
+      var v = s.dx / Math.max(1, ev.timeStamp - s.t),
+        to = s.dx < -90 || (v < -0.5 && s.dx < -24) ? i + 1 : s.dx > 90 || (v > 0.5 && s.dx > 24) ? i - 1 : i;
+      if (to !== i && to >= 0 && to <= 2) {
+        follow(0);
+        go(to);
+      } else settle();
+    },
+    onPointerCancel: () => {
+      sx.current = null;
+      settle();
+    }
+  };
+  var enter = dir.current || 'w-fade';
   var art;
   if (i === 0)
     art = (
-      <div key="a0" className="w-art w-fade" style={{ width: '300px', height: '260px' }}>
+      <div key="a0" className={'w-art ' + enter} style={{ width: '300px', height: '260px' }}>
         <div className="w-card" style={{ '--d': '60ms', '--r': '-7deg', left: '0px', top: '104px' }}>
           <PhotoFrame width={150} height={104} tilt={-7} image={WELCOME_PHOTOS.pour} />
         </div>
@@ -45,7 +103,7 @@ export function Welcome(p) {
     );
   else if (i === 1)
     art = (
-      <div key="a1" className="w-art w-fade" style={{ width: '300px', height: '260px' }}>
+      <div key="a1" className={'w-art ' + enter} style={{ width: '300px', height: '260px' }}>
         <div className="w-mock" style={{ left: '30px', top: '46px', transform: 'rotate(-3deg)' }}>
           <span className="title15">Who gets in</span>
           {[
@@ -73,7 +131,7 @@ export function Welcome(p) {
     );
   else
     art = (
-      <div key="a2" className="w-art w-fade" style={{ width: '300px', height: '260px' }}>
+      <div key="a2" className={'w-art ' + enter} style={{ width: '300px', height: '260px' }}>
         <div className="w-mock" style={{ left: '24px', top: '52px', transform: 'rotate(2deg)' }}>
           <span className="title15">Friday plan</span>
           {meta('4 of 5 voted · closes Thu 6 pm')}
@@ -106,31 +164,23 @@ export function Welcome(p) {
           Log in
         </Button>
       </div>
-      <div
-        className="rel col"
-        style={{ alignItems: 'center', marginTop: '40px', flex: 'none' }}
-        onTouchStart={(ev) => (sx.current = ev.touches[0].clientX)}
-        onTouchEnd={(ev) => {
-          if (sx.current == null) return;
-          var dx = ev.changedTouches[0].clientX - sx.current;
-          if (Math.abs(dx) > 40) go(i + (dx < 0 ? 1 : -1));
-          sx.current = null;
-        }}
-      >
-        {art}
-      </div>
-      <div
-        key={'t' + i}
-        className="rel col w-fade"
-        style={{ alignItems: 'center', textAlign: 'center', gap: '10px', marginTop: '28px' }}
-        aria-live="polite"
-      >
-        <span className="step-kicker">{i + 1 + ' of 3'}</span>
-        <h1 className="g-display disp w-title">
-          {steps[i][0]}
-          <span className="stop">.</span>
-        </h1>
-        <p className="w-body">{steps[i][1]}</p>
+      <div ref={swipeBox} className="rel col w-swipe" {...swipe}>
+        <div className="rel col" style={{ alignItems: 'center', marginTop: '40px', flex: 'none' }}>
+          {art}
+        </div>
+        <div
+          key={'t' + i}
+          className={'rel col ' + enter}
+          style={{ alignItems: 'center', textAlign: 'center', gap: '10px', marginTop: '28px' }}
+          aria-live="polite"
+        >
+          <span className="step-kicker">{i + 1 + ' of 3'}</span>
+          <h1 className="g-display disp w-title">
+            {steps[i][0]}
+            <span className="stop">.</span>
+          </h1>
+          <p className="w-body">{steps[i][1]}</p>
+        </div>
       </div>
       <div className="rel" style={{ display: 'flex', justifyContent: 'center', marginTop: '20px' }}>
         <PageIndicator count={3} active={i} />

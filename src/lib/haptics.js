@@ -14,7 +14,8 @@ export const haptic = {
 
 /* Any tap on a selectable control (chips, tiles, switches, radio options) gives the light "select" buzz,
    so each component doesn't have to remember to do it. */
-const SELECTABLE = '[aria-pressed], [role="switch"], [role="radio"], [role="tab"], .mood, .vibe-tile, .loc-btn';
+const SELECTABLE =
+  '[aria-pressed], [role="switch"], [role="radio"], [role="tab"], .mood, .vibe-tile, .loc-btn, .vpin-wrap';
 export function listenForSelections(root) {
   root.addEventListener('click', (ev) => {
     var el = ev.target && ev.target.closest && ev.target.closest(SELECTABLE);
