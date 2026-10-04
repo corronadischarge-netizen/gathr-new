@@ -107,14 +107,5 @@
   --opacity-disabled: 0.4;
   --opacity-ghost-numeral: 0.35;
   --opacity-grain: 0.22;
-  --beat-quiet: 1000ms;
-  --beat-warming: 667ms;
-  --beat-buzzing: 500ms;
-  --beat-packed: 469ms;
-  --beat-full: 429ms;
-  --breathe: 4800ms;
-  --drift: 18000ms;
-  --dur-fast: 120ms;
-  --dur-base: 200ms;
-  --dur-slow: 320ms;
+  /* motion timings live in motion.css */
 }

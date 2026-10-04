@@ -1,4 +1,5 @@
 import { ORG_KEY, orgLoad, setCheckin } from '../data/organisers';
+import { haptic } from '../lib/haptics';
 import { Button } from '../design-system';
 import { store } from '../lib/utils';
 import { svgIcon } from '../ui/helpers';
@@ -17,7 +18,7 @@ export function ScanResult(p) {
       setCheckin(c, id, r.walkin.name, true);
     } else setCheckin(c, id, r.guest.name, true);
     c.toast((r.walkin ? r.walkin.name : r.guest.name) + ' is in');
-    if (navigator.vibrate) navigator.vibrate(60);
+    haptic.success();
     p.onDone();
   }
   return (

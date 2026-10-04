@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { haptic } from '../lib/haptics';
 import jsQR from 'jsqr';
 import { ScanResult } from './ScanResult';
 import { hostCur } from '../data/hostNights';
@@ -67,7 +68,7 @@ export function Scanner(p) {
             var found = (txt) => {
               busy.current = false;
               if (txt && !resRef.current) {
-                if (navigator.vibrate) navigator.vibrate(30);
+                haptic.select();
                 setRes(checkPass(sRef.current, id, txt));
               }
             };

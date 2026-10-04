@@ -1,5 +1,6 @@
 import { createRoot } from 'react-dom/client';
 import { App } from './App';
+import { listenForSelections } from './lib/haptics';
 
 // Styles, in the same order the original single-page app declared them
 import './styles/fonts.css';
@@ -7,6 +8,7 @@ import './styles/tokens.css';
 import './design-system/design-system.css';
 import 'maplibre-gl/dist/maplibre-gl.css';
 import './styles/app.css';
+import './styles/motion.css';
 
 /* Mount + scale: full screen on phones and in the native app, a scaled phone frame on desktop */
 function fit() {
@@ -31,4 +33,5 @@ function fit() {
 
 window.addEventListener('resize', fit);
 fit();
+listenForSelections(document);
 createRoot(document.getElementById('root')).render(<App />);

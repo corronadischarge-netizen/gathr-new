@@ -1,0 +1,129 @@
+/* ================= gathr motion =================
+   Every animation explains a change: where something came from, where it went, or what happened.
+   - Screens slide on forward and back. Tabs cross-fade. Selections settle. A booking draws a tick.
+   - The only looping motion is the 3D stickers bobbing (±4px, slow). Nothing pulses, breathes, glows or shimmers.
+   - Direct feedback (press, select) is under 200ms; functional motion never passes 500ms.
+   - Animation never blocks input: nothing here sets pointer-events, so a person can always tap, go back or scroll.
+   - Enter slower, exit faster (a sheet opens in 300ms and closes in 200ms).
+   All timings come from the tokens below; no other file sets durations or curves. */
+:root {
+  --motion-fast: 100ms; /* press, toggle */
+  --motion-normal: 200ms; /* chip select, sheet close, fades */
+  --motion-slow: 300ms; /* screen slide, sheet open */
+  --motion-slower: 450ms; /* booking tick, celebration */
+  --ease-standard: cubic-bezier(0.2, 0, 0, 1);
+  --ease-enter: cubic-bezier(0, 0, 0.2, 1);
+  --ease-exit: cubic-bezier(0.4, 0, 1, 1);
+  --ease-settle: cubic-bezier(0.3, 1.4, 0.5, 1); /* a small overshoot, for things that land: stickers, the heart */
+  --press-scale: 0.97;
+  --press-scale-card: 0.98;
+}
+
+/* ---------- press, disabled, focus: every tappable thing ---------- */
+:where(button, [role='button'], a[href]) {
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    scale var(--motion-fast) var(--ease-standard),
+    background-color var(--motion-normal) var(--ease-standard),
+    color var(--motion-normal) var(--ease-standard),
+    box-shadow var(--motion-normal) var(--ease-standard),
+    opacity var(--motion-normal) var(--ease-standard);
+}
+/* scale (not transform) so a press never fights a component's own transform */
+:is(button, [role='button']):not(:disabled, [aria-disabled='true'], .tap, .vpin-wrap):active { scale: var(--press-scale); }
+.tap:active { scale: var(--press-scale-card); }
+.vpin-wrap:active .vpin { scale: var(--press-scale); } /* the marker itself is positioned by the map */
+.vpin { transition: scale var(--motion-fast) var(--ease-standard); }
+:is(button, [role='button']):disabled, [aria-disabled='true'] { opacity: var(--opacity-disabled); cursor: default; }
+:where(button, [role='button'], a[href], [tabindex='0'], summary):focus-visible { outline: 2px solid transparent; box-shadow: var(--focus-ring); }
+
+/* touch targets: controls drawn smaller than 44px get an invisible 44px tap area (looks unchanged) */
+.g-btn-sm, button.g-feature-go, .g-rank-btn, .org-in, .switch { position: relative; }
+:is(.g-btn-sm, button.g-feature-go, .g-rank-btn, .org-in, .switch)::after {
+  content: '';
+  position: absolute;
+  top: min(0px, calc(50% - 22px));
+  bottom: min(0px, calc(50% - 22px));
+  left: min(0px, calc(50% - 22px));
+  right: min(0px, calc(50% - 22px));
+}
+
+/* ---------- navigation: forward slides in from the right, back from the left, tabs cross-fade ---------- */
+.screen.nav-fwd { animation: nav-fwd var(--motion-slow) var(--ease-enter); }
+.screen.nav-back { animation: nav-back var(--motion-slow) var(--ease-enter); }
+.screen.nav-tab { animation: g-fade var(--motion-normal) var(--ease-standard); }
+@keyframes nav-fwd { from { opacity: 0; transform: translateX(32px); } to { opacity: 1; transform: none; } }
+@keyframes nav-back { from { opacity: 0; transform: translateX(-32px); } to { opacity: 1; transform: none; } }
+@keyframes g-fade { from { opacity: 0; } to { opacity: 1; } }
+
+/* ---------- sheets, poster, toasts ---------- */
+.overlay { animation: g-fade var(--motion-normal) var(--ease-standard); }
+.sheet-slot.rise { animation: sheet-in var(--motion-slow) var(--ease-enter); }
+@keyframes sheet-in { from { transform: translateY(40%); opacity: 0; } to { transform: none; opacity: 1; } }
+.poster-layer { animation: g-fade var(--motion-normal) var(--ease-standard); }
+.toast { animation: toast-in var(--motion-normal) var(--ease-enter); }
+@keyframes toast-in { from { opacity: 0; transform: translate(-50%, 12px); } to { opacity: 1; transform: translate(-50%, 0); } }
+
+/* ---------- welcome: the night assembles (logo, posters, then what gathr tells you) ---------- */
+.w-in { animation: rise var(--motion-slower) var(--ease-enter) both; animation-delay: var(--d, 0ms); }
+.w-card { animation: deal var(--motion-slower) var(--ease-enter) both; animation-delay: var(--d, 0ms); }
+.w-tag { animation: tag-pop var(--motion-slow) var(--ease-settle) both; animation-delay: var(--d, 0ms); }
+.w-3d { opacity: 0; animation: pop-3d var(--motion-slower) var(--ease-enter) forwards; animation-delay: var(--d, 0ms); }
+.w-fade { animation: rise var(--motion-slow) var(--ease-enter) both; }
+.fade-up { animation: rise var(--motion-slow) var(--ease-enter) both; animation-delay: var(--d, 0ms); }
+@keyframes rise { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+@keyframes deal { from { opacity: 0; transform: translateY(40px) scale(0.9); } to { opacity: 1; transform: none; } }
+@keyframes tag-pop { from { opacity: 0; transform: scale(0.6); } to { opacity: 1; transform: none; } }
+@keyframes pop-3d { from { opacity: 0; transform: scale(0.4) rotate(calc(var(--r, 0deg) - 30deg)); } to { opacity: 1; transform: scale(1) rotate(var(--r, 0deg)); } }
+
+/* the only loop: 3D stickers bob ±4px, slowly */
+.bob { animation: bob 4.2s ease-in-out infinite; }
+.feature-ic.float-ic { animation: bob 5s ease-in-out infinite; }
+@keyframes bob { 0%, 100% { translate: 0 4px; } 50% { translate: 0 -4px; } }
+
+/* ---------- selections settle ---------- */
+.g-chip.is-selected span { animation: chip-in var(--motion-normal) var(--ease-standard); }
+@keyframes chip-in { from { transform: scale(0.9); } to { transform: none; } }
+.g-ibtn.is-active svg { animation: heart var(--motion-slow) var(--ease-settle); }
+@keyframes heart { 0% { transform: scale(0.6); } 60% { transform: scale(1.2); } 100% { transform: none; } }
+.mood {
+  transition: scale var(--motion-fast) var(--ease-standard), box-shadow var(--motion-normal) var(--ease-standard);
+  animation: tile-in var(--motion-slow) var(--ease-enter) both;
+  animation-delay: var(--d, 0ms);
+}
+.mood-ic { transition: transform var(--motion-slow) var(--ease-settle); }
+.vibe-tile {
+  transition: scale var(--motion-fast) var(--ease-standard), background-color var(--motion-normal) var(--ease-standard), color var(--motion-normal) var(--ease-standard);
+  animation: tile-in var(--motion-slow) var(--ease-enter) both;
+  animation-delay: var(--d, 0ms);
+}
+.vibe-tile .i3 { transition: transform var(--motion-normal) var(--ease-standard); }
+@keyframes tile-in { from { opacity: 0; translate: 0 10px; } to { opacity: 1; translate: 0 0; } }
+.switch { transition: scale var(--motion-fast) var(--ease-standard), background-color var(--motion-normal) var(--ease-standard); }
+.switch span { transition: transform var(--motion-normal) var(--ease-standard); }
+.loc-btn { transition: scale var(--motion-fast) var(--ease-standard), box-shadow var(--motion-normal) var(--ease-standard); }
+.card { transition: scale var(--motion-fast) var(--ease-standard), box-shadow var(--motion-normal) var(--ease-standard), opacity var(--motion-normal) var(--ease-standard); }
+.vpin-bub { transition: transform var(--motion-normal) var(--ease-standard); }
+.tick { display: inline-block; animation: tick var(--motion-normal) var(--ease-enter); }
+@keyframes tick { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: none; } }
+.vote-bar i { transition: width var(--motion-slow) var(--ease-standard); }
+.ob-steps i.now::after { animation: fill var(--motion-slow) var(--motion-fast) var(--ease-standard) forwards; }
+@keyframes fill { to { transform: none; } }
+
+/* ---------- booking confirmed: the tick draws, the pass rises ---------- */
+.ok-tick { animation: tag-pop var(--motion-slow) var(--ease-settle) both; }
+.ok-tick path { stroke-dasharray: 24; stroke-dashoffset: 24; animation: draw var(--motion-slower) var(--motion-normal) var(--ease-standard) forwards; }
+@keyframes draw { to { stroke-dashoffset: 0; } }
+.pass-card { animation: rise var(--motion-slower) var(--motion-normal) var(--ease-enter) both; }
+.qr { animation: g-fade var(--motion-normal) var(--motion-slower) var(--ease-standard) both; }
+
+/* ---------- reduced motion: no slide, scale, bounce or bob. Only fades and instant changes. ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .screen.nav-fwd, .screen.nav-back, .sheet-slot.rise, .toast, .w-in, .w-card, .w-tag, .w-3d, .w-fade, .fade-up,
+  .mood, .vibe-tile, .ok-tick, .pass-card, .tick { animation-name: g-fade !important; }
+  .w-3d { transform: rotate(var(--r, 0deg)); }
+  .bob, .feature-ic.float-ic, .g-chip.is-selected span, .g-ibtn.is-active svg { animation: none !important; }
+  .ok-tick path, .ob-steps i.now::after { animation: none !important; stroke-dashoffset: 0; transform: none; }
+  :is(button, [role='button'], .tap):active, .vpin-wrap:active .vpin { scale: none !important; }
+  .mood-ic, .vibe-tile .i3, .vpin-bub, .switch span, .vote-bar i, .g-progress span { transition: none !important; }
+}
