@@ -11,6 +11,7 @@
   --motion-normal: 200ms; /* chip select, sheet close, fades */
   --motion-slow: 300ms; /* screen slide, sheet open */
   --motion-slower: 450ms; /* booking tick, celebration */
+  --motion-back: 250ms; /* going back: the reverse of a 300ms push, a little faster */
   --ease-standard: cubic-bezier(0.2, 0, 0, 1);
   --ease-enter: cubic-bezier(0, 0, 0.2, 1);
   --ease-exit: cubic-bezier(0.4, 0, 1, 1);
@@ -48,13 +49,36 @@
   right: min(0px, calc(50% - 22px));
 }
 
-/* ---------- navigation: forward slides in from the right, back from the left, tabs cross-fade ---------- */
+/* ---------- navigation ----------
+   Forward: the new screen slides in from the right while the old one shifts left and dims underneath.
+   Back reverses it, faster. Tabs cross-fade. The old screen is a frozen, untappable copy (useScreenTransition). */
+.screen { isolation: isolate; } /* each screen keeps its own layers, so a leaving copy can sit cleanly above or below */
+.ghost-layer { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
+.ghost-layer:empty { display: none; }
+.ghost-layer-back { z-index: 1; } /* going back, the old screen leaves on top */
+.screen.ghost { overflow: hidden; }
 .screen.nav-fwd { animation: nav-fwd var(--motion-slow) var(--ease-enter); }
-.screen.nav-back { animation: nav-back var(--motion-slow) var(--ease-enter); }
+.screen.nav-back { animation: nav-back var(--motion-back) var(--ease-standard); }
 .screen.nav-tab { animation: g-fade var(--motion-normal) var(--ease-standard); }
-@keyframes nav-fwd { from { opacity: 0; transform: translateX(32px); } to { opacity: 1; transform: none; } }
-@keyframes nav-back { from { opacity: 0; transform: translateX(-32px); } to { opacity: 1; transform: none; } }
+.ghost-fwd { animation: shift-dim var(--motion-slow) var(--ease-enter) forwards; }
+.ghost-back { animation: slide-off var(--motion-back) var(--ease-exit) forwards; }
+.ghost-tab { animation: fade-out var(--motion-normal) var(--ease-standard) forwards; }
+@keyframes nav-fwd { from { transform: translateX(100%); } to { transform: none; } }
+@keyframes nav-back { from { transform: translateX(-20%); opacity: 0.4; } to { transform: none; opacity: 1; } }
+@keyframes shift-dim { to { transform: translateX(-20%); opacity: 0.4; } }
+@keyframes slide-off { to { transform: translateX(100%); } }
+@keyframes fade-out { to { opacity: 0; } }
 @keyframes g-fade { from { opacity: 0; } to { opacity: 1; } }
+/* edge swipe: a thin strip along the left edge (inside the 16px gutter) that only catches sideways drags */
+.edge-swipe { position: absolute; left: 0; top: 0; bottom: 0; width: 16px; z-index: 2; touch-action: pan-y; }
+.screen.under { pointer-events: none; transform: translateX(-20%); opacity: 0.4; }
+
+/* ---------- tab bar: the active disc slides to the new tab (green in host mode) ---------- */
+.g-tabbar { position: relative; }
+.g-tabbar .g-tab { position: relative; z-index: 1; }
+.g-tabbar .g-tab.is-active { background: transparent; }
+.g-tab-ind { position: absolute; left: 0; top: 0; border-radius: var(--radius-full); background: var(--brand); pointer-events: none; transition: transform var(--motion-normal) var(--ease-standard); }
+.host-tabbar .g-tab-ind { background: var(--green-300); }
 
 /* ---------- sheets, poster, toasts ---------- */
 .overlay { animation: g-fade var(--motion-normal) var(--ease-standard); }
@@ -119,6 +143,9 @@
 
 /* ---------- reduced motion: no slide, scale, bounce or bob. Only fades and instant changes. ---------- */
 @media (prefers-reduced-motion: reduce) {
+  .ghost-fwd, .ghost-back { animation-name: fade-out !important; }
+  .screen.under { transform: none; }
+  .g-tab-ind { transition: none; }
   .screen.nav-fwd, .screen.nav-back, .sheet-slot.rise, .toast, .w-in, .w-card, .w-tag, .w-3d, .w-fade, .fade-up,
   .mood, .vibe-tile, .ok-tick, .pass-card, .tick { animation-name: g-fade !important; }
   .w-3d { transform: rotate(var(--r, 0deg)); }

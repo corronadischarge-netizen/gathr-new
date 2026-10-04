@@ -1,4 +1,5 @@
 import { Icon } from './Icon';
+import { TabIndicator } from './TabIndicator';
 import { cx } from './utils';
 
 const TABS = [
@@ -13,6 +14,7 @@ export function TabBar(p) {
   var active = p.active || 'tonight';
   return (
     <nav className={cx('g-tabbar', p.className)} aria-label="Main">
+      <TabIndicator active={active} />
       {TABS.map((t) => {
         var on = active === t[0];
         return (

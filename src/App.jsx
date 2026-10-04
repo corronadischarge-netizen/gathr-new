@@ -6,6 +6,8 @@ import { REVIEW } from './config';
 import { EVENTS, VENUES, isPast } from './data/listings';
 import { orgLoad } from './data/organisers';
 import { TabBar } from './design-system';
+import { useEdgeSwipe } from './hooks/useEdgeSwipe';
+import { useScreenTransition } from './hooks/useScreenTransition';
 import { store } from './lib/utils';
 import { TABS } from './navigation';
 import { Age } from './screens/Age';
@@ -42,6 +44,9 @@ import { You } from './screens/You';
 import { Auth } from './services/auth';
 import { Pay } from './services/payments';
 import { SheetLayer } from './sheets/SheetLayer';
+
+/* Android's system back gesture already goes back, so the in-app edge swipe is for iPhone and the web */
+const ANDROID = /Android/i.test(navigator.userAgent);
 
 export function App() {
   var s0 = {
@@ -189,11 +194,11 @@ export function App() {
   function go(scr, extra) {
     set((o) => Object.assign({ stack: o.stack.concat(scr), sheet: null, dir: 'fwd' }, extra || {}));
   }
-  function back() {
+  function back(how) {
     set((o) => ({
       stack: o.stack.length > 1 ? o.stack.slice(0, -1) : o.stack,
       sheet: null,
-      dir: 'back',
+      dir: how === 'swipe' ? 'swipe' : 'back',
       login: o.stack.length > 2 ? o.login : false
     }));
   }
@@ -323,13 +328,64 @@ export function App() {
     venuedash: VenueDash
   };
   var Scr = screens[scr] || Tonight;
+  var scrKey = scr + (scr === 'event' || scr === 'venue' ? S.cur : '');
+  var screenRef = useRef(null),
+    ghostRef = useRef(null),
+    underRef = useRef(null),
+    phoneRef = useRef(null);
+  useScreenTransition(scrKey, S.dir, screenRef, ghostRef);
+  /* swipe back from the left edge (iPhone and web; Android uses its own back gesture, handled below) */
+  const [under, setUnder] = useState(false);
+  var Under = under && S.stack.length > 1 ? screens[S.stack[S.stack.length - 2]] || Tonight : null;
+  var swipe = useEdgeSwipe({
+    enabled: S.stack.length > 1 && !S.sheet && !S.scanning,
+    phoneRef: phoneRef,
+    screenRef: screenRef,
+    underRef: underRef,
+    onStart: () => setUnder(true),
+    onBack: () => {
+      setUnder(false);
+      back('swipe');
+    },
+    onCancel: () => setUnder(false)
+  });
+  var canEdgeSwipe = S.stack.length > 1 && !S.sheet && !S.scanning && !ANDROID;
+  /* Android back button and gesture: close what's open first, then go back a screen, then home, then leave */
+  var hwBack = useRef(null);
+  hwBack.current = (CapApp) => {
+    if (S.sheet) {
+      if (!S.busy) set({ sheet: null });
+    } else if (S.scanning) set({ scanning: false });
+    else if (scr === 'map' && S.mapSel) set({ mapSel: null });
+    else if (S.stack.length > 1) back();
+    else if (scr === 'welcome' && S.wstep > 0) set({ wstep: S.wstep - 1 });
+    else if (TABS.indexOf(scr) > 0) tab('tonight');
+    else if (S.mode === 'host' && scr !== 'hostdoor' && HOST_TABS.some((t) => t[0] === scr)) tab('hostdoor');
+    else CapApp.minimizeApp();
+  };
+  useEffect(() => {
+    var C = window.Capacitor;
+    if (!C || !C.isNativePlatform || !C.isNativePlatform()) return;
+    var handle = null,
+      gone = false;
+    import('@capacitor/app').then((m) =>
+      m.App.addListener('backButton', () => hwBack.current(m.App)).then((h) => {
+        if (gone) h.remove();
+        else handle = h;
+      })
+    );
+    return () => {
+      gone = true;
+      if (handle) handle.remove();
+    };
+  }, []);
   var first = useRef(true);
   useEffect(() => {
     if (first.current) {
       first.current = false;
       return;
     }
-    var el = document.querySelector('.phone .screen');
+    var el = screenRef.current;
     if (el && !S.sheet) el.focus({ preventScroll: true });
   }, [scr, S.cur]);
   var hostTabs = S.mode === 'host' && HOST_TABS.some((t) => t[0] === scr);
@@ -338,14 +394,22 @@ export function App() {
     <div className={'stage' + (REVIEW ? ' has-review' : '')}>
       {REVIEW ? <ReviewPanel ctx={ctx} scr={scr} /> : null}
       <div className="phone-wrap">
-        <div className="phone">
+        <div className="phone" ref={phoneRef}>
+          {Under ? (
+            <div ref={underRef} className="screen under" aria-hidden="true" inert="">
+              <Under ctx={ctx} />
+            </div>
+          ) : null}
+          <div ref={ghostRef} className="ghost-layer" aria-hidden="true" />
           <div
-            key={scr + (scr === 'event' || scr === 'venue' ? S.cur : '')}
+            key={scrKey}
+            ref={screenRef}
             tabIndex={-1}
             className={'screen nav-' + (S.dir || 'tab') + (scr === 'map' ? ' no-scroll' : '')}
           >
             <Scr ctx={ctx} />
           </div>
+          {canEdgeSwipe ? <div className="edge-swipe" aria-hidden="true" {...swipe} /> : null}
           {showTabs ? <div className="tab-fade" /> : null}
           {showTabs ? (
             <div className="tabwrap">

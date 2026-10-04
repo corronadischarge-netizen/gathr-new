@@ -1,3 +1,4 @@
+import { TabIndicator } from '../design-system';
 import { icon, svgIcon } from '../ui/helpers';
 
 /* ================= HOST MODE =================
@@ -20,6 +21,7 @@ export const HOST_TABS = [
 export function HostTabBar(p) {
   return (
     <nav className="g-tabbar host-tabbar" aria-label="Hosting">
+      <TabIndicator active={p.active} />
       {HOST_TABS.map((t) => {
         var on = p.active === t[0];
         return (

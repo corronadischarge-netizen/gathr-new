@@ -14,6 +14,7 @@ export { PageIndicator } from './PageIndicator';
 export { Bloom } from './Bloom';
 export { TopBar } from './TopBar';
 export { TabBar } from './TabBar';
+export { TabIndicator } from './TabIndicator';
 export { Sheet } from './Sheet';
 export { Media } from './Media';
 export { VenueCard } from './VenueCard';
