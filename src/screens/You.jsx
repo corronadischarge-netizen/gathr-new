@@ -57,6 +57,15 @@ export function You(p) {
       ['spotlight', 'red']
     ]
   ];
+  // promoters: the nights hosts invited them to, with their own guest lists
+  if ((S.promoting || []).length)
+    rows.unshift([
+      'Nights you’re promoting',
+      S.promoting.length +
+        (S.promoting.length === 1 ? ' night · your guest list' : ' nights · your guest lists'),
+      () => c.go('promoting'),
+      ['wristband', 'green']
+    ]);
   // gathr admins (and only them) get a way in to approvals
   if (S.isAdmin)
     rows.unshift([

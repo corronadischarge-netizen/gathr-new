@@ -29,7 +29,8 @@ export function Notifs(p) {
   var LOOK = {
     night_live: ['ticket', 'green'],
     night_back: ['megaphone', 'yellow'],
-    verified: ['heart', 'violet']
+    verified: ['heart', 'violet'],
+    promoter_invite: ['wristband', 'green']
   };
   (S.inbox || [])
     .filter((n) => LOOK[n.kind])

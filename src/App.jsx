@@ -32,6 +32,7 @@ import { OrgForm } from './screens/OrgForm';
 import { OrgHome } from './screens/OrgHome';
 import { OrgIntro } from './screens/OrgIntro';
 import { OrgSetup } from './screens/OrgSetup';
+import { Promoting } from './screens/Promoting';
 import { Pass } from './screens/Pass';
 import { Phone } from './screens/Phone';
 import { Plans } from './screens/Plans';
@@ -341,12 +342,23 @@ export function App() {
     } else if (d.kind === 'night_live' || d.kind === 'night_back') {
       if (!mine || !(S.org.events || []).some((o) => o.id === ev)) return; // their nights are still loading
       set({ pendingOpen: null, mode: 'host', stack: ['orghome', 'orgevent'], orgView: ev, dir: 'fwd' });
+    } else if (d.kind === 'promoter_invite') {
+      set({ pendingOpen: null, mode: 'guest', stack: ['you', 'promoting'], dir: 'fwd' });
     } else if (d.kind === 'verified') {
       set(
         mine ? { pendingOpen: null, mode: 'host', stack: ['orghome'], dir: 'mode' } : { pendingOpen: null }
       );
     } else set({ pendingOpen: null });
   }, [S.pendingOpen, S.feedAt, S.org]);
+  /* promoters: take any lists hosts invited you to (by your email), then load the nights you're promoting.
+     Again when a new notification arrives (it may be an invite). */
+  useEffect(() => {
+    if (!Remote.remoteOn || !S.signedIn) return;
+    Remote.acceptPromoterLists()
+      .then(() => Remote.myPromoterLists())
+      .then((l) => set({ promoting: l }))
+      .catch(() => {});
+  }, [S.signedIn, S.inboxAt]);
   /* other cities: which ones you asked to hear about; an ask made before signing in is sent once you're in */
   useEffect(() => {
     if (!S.signedIn) return;
@@ -480,6 +492,7 @@ export function App() {
     hostprofile: HostProfile,
     orgintro: OrgIntro,
     orgsetup: OrgSetup,
+    promoting: Promoting,
     orghome: OrgHome,
     orgform: OrgForm,
     orgevent: OrgEvent,

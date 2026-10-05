@@ -57,6 +57,10 @@ export const Share = {
   whatsapp: (text) => {
     Share.open('https://wa.me/?text=' + encodeURIComponent(text));
   },
+  /* a WhatsApp message to one Indian mobile number */
+  whatsappTo: (phone, text) => {
+    Share.open('https://wa.me/91' + phone + '?text=' + encodeURIComponent(text));
+  },
   directions: (v) => {
     Share.open('https://www.google.com/maps/dir/?api=1&destination=' + v.lat + ',' + v.lng);
   },

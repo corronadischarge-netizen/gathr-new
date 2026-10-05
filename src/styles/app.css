@@ -619,3 +619,14 @@ button.ev-hero-img { border: 0; padding: 0; margin: 0; width: 100%; cursor: zoom
 .energy-row button::after { content: ""; position: absolute; inset: -4px 0; }
 .energy-row button.on { background: var(--brand); box-shadow: none; color: #fff; }
 .energy-row button:focus-visible { outline: 2px solid transparent; box-shadow: var(--focus-ring); }
+/* guest lists: one line per guest or promoter, details on tap */
+.gl-row { display: block; min-height: 0; padding: 0; }
+.gl-row .org-guest-main { min-height: 52px; }
+.gl-row .org-guest-main:disabled { cursor: default; }
+.gl-taken { flex: none; font: 600 12px/1 var(--font-sans); color: var(--go-text); }
+.gl-theirs { padding-left: 12px; margin-bottom: 8px; box-shadow: inset 2px 0 0 var(--line); }
+/* promoter: one night, its list and cap */
+.promo-head { display: flex; align-items: center; gap: 12px; width: 100%; padding: 0; border: 0; background: none; color: var(--ink); font: inherit; text-align: left; cursor: pointer; }
+.promo-head:focus-visible { outline: 2px solid transparent; box-shadow: var(--focus-ring); border-radius: 12px; }
+.promo-count { flex: none; font: 600 15px/1 var(--font-sans); color: var(--ink-muted); font-variant-numeric: tabular-nums; }
+.promo-count b { font-size: 22px; color: var(--ink); }
