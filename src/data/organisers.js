@@ -226,6 +226,26 @@ export function orgStats(S, id) {
           ]
         : [];
     guests = guests.concat((org.walkins || {})[id] || []);
+    // the door, in Supabase: who's in comes from every door phone's check-ins (plus any still sending)
+    var doorRows = fromDb && S.remoteCheckins && S.remoteCheckins[id];
+    if (doorRows) {
+      ci = {};
+      guests = guests.map((g) => {
+        var mine = doorRows.filter(
+          (r) =>
+            r.outcome === 'admitted' &&
+            ((g.bookingId && r.booking_id === g.bookingId) || (g.entryId && r.guest_entry_id === g.entryId))
+        );
+        if (mine.length) ci[g.name] = Date.parse(mine[0].scanned_at) || Date.now();
+        return Object.assign({}, g, {
+          inRows: mine,
+          inNames: [].concat.apply(
+            [],
+            mine.map((r) => r.guest_names || [])
+          ) // guest-list people already in
+        });
+      });
+    }
     var n = views[id] || 0,
       interested = S.saved[id] ? 1 : 0;
     return {

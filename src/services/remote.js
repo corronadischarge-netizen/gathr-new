@@ -430,7 +430,11 @@ export function pullGuests(eventId) {
             : 'Booked on gathr',
         plusOnes: g.plus_ones || [],
         guestList: g.guest_list || null,
-        bookingId: g.booking_id
+        bookingId: g.booking_id,
+        entryId: g.entry_id || null,
+        couples: g.couples,
+        stags: g.stags,
+        girls: g.girls
       }))
     );
 }
@@ -540,4 +544,33 @@ export function removeFromList(entryId) {
         .select('id')
     )
     .then(ok);
+}
+
+/* ---------------------------------------------------------------- the door (step 5) */
+/* Every check-in for one of your nights, from every door phone. */
+export function pullCheckins(eventId) {
+  return db()
+    .then((c) =>
+      c
+        .from('checkins')
+        .select(
+          'id, client_id, booking_id, guest_entry_id, guest_names, outcome, couples, stags, girls, scanned_at'
+        )
+        .eq('event_id', eventId)
+        .order('scanned_at')
+    )
+    .then(ok);
+}
+/* Record one check-in. The database works out the credit and refuses anything the door's rules don't allow. */
+export function sendCheckin(row) {
+  return db()
+    .then((c) => c.from('checkins').insert(row).select('id, scanned_at').single())
+    .then(ok);
+}
+/* Undo a check-in: only the phone that recorded it, within 10 minutes. Resolves how many were undone. */
+export function undoCheckins(ids) {
+  return db()
+    .then((c) => c.from('checkins').delete().in('id', ids).select('id'))
+    .then(ok)
+    .then((rows) => rows.length);
 }

@@ -58,6 +58,36 @@ export function checkPass(S, id, raw) {
     };
   }
   var g = st.guests.filter((x) => x.code === code)[0];
+  // a guest list: named people, let in as they arrive (some may be in already)
+  if (g && g.guestList) {
+    var everyone = [g.name].concat(g.plusOnes || []),
+      inside = g.inNames || [],
+      out = everyone.filter((n) => inside.indexOf(n) < 0);
+    if (!out.length)
+      return {
+        tone: 'amber',
+        title: 'Already in',
+        line:
+          g.name +
+          (everyone.length > 1 ? ' and all ' + (everyone.length - 1) + ' plus-ones' : '') +
+          ' · guest list',
+        guest: g,
+        undo: true
+      };
+    return {
+      tone: 'green',
+      title: g.name + (g.plusOnes && g.plusOnes.length ? ' + ' + g.plusOnes.length : ''),
+      line:
+        'Guest list · ' +
+        g.guestList +
+        ' · free entry' +
+        (inside.length ? ' · ' + inside.join(', ') + ' already in' : '') +
+        ' · check their ID',
+      guest: g,
+      admit: true,
+      pick: out
+    };
+  }
   if (g && st.ci[g.name])
     return {
       tone: 'amber',

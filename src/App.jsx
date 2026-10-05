@@ -45,6 +45,7 @@ import { Welcome } from './screens/Welcome';
 import { Wrapped } from './screens/Wrapped';
 import { You } from './screens/You';
 import { Auth } from './services/auth';
+import * as Door from './services/door';
 import * as Remote from './services/remote';
 import { Pay } from './services/payments';
 import { SheetLayer } from './sheets/SheetLayer';
@@ -303,16 +304,37 @@ export function App() {
     }, 800);
     return () => clearTimeout(t);
   }, [S.signedIn, S.me && S.me.name, S.phone, S.age]);
-  /* hosting: who's coming to your gathr nights, from every phone (refreshed when you open a host screen) */
+  /* hosting: who's coming to your gathr nights and who's in, from every phone. Refreshed when you open a
+     host screen, and every 15 seconds on the door and guest screens, so other door phones' scans show up. */
+  var hostScreen = S.stack[S.stack.length - 1];
   useEffect(() => {
     if (!Remote.remoteOn || S.mode !== 'host' || !S.org || !S.org.profile) return;
-    var ids = hostNights(S).filter((k) => EVENTS[k] && EVENTS[k].remote);
-    ids.forEach((id) => {
-      Remote.pullGuests(id)
-        .then((list) => set((o) => ({ remoteGuests: Object.assign({}, o.remoteGuests, { [id]: list }) })))
-        .catch(() => {});
-    });
-  }, [S.mode, S.stack[S.stack.length - 1], S.feedAt, S.org]);
+    var door = { set: set, toast: toast };
+    function refresh() {
+      hostNights(S)
+        .filter((k) => EVENTS[k] && EVENTS[k].remote)
+        .forEach((id) => {
+          Remote.pullGuests(id)
+            .then((list) => set((o) => ({ remoteGuests: Object.assign({}, o.remoteGuests, { [id]: list }) })))
+            .catch(() => {});
+          Door.loadCheckins(door, id);
+        });
+      Door.flush(door);
+    }
+    refresh();
+    if (['hostdoor', 'hostguests', 'orgevent'].indexOf(hostScreen) < 0) return;
+    var t = setInterval(refresh, 15000);
+    return () => clearInterval(t);
+  }, [S.mode, hostScreen, S.feedAt, S.org]);
+  /* check-ins waiting for signal go as soon as the phone is back online */
+  useEffect(() => {
+    if (!Remote.remoteOn) return;
+    var door = { set: set, toast: toast };
+    var go = () => Door.flush(door);
+    go();
+    window.addEventListener('online', go);
+    return () => window.removeEventListener('online', go);
+  }, []);
   useEffect(() => {
     if (scrTop() !== 'event') return;
     var v = store('gathr.views') || {};

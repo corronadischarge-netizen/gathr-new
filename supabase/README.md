@@ -8,6 +8,7 @@
 4. `20261005100000_posters.sql`: a public storage bucket for night posters; only an organiser's owners can add or remove posters, in their own folder.
 5. `20261006090000_event_guests.sql`: lets a night's team (owners and door staff) see who's booked, with the name on each booking, while profiles stay private.
 6. `20261006100000_guest_lists.sql`: guest lists (free entry for named people) from the host or a promoter, with caps; guests take free passes only if their sign-in email is on the list; promoters can be paid per guest-list person. Replaces event_guests() so the door also sees guest-list people.
+7. `20261007090000_door_checkins.sql`: door check-ins for guest lists: people come in by name (some now, the rest later, never twice), promoters are credited for their guest-list people, a door phone can undo its own check-in for 10 minutes, and payout lines count guest-list people.
 
 Every table has row-level security, so each person only reads and changes what their role allows.
 
