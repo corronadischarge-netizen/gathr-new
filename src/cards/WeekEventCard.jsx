@@ -9,11 +9,11 @@ export function WeekEventCard(p) {
     e = p.e,
     v = VENUES[e.venue];
   var badge = e.rsvp
-    ? ['Free', 'go']
+    ? ['Free', 'quiet']
     : e.nFriends >= 2
-      ? [e.nFriends + ' friends', 'people']
+      ? [e.nFriends + ' friends', 'quiet']
       : e.age
-        ? [e.age + '+', 'neutral']
+        ? [e.age + '+', 'quiet']
         : null;
   return (
     <Tap

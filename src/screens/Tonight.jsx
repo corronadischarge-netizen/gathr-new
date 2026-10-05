@@ -36,6 +36,11 @@ export function Tonight(p) {
   var lastFilter = useRef({ f: S.filter, at: 0 });
   if (lastFilter.current.f !== S.filter) lastFilter.current = { f: S.filter, at: Date.now() };
   var swapped = Date.now() - lastFilter.current.at < 400;
+  // the bell: how many updates you haven't opened (unread notifications and guest lists you haven't seen)
+  var unread =
+    (S.inbox || []).filter((n) => !n.read_at && n.kind !== 'guest_list').length +
+    (S.myGuestLists || []).filter((g) => (S.glSeen || []).indexOf(g.entryId) < 0).length;
+  var fresh = !S.notifSeen;
   return (
     <div className="col" style={{ paddingTop: '48px', paddingBottom: '140px' }}>
       <div className="rowc between px">
@@ -44,15 +49,19 @@ export function Tonight(p) {
         </Tap>
         <div className="rowc" style={{ gap: '8px' }}>
           <IconButton icon="search" label="Search" onClick={() => c.tab('search')} />
-          <span className="bell">
+          <span className={'bell' + (fresh ? ' is-new' : '')}>
             <IconButton
               icon="bell"
-              label={S.notifSeen ? 'Updates' : 'Updates, new'}
+              label={!fresh ? 'Updates' : unread ? 'Updates, ' + unread + ' new' : 'Updates, new'}
               onClick={() =>
                 c.go('notifs', { notifSeen: true, glSeen: (S.myGuestLists || []).map((g) => g.entryId) })
               }
             />
-            {S.notifSeen ? null : <i className="bell-dot" aria-hidden />}
+            {fresh ? (
+              <i key={unread} className={'bell-count' + (unread ? '' : ' is-dot')} aria-hidden>
+                {unread ? (unread > 9 ? '9+' : unread) : null}
+              </i>
+            ) : null}
           </span>
         </div>
       </div>

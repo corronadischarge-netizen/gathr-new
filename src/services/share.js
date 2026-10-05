@@ -1,5 +1,10 @@
 import { APP_URL, CFG } from '../config';
 
+function isNative() {
+  var C = window.Capacitor;
+  return !!(C && C.isNativePlatform && C.isNativePlatform());
+}
+
 /* Free device services: share, WhatsApp, maps, calendar, contacts, clipboard */
 export const Share = {
   copy: (text) => {
@@ -23,6 +28,14 @@ export const Share = {
     });
   } /* resolves 'shared' | 'copied' | 'cancelled' */,
   link: (title, text, url) => {
+    // the installed app: the phone's own share sheet (the app's web view has no navigator.share)
+    if (isNative())
+      return import('@capacitor/share')
+        .then((m) => m.Share.share({ title: title, text: text, url: url, dialogTitle: title }))
+        .then(
+          () => 'shared',
+          (e) => (/cancel/i.test((e && e.message) || '') ? 'cancelled' : Share.copy(text + ' ' + url))
+        );
     if (navigator.share)
       return navigator.share({ title: title, text: text, url: url }).then(
         () => 'shared',

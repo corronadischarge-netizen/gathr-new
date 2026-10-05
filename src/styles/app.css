@@ -136,6 +136,9 @@ a.rule-link { text-decoration: none; }
 .g-crowd-words b { font-weight: 600; }
 .g-crowd-words span { font-weight: 400; }
 .g-chip { font-weight: 500; }
+.g-chip:not(.is-selected) { box-shadow: inset 0 0 0 1px var(--line-strong); }
+/* small labels on cards (Free, 18+, friends going): quiet glass with a thin line instead of a colour */
+.g-badge-quiet { background: var(--glass-scrim); color: var(--night-50); box-shadow: inset 0 0 0 1px #ffffff2e; -webkit-backdrop-filter: blur(var(--blur-sm)); backdrop-filter: blur(var(--blur-sm)); }
 .lead { font-size: 17px; line-height: 25px; font-weight: 400; color: var(--night-300); }
 .g-accent { font-size: 17px; line-height: 22px; }
 .g-vibe { font-size: 15px; height: 36px; }
@@ -166,7 +169,10 @@ a.rule-link { text-decoration: none; }
 .field-row input::placeholder { color: var(--night-500); letter-spacing: 0; }
 .welcome .lead { max-width: 320px; margin: 12px auto 0; text-align: center; }
 .bell { position: relative; display: inline-flex; }
-.bell-dot { position: absolute; top: 9px; right: 11px; width: 8px; height: 8px; border-radius: 999px; background: var(--yellow-300); box-shadow: 0 0 0 2px var(--bg); pointer-events: none; }
+/* the bell with something new: the button turns light, and a violet count sits on its corner */
+.bell.is-new .g-ibtn { background: var(--night-50); color: var(--on-ink); }
+.bell-count { position: absolute; top: -4px; right: -4px; min-width: 22px; height: 22px; padding: 0 6px; box-sizing: border-box; border-radius: 999px; background: var(--brand); color: #fff; font: 700 12px/22px var(--font-sans); font-style: normal; text-align: center; font-variant-numeric: tabular-nums; box-shadow: 0 0 0 2px var(--bg); pointer-events: none; }
+.bell-count.is-dot { min-width: 12px; width: 12px; height: 12px; padding: 0; top: 2px; right: 2px; }
 .notif-ic { width: 40px; height: 40px; flex: none; border-radius: 12px; display: grid; place-items: center; background: var(--surface); color: var(--ink); }
 
 /* ---------- full-screen mode: phones, home-screen app, or ?full ---------- */
@@ -285,7 +291,7 @@ html.is-full .map-ctrls { bottom: calc(132px + env(safe-area-inset-bottom, 0px))
    Green / yellow / red stay semantic (go, crowd, limits). Every CTA follows the system: white primary pill. */
 .hue-yellow, .hue-green, .hue-red, .hue-pink, .hue-violet, .hue-blue { --hb: var(--night-800); --hi: var(--ink); }
 .card-slot .g-ecard-cta { background: var(--night-50); color: var(--night-950); }
-.mood { background: var(--night-900); box-shadow: inset 0 0 0 1px var(--line); color: var(--ink); }
+.mood { background: var(--night-900); box-shadow: inset 0 0 0 1px var(--line-strong); color: var(--ink); }
 .mood.on { background: var(--brand); color: #fff; box-shadow: none; }
 .vibe-tile.on { background: var(--brand); color: #fff; }
 .vibe-tile .i3 { filter: drop-shadow(0 6px 10px #0009); }
@@ -542,3 +548,13 @@ button.ev-hero-img { border: 0; padding: 0; margin: 0; width: 100%; cursor: zoom
 .pick-row { gap: 12px; width: 100%; min-height: 48px; padding: 0; border: 0; border-top: 1px solid #ffffff14; background: none; color: var(--ink); font: inherit; text-align: left; cursor: pointer; }
 .pick-box { width: 24px; height: 24px; flex: none; display: grid; place-items: center; border-radius: 8px; box-shadow: inset 0 0 0 2px var(--line-strong); }
 .pick-row.on .pick-box { background: var(--green-300); color: #0a0a0a; box-shadow: none; }
+
+/* ===== portrait only: a phone turned sideways in a browser sees this instead of a squashed app ===== */
+.upright { display: none; }
+@media (orientation: landscape) and (max-height: 520px) and (pointer: coarse) {
+  .upright { position: fixed; inset: 0; z-index: 1000; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; padding: 24px; background: var(--bg); color: var(--ink); text-align: center; }
+  .upright svg { margin-bottom: 8px; color: var(--brand-text); }
+  .upright-t { margin: 0; font: 700 20px/26px var(--font-sans); letter-spacing: -0.01em; }
+  .upright-s { margin: 0; font: 400 14px/20px var(--font-sans); color: var(--ink-muted); }
+  #root { visibility: hidden; }
+}

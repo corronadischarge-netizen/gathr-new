@@ -210,6 +210,11 @@
 @keyframes row-in { from { opacity: 0; transform: translateY(-12px); } to { opacity: 1; transform: none; } }
 
 /* ---------- reduced motion: no slide, scale, bounce or bob. Only fades and instant changes. ---------- */
+/* the bell: rings once when something new arrives, and the count pops in */
+.bell.is-new .g-ibtn svg { transform-origin: 50% 10%; animation: bell-ring var(--motion-slower) var(--ease-standard) 1; }
+@keyframes bell-ring { 0%, 100% { rotate: 0deg; } 20% { rotate: 14deg; } 45% { rotate: -10deg; } 70% { rotate: 6deg; } }
+.bell-count { animation: tag-pop var(--motion-pop) var(--ease-settle) both; }
+
 @media (prefers-reduced-motion: reduce) {
   .ghost-fwd, .ghost-back { animation-name: fade-out !important; }
   .screen.under { transform: none; }
@@ -217,7 +222,7 @@
   .screen.nav-fwd, .screen.nav-back, .sheet-slot.rise, .toast, .w-in, .w-card, .w-tag, .w-3d, .w-fade, .fade-up,
   .mood, .vibe-tile, .celebrate .ok-tick, .celebrate .pass-card, .celebrate .pass-ic, .roll-up, .roll-down { animation-name: g-fade !important; }
   .sheet-leaving .sheet-slot, .sheet-slot.sheet-leaving { animation-name: fade-out !important; }
-  .shake { animation: none !important; }
+  .shake, .bell.is-new .g-ibtn svg, .bell-count { animation: none !important; }
   .sheet-slot.settling { transition: none; }
   .w-3d { transform: rotate(var(--r, 0deg)); }
   .bob, .feature-ic.float-ic, .g-chip.is-selected span, .g-ibtn.is-active svg { animation: none !important; }

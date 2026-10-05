@@ -39,6 +39,12 @@ workflows:
           /usr/libexec/PlistBuddy -c "Add :NSCameraUsageDescription string gathr uses the camera to scan guests' passes at the door and to take a profile picture." $PLIST || /usr/libexec/PlistBuddy -c "Set :NSCameraUsageDescription gathr uses the camera to scan guests' passes at the door and to take a profile picture." $PLIST
           /usr/libexec/PlistBuddy -c "Add :ITSAppUsesNonExemptEncryption bool false" $PLIST || true
           /usr/libexec/PlistBuddy -c "Set :CFBundleVersion $BUILD_NUMBER" $PLIST
+          # portrait only (iPhone and iPad)
+          for KEY in UISupportedInterfaceOrientations "UISupportedInterfaceOrientations~ipad"; do
+            /usr/libexec/PlistBuddy -c "Delete :$KEY" $PLIST || true
+            /usr/libexec/PlistBuddy -c "Add :$KEY array" $PLIST
+            /usr/libexec/PlistBuddy -c "Add :$KEY:0 string UIInterfaceOrientationPortrait" $PLIST
+          done
       - name: Set up signing
         script: xcode-project use-profiles
       - name: Build the app
@@ -92,6 +98,11 @@ workflows:
           MANIFEST=android/app/src/main/AndroidManifest.xml
           grep -q ACCESS_FINE_LOCATION $MANIFEST || perl -0pi -e 's#</manifest>#    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />\n    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />\n</manifest>#' $MANIFEST
           grep -q 'permission.CAMERA' $MANIFEST || perl -0pi -e 's#</manifest>#    <uses-permission android:name="android.permission.CAMERA" />\n    <uses-feature android:name="android.hardware.camera" android:required="false" />\n</manifest>#' $MANIFEST
+      - name: Portrait only
+        script: |
+          MANIFEST=android/app/src/main/AndroidManifest.xml
+          grep -q 'screenOrientation' $MANIFEST || perl -0pi -e 's#(<activity\b)#$1\n            android:screenOrientation="portrait"#' $MANIFEST
+          grep -n 'screenOrientation' $MANIFEST
       - name: Build the APK
         script: |
           cd android
