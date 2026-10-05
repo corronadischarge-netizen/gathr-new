@@ -5,6 +5,7 @@ import { CitySheet } from './CitySheet';
 import { ConfirmSheet } from './ConfirmSheet';
 import { FriendsSheet } from './FriendsSheet';
 import { PosterLayer } from './PosterLayer';
+import { ReportSheet } from './ReportSheet';
 import { RulesSheet } from './RulesSheet';
 
 /* Which sheet to show for each value of state.sheet */
@@ -14,6 +15,7 @@ const SHEETS = {
   list: BookSheet,
   rules: RulesSheet,
   city: CitySheet,
+  report: ReportSheet,
   cancel: ConfirmSheet,
   logout: ConfirmSheet
 };

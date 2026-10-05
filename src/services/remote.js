@@ -36,6 +36,8 @@ export function sayError(e) {
   if (e && e.code === '23505' && /phone/.test(m)) return 'That phone number is already on this guest list.';
   if (e && e.code === '23505' && /guest_list/.test(m)) return 'That email is already on this guest list.';
   if (/already have a list|That's you|waiting for its promoter/.test(m)) return m.replace(/\.?\s*$/, '.');
+  if (e && e.code === '23505' && /night_reports/.test(m))
+    return 'You’ve already reported this night. Thanks.';
   if (/null value in column "email"|schema cache/.test(m))
     return 'This needs the latest gathr database update. Add their email for now.';
   if (/row-level security|permission/i.test(m)) return 'You don’t have permission to do that.';
@@ -371,15 +373,37 @@ export function verifyOrganiser(id) {
     c.from('organisers').update({ status: 'verified' }).eq('id', id).select('id').then(ok)
   );
 }
-export function decideNight(id, live) {
-  return db().then((c) =>
-    c
-      .from('events')
-      .update({ status: live ? 'live' : 'draft' })
-      .eq('id', id)
-      .select('id')
-      .then(ok)
-  );
+/* gathr's decision on a night: 'live', 'back' (to the host as a draft, with a note) or 'reject' (for good) */
+export function decideNight(id, how, note) {
+  var status = how === true || how === 'live' ? 'live' : how === 'reject' ? 'removed' : 'draft';
+  return db().then((c) => {
+    function send(row) {
+      return c.from('events').update(row).eq('id', id).select('id').then(ok);
+    }
+    if (status === 'live') return send({ status: status });
+    return send({ status: status, review_note: note || null }).catch((e) => {
+      // a database without review notes yet (migration 20261008120000)
+      if (!/schema cache|review_note/.test((e && e.message) || '')) throw e;
+      return send({ status: status });
+    });
+  });
+}
+/* Nights waiting for a check, with their flags and the host's record (newest database only). */
+export function pullReviewQueue() {
+  return db().then((c) => c.rpc('review_queue').then(ok));
+}
+export function setTrusted(orgId, yes) {
+  return db().then((c) => c.rpc('set_trusted', { org: orgId, yes: yes }).then(ok));
+}
+/* A guest reports a night on gathr. */
+export function reportNight(eventId, reason, note) {
+  return db().then((c) => {
+    if (!me) throw new Error('Sign in to report a night.');
+    return c
+      .from('night_reports')
+      .insert({ event_id: eventId, reason: reason, note: note || null })
+      .then(ok);
+  });
 }
 
 /* ---------------------------------------------------------------- you: profile and bookings (step 3) */

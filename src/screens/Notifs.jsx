@@ -30,7 +30,11 @@ export function Notifs(p) {
     night_live: ['ticket', 'green'],
     night_back: ['megaphone', 'yellow'],
     verified: ['heart', 'violet'],
-    promoter_invite: ['wristband', 'green']
+    promoter_invite: ['wristband', 'green'],
+    night_submitted: ['ticket', 'blue'],
+    night_rejected: ['megaphone', 'red'],
+    night_review: ['megaphone', 'violet'],
+    night_reported: ['megaphone', 'red']
   };
   (S.inbox || [])
     .filter((n) => LOOK[n.kind])

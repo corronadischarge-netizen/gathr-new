@@ -339,7 +339,14 @@ export function App() {
         bookList: d.list_id,
         dir: 'fwd'
       });
-    } else if (d.kind === 'night_live' || d.kind === 'night_back') {
+    } else if (d.kind === 'night_review' || d.kind === 'night_reported') {
+      set({ pendingOpen: null, mode: 'guest', stack: ['you', 'admin'], dir: 'fwd' });
+    } else if (
+      d.kind === 'night_live' ||
+      d.kind === 'night_back' ||
+      d.kind === 'night_submitted' ||
+      d.kind === 'night_rejected'
+    ) {
       if (!mine || !(S.org.events || []).some((o) => o.id === ev)) return; // their nights are still loading
       set({ pendingOpen: null, mode: 'host', stack: ['orghome', 'orgevent'], orgView: ev, dir: 'fwd' });
     } else if (d.kind === 'promoter_invite') {

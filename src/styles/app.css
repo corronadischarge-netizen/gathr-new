@@ -630,3 +630,9 @@ button.ev-hero-img { border: 0; padding: 0; margin: 0; width: 100%; cursor: zoom
 .promo-head:focus-visible { outline: 2px solid transparent; box-shadow: var(--focus-ring); border-radius: 12px; }
 .promo-count { flex: none; font: 600 15px/1 var(--font-sans); color: var(--ink-muted); font-variant-numeric: tabular-nums; }
 .promo-count b { font-size: 22px; color: var(--ink); }
+/* admin: automatic flags; report sheet */
+.flag-chip { display: inline-flex; align-items: center; height: 26px; padding: 0 10px; border-radius: 9999px; background: #f0483d24; box-shadow: inset 0 0 0 1px #f0483d66; color: #ff8a80; font: 600 12px/1 var(--font-sans); }
+.inline-link { display: inline; min-height: 0; padding: 0; font-size: inherit; color: var(--ink-muted); text-decoration: underline; }
+.report-row { min-height: 52px; }
+.report-dot { flex: none; width: 20px; height: 20px; border-radius: 50%; box-shadow: inset 0 0 0 2px var(--line-strong); }
+.report-row.on .report-dot { box-shadow: inset 0 0 0 6px var(--brand); }

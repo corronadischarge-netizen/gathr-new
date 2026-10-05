@@ -107,7 +107,7 @@ export function OrgForm(p) {
     pushNight(o, status, pr).then(
       (n) => {
         setSaving(null);
-        saved(n, status, o.id);
+        saved(n, n.status === 'live' ? 'live' : status, o.id); // a trusted host's night goes live straight away
       },
       (e) => {
         setSaving(null);
@@ -124,7 +124,8 @@ export function OrgForm(p) {
       orgView: o.id,
       dir: 'fwd'
     });
-    if (status === 'review') {
+    if (status === 'live') c.toast('It’s live. Guests can book it now');
+    else if (status === 'review') {
       c.toast(Auth.live ? 'Sent to gathr for a check. Usually under a day' : 'Sent for review');
       if (!Auth.live)
         setTimeout(() => {

@@ -169,7 +169,10 @@ export function EventScreen(p) {
         </div>
         {e.org && e.host ? (
           <p className="meta" style={{ margin: '-8px 0 0' }}>
-            {'Hosted by ' + e.host + ' · listed on gathr'}
+            {'Hosted by ' + e.host + ' · listed on gathr · '}
+            <button type="button" className="link-btn inline-link" onClick={() => c.set({ sheet: 'report' })}>
+              Report this night
+            </button>
           </p>
         ) : null}
         {/* 3 · who's going (only when friends are) */}
