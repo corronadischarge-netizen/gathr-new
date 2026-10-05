@@ -585,3 +585,16 @@ button.ev-hero-img { border: 0; padding: 0; margin: 0; width: 100%; cursor: zoom
 .field-row.has-ph.is-empty::before { content: attr(data-ph); position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: var(--ink-faint); font-size: 17px; pointer-events: none; }
 .field-row.has-ph.is-empty:not(:focus-within) input { color: transparent; }
 .field-row.has-ph.is-empty:focus-within::before { content: none; }
+/* ===== city chip and sheet ===== */
+.city-chip { display: inline-flex; align-items: center; gap: 4px; height: 36px; padding: 0 10px 0 8px; margin-left: 10px; border: 0; border-radius: 9999px; background: var(--surface); box-shadow: inset 0 0 0 1px var(--line); color: var(--ink); font: 600 14px/1 var(--font-sans); cursor: pointer; position: relative; }
+.city-chip::after { content: ""; position: absolute; inset: -4px; }
+.city-chip:focus-visible { outline: 2px solid transparent; box-shadow: var(--focus-ring); }
+.city-chip svg { color: var(--ink-muted); }
+.city-row { min-height: 60px; }
+.city-ic { flex: none; width: 36px; height: 36px; border-radius: 12px; display: grid; place-items: center; background: var(--night-800); color: var(--ink-muted); }
+.city-ic.on { background: var(--brand); color: #fff; }
+.city-tick { color: var(--brand-text); display: grid; place-items: center; }
+.city-tell { flex: none; display: inline-flex; align-items: center; gap: 6px; height: 36px; padding: 0 14px; border: 0; border-radius: 9999px; background: var(--night-800); color: var(--ink); font: 600 13px/1 var(--font-sans); cursor: pointer; position: relative; }
+.city-tell::after { content: ""; position: absolute; inset: -4px 0; }
+.city-tell.on { background: none; color: var(--go-text); cursor: default; }
+.city-tell:focus-visible { outline: 2px solid transparent; box-shadow: var(--focus-ring); }

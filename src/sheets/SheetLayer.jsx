@@ -1,6 +1,7 @@
 import { useDialog } from '../hooks/useDialog';
 import { AgeSheet } from './AgeSheet';
 import { BookSheet } from './BookSheet';
+import { CitySheet } from './CitySheet';
 import { ConfirmSheet } from './ConfirmSheet';
 import { FriendsSheet } from './FriendsSheet';
 import { PosterLayer } from './PosterLayer';
@@ -12,6 +13,7 @@ const SHEETS = {
   friends: FriendsSheet,
   list: BookSheet,
   rules: RulesSheet,
+  city: CitySheet,
   cancel: ConfirmSheet,
   logout: ConfirmSheet
 };

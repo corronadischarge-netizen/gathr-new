@@ -46,3 +46,12 @@ export const AREAS = [
   'The Mills',
   'FC Road'
 ];
+
+/* Cities after Pune: shown as "Coming soon" on the city chip; [key, name] (keys match the database) */
+export const NEXT_CITIES = [
+  ['mumbai', 'Mumbai'],
+  ['bengaluru', 'Bengaluru'],
+  ['delhi', 'Delhi NCR'],
+  ['goa', 'Goa'],
+  ['hyderabad', 'Hyderabad']
+];

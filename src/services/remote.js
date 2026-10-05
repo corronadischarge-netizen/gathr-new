@@ -600,3 +600,21 @@ export function markRead(ids) {
     .then((c) => c.from('notifications').update({ read_at: new Date().toISOString() }).in('id', ids))
     .then(ok);
 }
+
+/* ---------------------------------------------------------------- other cities: "Tell me when" */
+export function myCities() {
+  return db()
+    .then((c) => (me ? c.from('city_interest').select('city').then(ok) : []))
+    .then((r) => r.map((x) => x.city));
+}
+export function wantCity(city) {
+  return db().then((c) =>
+    c
+      .from('city_interest')
+      .upsert({ city: city }, { onConflict: 'user_id,city', ignoreDuplicates: true })
+      .then(ok)
+  );
+}
+export function cityCounts() {
+  return db().then((c) => c.rpc('city_interest_counts').then(ok));
+}

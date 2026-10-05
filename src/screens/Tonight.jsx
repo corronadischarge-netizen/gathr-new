@@ -11,7 +11,7 @@ import { blockedFor } from '../data/format';
 import { EVENTS, upcoming } from '../data/listings';
 import { FILTERS } from '../data/options';
 import { IconButton } from '../design-system';
-import { eyebrow, i3, meAvatar, meta, stop } from '../ui/helpers';
+import { eyebrow, i3, icon, meAvatar, meta, stop, svgIcon } from '../ui/helpers';
 import { Tap } from '../ui/Tap';
 
 function visible(S, e) {
@@ -44,9 +44,21 @@ export function Tonight(p) {
   return (
     <div className="col" style={{ paddingTop: '48px', paddingBottom: '140px' }}>
       <div className="rowc between px">
-        <Tap onClick={() => c.tab('you')} aria-label="You" className="tap">
-          {meAvatar(S, 48)}
-        </Tap>
+        <div className="rowc">
+          <Tap onClick={() => c.tab('you')} aria-label="You" className="tap">
+            {meAvatar(S, 48)}
+          </Tap>
+          <button
+            type="button"
+            className="city-chip"
+            aria-label="City: Pune. See other cities"
+            onClick={() => c.set({ sheet: 'city' })}
+          >
+            {icon('map-pin', 16)}
+            Pune
+            {svgIcon(['M6 9l6 6 6-6'], 16)}
+          </button>
+        </div>
         <div className="rowc" style={{ gap: '8px' }}>
           <IconButton icon="search" label="Search" onClick={() => c.tab('search')} />
           <span className={'bell' + (fresh ? ' is-new' : '')}>

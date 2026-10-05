@@ -4,6 +4,7 @@ import { ReviewPanel } from './components/ReviewPanel';
 import { Scanner } from './components/Scanner';
 import { REVIEW } from './config';
 import { EVENTS, VENUES, isPast } from './data/listings';
+import { NEXT_CITIES } from './data/options';
 import { hostNights } from './data/hostNights';
 import { ORG_KEY, orgLoad, setRemoteFeed, syncOrg } from './data/organisers';
 import { TabBar } from './design-system';
@@ -151,7 +152,9 @@ export function App() {
     'mode',
     'hostNight',
     'myBookings',
-    'glSeen'
+    'glSeen',
+    'cityWant',
+    'cityAsk'
   ];
   (() => {
     var p = store('gathr.state');
@@ -343,6 +346,24 @@ export function App() {
       );
     } else set({ pendingOpen: null });
   }, [S.pendingOpen, S.feedAt, S.org]);
+  /* other cities: which ones you asked to hear about; an ask made before signing in is sent once you're in */
+  useEffect(() => {
+    if (!S.signedIn) return;
+    var ask = S.cityAsk,
+      name = ask && (NEXT_CITIES.filter((x) => x[0] === ask)[0] || [])[1];
+    var send = !ask ? Promise.resolve() : Remote.remoteOn ? Remote.wantCity(ask) : Promise.resolve();
+    send
+      .then(() => (Remote.remoteOn ? Remote.myCities() : null))
+      .then((list) => {
+        set((o) => {
+          var mine = list || o.cityWant || [];
+          if (ask && mine.indexOf(ask) < 0) mine = mine.concat(ask);
+          return { cityWant: mine, cityAsk: null };
+        });
+        if (name) toast('We’ll tell you when gathr opens in ' + name);
+      })
+      .catch(() => {});
+  }, [S.signedIn]);
   /* your name, phone and age band go to your private profile (hosts see only the name on your bookings) */
   useEffect(() => {
     if (!Remote.remoteOn || !S.signedIn) return;
