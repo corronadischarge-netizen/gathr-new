@@ -9,9 +9,9 @@ export function WeekEventCard(p) {
     e = p.e,
     v = VENUES[e.venue];
   var badge = e.rsvp
-    ? ['Free', 'quiet']
+    ? ['Free', 'go']
     : e.nFriends >= 2
-      ? [e.nFriends + ' friends', 'quiet']
+      ? [e.nFriends + ' friends', 'people']
       : e.age
         ? [e.age + '+', 'quiet']
         : null;
