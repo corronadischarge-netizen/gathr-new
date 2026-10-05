@@ -8,7 +8,7 @@ export function WeekEventCard(p) {
   var c = p.ctx,
     e = p.e,
     v = VENUES[e.venue];
-  // the label on the card: Free stands out (green ticket); friends going and age are quiet
+  // the label on the card: Free (green ticket) and friends going (a light tag) stand out; age is quiet
   var badge = e.rsvp
     ? [
         <>
@@ -19,7 +19,14 @@ export function WeekEventCard(p) {
         'tag-free'
       ]
     : e.nFriends >= 2
-      ? [e.nFriends + ' going', 'quiet']
+      ? [
+          <>
+            <Icon name="users" size={14} />
+            {e.nFriends + ' going'}
+          </>,
+          'quiet',
+          'tag-going'
+        ]
       : e.age
         ? [e.age + '+', 'quiet']
         : null;

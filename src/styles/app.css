@@ -559,3 +559,5 @@ button.ev-hero-img { border: 0; padding: 0; margin: 0; width: 100%; cursor: zoom
 }
 /* night card labels: Free in green with a ticket */
 .g-badge.tag-free { color: var(--go-text, var(--green-300)); }
+/* friends going: a light tag with dark text, so it stands out without a colour */
+.g-badge.tag-going { background: var(--night-50); color: var(--on-ink); box-shadow: none; -webkit-backdrop-filter: none; backdrop-filter: none; }
