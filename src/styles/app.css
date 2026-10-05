@@ -557,8 +557,5 @@ button.ev-hero-img { border: 0; padding: 0; margin: 0; width: 100%; cursor: zoom
   .upright-s { margin: 0; font: 400 14px/20px var(--font-sans); color: var(--ink-muted); }
   #root { visibility: hidden; }
 }
-/* night card labels: Free in green with a ticket, friends going with their faces in pink */
+/* night card labels: Free in green with a ticket */
 .g-badge.tag-free { color: var(--go-text, var(--green-300)); }
-.g-badge.tag-friends { color: var(--people-text); padding-left: 4px; }
-.g-badge.tag-friends .mini-crew > * { margin-right: -5px; }
-.g-badge.tag-friends .mini-crew > *:last-child { margin-right: 4px; }

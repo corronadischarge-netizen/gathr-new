@@ -1,14 +1,14 @@
 import { priceTxt } from '../data/format';
 import { VENUES } from '../data/listings';
 import { EventCard, Icon } from '../design-system';
-import { fav, i3 } from '../ui/helpers';
+import { i3 } from '../ui/helpers';
 import { Tap } from '../ui/Tap';
 
 export function WeekEventCard(p) {
   var c = p.ctx,
     e = p.e,
     v = VENUES[e.venue];
-  // the label on the card: Free (green ticket) or friends going (their faces) stand out; age stays quiet
+  // the label on the card: Free stands out (green ticket); friends going and age are quiet
   var badge = e.rsvp
     ? [
         <>
@@ -19,14 +19,7 @@ export function WeekEventCard(p) {
         'tag-free'
       ]
     : e.nFriends >= 2
-      ? [
-          <>
-            <span className="mini-crew">{(e.friends || []).slice(0, 3).map((f) => fav(f, 18))}</span>
-            {e.nFriends + ' going'}
-          </>,
-          'quiet',
-          'tag-friends'
-        ]
+      ? [e.nFriends + ' going', 'quiet']
       : e.age
         ? [e.age + '+', 'quiet']
         : null;
