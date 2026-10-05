@@ -67,11 +67,22 @@ workflows:
       - name: Install dependencies
         script: npm ci
       - name: Build the web app
-        script: npm run build
+        script: |
+          # notifications switch on only when Firebase's settings are in the project (see firebase/README.md)
+          if [ -f firebase/google-services.json ]; then export VITE_PUSH=1; fi
+          npm run build
       - name: Create the Android app shell
         script: |
           if [ ! -d android ]; then npx cap add android; fi
           npx cap sync android
+      - name: Add Firebase for notifications
+        script: |
+          if [ -f firebase/google-services.json ]; then
+            cp firebase/google-services.json android/app/google-services.json
+            echo "Firebase added: notifications are on"
+          else
+            echo "No firebase/google-services.json yet: this build has notifications off"
+          fi
       - name: Set the app icon
         # Makes every icon size from assets/icon-only.png (plus the two layers of Android's adaptive icon)
         script: npx capacitor-assets generate --android

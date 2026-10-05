@@ -46,6 +46,7 @@ import { Wrapped } from './screens/Wrapped';
 import { You } from './screens/You';
 import { Auth } from './services/auth';
 import * as Door from './services/door';
+import { startPush } from './services/push';
 import * as Remote from './services/remote';
 import { Pay } from './services/payments';
 import { SheetLayer } from './sheets/SheetLayer';
@@ -296,6 +297,52 @@ export function App() {
       })
       .catch(() => {});
   }, [S.signedIn]);
+  /* notifications: on the installed app, ask to send them and register this phone; and your inbox for Updates
+     (a new unread one lights the bell). Refreshed when a notification arrives while the app is open. */
+  useEffect(() => {
+    if (!Remote.remoteOn || !S.signedIn) return;
+    startPush({ set: set, toast: toast });
+  }, [S.signedIn]);
+  useEffect(() => {
+    if (!Remote.remoteOn || !S.signedIn) return;
+    Remote.pullInbox()
+      .then((list) =>
+        set((o) => ({
+          inbox: list,
+          notifSeen: list.some((n) => !n.read_at && n.kind !== 'guest_list') ? false : o.notifSeen
+        }))
+      )
+      .catch(() => {});
+  }, [S.signedIn, S.inboxAt]);
+  /* a tapped notification opens its place once the nights it points at have loaded */
+  useEffect(() => {
+    var d = S.pendingOpen;
+    if (!d) return;
+    var ev = d.event_id,
+      mine = S.org && S.org.profile;
+    if (d.kind === 'guest_list') {
+      if (!EVENTS[ev]) return; // the feed is still loading
+      var gate = EVENTS[ev].age >= 21 && !S.age;
+      set({
+        pendingOpen: null,
+        mode: 'guest',
+        stack: ['tonight', 'event'],
+        cur: ev,
+        sheet: gate ? 'age' : 'list',
+        after: gate ? 'list' : null,
+        bookMode: 'guest',
+        bookList: d.list_id,
+        dir: 'fwd'
+      });
+    } else if (d.kind === 'night_live' || d.kind === 'night_back') {
+      if (!mine || !(S.org.events || []).some((o) => o.id === ev)) return; // their nights are still loading
+      set({ pendingOpen: null, mode: 'host', stack: ['orghome', 'orgevent'], orgView: ev, dir: 'fwd' });
+    } else if (d.kind === 'verified') {
+      set(
+        mine ? { pendingOpen: null, mode: 'host', stack: ['orghome'], dir: 'mode' } : { pendingOpen: null }
+      );
+    } else set({ pendingOpen: null });
+  }, [S.pendingOpen, S.feedAt, S.org]);
   /* your name, phone and age band go to your private profile (hosts see only the name on your bookings) */
   useEffect(() => {
     if (!Remote.remoteOn || !S.signedIn) return;

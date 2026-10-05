@@ -574,3 +574,29 @@ export function undoCheckins(ids) {
     .then(ok)
     .then((rows) => rows.length);
 }
+
+/* ---------------------------------------------------------------- notifications (step 6) */
+/* This phone's push address, for the signed-in user (a shared phone moves to whoever signed in last). */
+export function saveDevice(token, platform) {
+  return db()
+    .then((c) => (me ? c.rpc('save_device', { tok: token, plat: platform }) : { data: null }))
+    .then(ok);
+}
+/* Your notifications, newest first (including ones sent to your email before you joined). */
+export function pullInbox() {
+  return db().then((c) => {
+    if (!me) return [];
+    return c
+      .from('notifications')
+      .select('id, kind, title, body, data, created_at, read_at')
+      .order('created_at', { ascending: false })
+      .limit(30)
+      .then(ok);
+  });
+}
+export function markRead(ids) {
+  if (!ids.length) return Promise.resolve();
+  return db()
+    .then((c) => c.from('notifications').update({ read_at: new Date().toISOString() }).in('id', ids))
+    .then(ok);
+}

@@ -1,6 +1,9 @@
+import { useEffect } from 'react';
 import { EVENTS, VENUES } from '../data/listings';
 import { IconButton } from '../design-system';
 import { poss } from '../lib/utils';
+import { openFrom } from '../services/push';
+import { markRead } from '../services/remote';
 import { icon, meta, note, tile } from '../ui/helpers';
 import { Tap } from '../ui/Tap';
 
@@ -8,6 +11,38 @@ export function Notifs(p) {
   var c = p.ctx,
     S = c.S,
     items = [];
+  // opening Updates reads your notifications
+  useEffect(() => {
+    var unread = (S.inbox || []).filter((n) => !n.read_at).map((n) => n.id);
+    if (!unread.length) return;
+    markRead(unread)
+      .then(() =>
+        c.set((o) => ({
+          inbox: (o.inbox || []).map((n) =>
+            unread.indexOf(n.id) >= 0 ? Object.assign({}, n, { read_at: 'now' }) : n
+          )
+        }))
+      )
+      .catch(() => {});
+  }, []);
+  // your nights and your organiser profile (guest lists show below, with whether you've taken your passes)
+  var LOOK = {
+    night_live: ['ticket', 'green'],
+    night_back: ['megaphone', 'yellow'],
+    verified: ['heart', 'violet']
+  };
+  (S.inbox || [])
+    .filter((n) => LOOK[n.kind])
+    .forEach((n) => {
+      items.push([
+        LOOK[n.kind],
+        n.title,
+        n.body,
+        () => {
+          openFrom(c, Object.assign({ kind: n.kind }, n.data));
+        }
+      ]);
+    });
   // guest lists you're on: tapping opens the night with "Guest list" already picked
   (S.myGuestLists || []).forEach((g) => {
     var e = EVENTS[g.event];
