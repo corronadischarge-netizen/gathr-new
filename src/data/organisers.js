@@ -161,7 +161,20 @@ export function syncOrg(org) {
       ORDER.push(o.id);
     }
   });
+  // live nights from every other organiser on gathr (from Supabase)
+  remoteFeed.forEach((x) => {
+    if (EVENTS[x.night.id] || !VENUES[x.night.venueId]) return;
+    EVENTS[x.night.id] = orgToEvent(x.night, { name: x.host });
+    ORDER.push(x.night.id);
+  });
   ORDER.sort((a, b) => new Date(EVENTS[a].iso) - new Date(EVENTS[b].iso));
+}
+
+/* the live feed from Supabase: [{ night, host }], kept here so a local save doesn't drop it */
+var remoteFeed = [];
+export function setRemoteFeed(list) {
+  remoteFeed = list || [];
+  syncOrg(orgLoad());
 }
 
 syncOrg(orgLoad());

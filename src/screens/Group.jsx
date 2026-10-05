@@ -177,7 +177,10 @@ function VoteList(p) {
     layer.current.appendChild(fly);
     el.style.visibility = 'hidden';
     var a = fly.animate(
-      [{ transform: 'translate(' + (prev.x - now.x) + 'px, ' + (prev.y - now.y) + 'px)' }, { transform: 'none' }],
+      [
+        { transform: 'translate(' + (prev.x - now.x) + 'px, ' + (prev.y - now.y) + 'px)' },
+        { transform: 'none' }
+      ],
       { duration: ms('--motion-slow'), easing: 'cubic-bezier(0.2, 0, 0, 1)' }
     );
     a.onfinish = a.oncancel = () => {

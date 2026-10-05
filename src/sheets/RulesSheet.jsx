@@ -15,7 +15,11 @@ export function RulesSheet(p) {
     [
       'user',
       'Age',
-      e.allAges ? 'Open to all ages.' : e.age ? e.age + '+ to enter.' + (e.age >= 21 ? ' Spirits 25+ by law.' : '') : null
+      e.allAges
+        ? 'Open to all ages.'
+        : e.age
+          ? e.age + '+ to enter.' + (e.age >= 21 ? ' Spirits 25+ by law.' : '')
+          : null
     ],
     ['user', 'ID', e.idNote || 'Government ID or DigiLocker (Pune rule)'],
     ['ticket', 'Entry', priceTxt(e) + (e.price ? ' per person' : '')],

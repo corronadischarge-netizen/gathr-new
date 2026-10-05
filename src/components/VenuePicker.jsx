@@ -46,7 +46,9 @@ export function VenuePicker(p) {
   // a venue with the same name in the same area is already listed: offer that one instead
   var twin =
     adding && adding.area
-      ? all.filter((k) => norm(VENUES[k].name) === norm(adding.name) && VENUES[k].area.indexOf(adding.area) >= 0)[0]
+      ? all.filter(
+          (k) => norm(VENUES[k].name) === norm(adding.name) && VENUES[k].area.indexOf(adding.area) >= 0
+        )[0]
       : null;
   function addNew() {
     var base = 'v_' + norm(adding.name).slice(0, 24),

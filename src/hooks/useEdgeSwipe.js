@@ -18,7 +18,9 @@ export function useEdgeSwipe(o) {
   function place(d, animate) {
     var s = opt.current.screenRef.current,
       u = opt.current.underRef.current,
-      tr = animate ? 'transform var(--motion-back) var(--ease-standard), opacity var(--motion-back) var(--ease-standard)' : 'none';
+      tr = animate
+        ? 'transform var(--motion-back) var(--ease-standard), opacity var(--motion-back) var(--ease-standard)'
+        : 'none';
     if (s) {
       s.style.transition = tr;
       s.style.transform = d ? 'translateX(' + d + 'px)' : '';

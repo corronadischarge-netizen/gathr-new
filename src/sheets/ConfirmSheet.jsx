@@ -1,7 +1,10 @@
 import { srcName } from '../data/format';
 import { VENUES } from '../data/listings';
 import { Button, Sheet } from '../design-system';
+import { ORG_KEY, orgLoad, syncOrg } from '../data/organisers';
+import { store } from '../lib/utils';
 import { Auth } from '../services/auth';
+import { remoteOn } from '../services/remote';
 
 /* "Are you sure?" for cancelling a booking (sheet 'cancel') or logging out (sheet 'logout') */
 export function ConfirmSheet(p) {
@@ -55,7 +58,15 @@ export function ConfirmSheet(p) {
               c.toast('Booking cancelled');
             } else {
               Auth.signOut();
+              // with Supabase on, their organiser lives in the database: don't leave a copy for the next person
+              if (remoteOn) {
+                store(ORG_KEY, null);
+                syncOrg(orgLoad());
+              }
               c.set({
+                org: remoteOn ? orgLoad() : S.org,
+                isAdmin: false,
+                mode: 'guest',
                 stack: ['welcome'],
                 sheet: null,
                 dir: 'tab',

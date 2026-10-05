@@ -20,7 +20,14 @@ function useDragToClose(onClose) {
       if (e.target.closest('button') || (e.pointerType === 'mouse' && e.button !== 0)) return;
       var slot = slotOf(e);
       if (!slot) return;
-      st.current = { y: e.clientY, k: slot.getBoundingClientRect().height / slot.offsetHeight || 1, d: 0, v: 0, t: e.timeStamp, on: false };
+      st.current = {
+        y: e.clientY,
+        k: slot.getBoundingClientRect().height / slot.offsetHeight || 1,
+        d: 0,
+        v: 0,
+        t: e.timeStamp,
+        on: false
+      };
       e.currentTarget.setPointerCapture(e.pointerId);
     },
     onPointerMove: (e) => {

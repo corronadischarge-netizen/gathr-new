@@ -4,13 +4,14 @@ import { ReviewPanel } from './components/ReviewPanel';
 import { Scanner } from './components/Scanner';
 import { REVIEW } from './config';
 import { EVENTS, VENUES, isPast } from './data/listings';
-import { orgLoad } from './data/organisers';
+import { ORG_KEY, orgLoad, setRemoteFeed, syncOrg } from './data/organisers';
 import { TabBar } from './design-system';
 import { useEdgeSwipe } from './hooks/useEdgeSwipe';
 import { useSheetExit } from './hooks/useSheetExit';
 import { useScreenTransition } from './hooks/useScreenTransition';
 import { store } from './lib/utils';
 import { TABS } from './navigation';
+import { Admin } from './screens/Admin';
 import { Age } from './screens/Age';
 import { Areas } from './screens/Areas';
 import { EditProfile } from './screens/EditProfile';
@@ -43,6 +44,7 @@ import { Welcome } from './screens/Welcome';
 import { Wrapped } from './screens/Wrapped';
 import { You } from './screens/You';
 import { Auth } from './services/auth';
+import * as Remote from './services/remote';
 import { Pay } from './services/payments';
 import { SheetLayer } from './sheets/SheetLayer';
 
@@ -235,6 +237,36 @@ export function App() {
         set({ stack: ['tonight', 'event'], cur: r.cur, sheet: 'list', guests: r.guests || 2, dir: 'fwd' });
     });
   }, []);
+  /* With Supabase on: venues and the live feed for everyone, and for a signed-in user their organiser
+     (profile, venues, nights) and whether they're a gathr admin. Their phone's copy is replaced by the
+     database's, keeping nights they haven't saved to it yet. */
+  useEffect(() => {
+    if (!Remote.remoteOn) return;
+    Remote.pullVenues()
+      .then(() => Remote.pullFeed())
+      .then((feed) => {
+        setRemoteFeed(feed);
+        set({ feedAt: Date.now() });
+      })
+      .catch(() => {});
+    if (!S.signedIn) return;
+    Remote.pullMine()
+      .then((mine) => {
+        if (!mine) return;
+        var cur = orgLoad();
+        var next = Object.assign({}, cur, {
+          profile: mine.profile,
+          events: mine.events.concat((cur.events || []).filter((o) => !o.remote))
+        });
+        store(ORG_KEY, next);
+        syncOrg(next);
+        set({ org: next });
+      })
+      .catch(() => {});
+    Remote.amAdmin()
+      .then((yes) => set({ isAdmin: yes }))
+      .catch(() => {});
+  }, [S.signedIn]);
   useEffect(() => {
     if (scrTop() !== 'event') return;
     var v = store('gathr.views') || {};
@@ -246,9 +278,12 @@ export function App() {
   }
   useEffect(() => {
     if (!S.toast) return;
-    var id = setTimeout(() => {
-      set({ toast: null });
-    }, S.toastAct && S.toastAct.for === S.toast ? 4000 : 2400);
+    var id = setTimeout(
+      () => {
+        set({ toast: null });
+      },
+      S.toastAct && S.toastAct.for === S.toast ? 4000 : 2400
+    );
     return () => {
       clearTimeout(id);
     };
@@ -334,7 +369,8 @@ export function App() {
     friendslist: FriendsList,
     newplan: NewPlan,
     wrapped: Wrapped,
-    venuedash: VenueDash
+    venuedash: VenueDash,
+    admin: Admin
   };
   var Scr = screens[scr] || Tonight;
   var scrKey = scr + (scr === 'event' || scr === 'venue' ? S.cur : '');

@@ -10,7 +10,12 @@ export function useScreenTransition(key, dir, screenRef, layerRef) {
   if (last.current.key !== key) {
     var el = screenRef.current;
     var animated = dir === 'fwd' || dir === 'back' || dir === 'tab' || dir === 'mode';
-    last.current = { key: key, node: el && animated ? el.cloneNode(true) : null, top: el ? el.scrollTop : 0, dir: dir };
+    last.current = {
+      key: key,
+      node: el && animated ? el.cloneNode(true) : null,
+      top: el ? el.scrollTop : 0,
+      dir: dir
+    };
   }
   useLayoutEffect(() => {
     var layer = layerRef.current,

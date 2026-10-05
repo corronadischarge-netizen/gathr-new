@@ -4,6 +4,8 @@ import { Switch } from '../components/Switch';
 import { VenuePicker } from '../components/VenuePicker';
 import { orgSave, orgVenueIds } from '../data/organisers';
 import { Button, Chip } from '../design-system';
+import { haptic } from '../lib/haptics';
+import { pushProfile, remoteOn, sayError } from '../services/remote';
 import { eyebrow, meta, stop } from '../ui/helpers';
 
 /* 2 · who you are and where you host */
@@ -34,8 +36,11 @@ export function OrgSetup(p) {
     okInsta = /^@?[a-z0-9._]{2,30}$/i.test(F.insta.trim()),
     okPhone = !F.phone || /^[6-9]\d{9}$/.test(F.phone);
   var ok = okName && okVenue && okInsta && okPhone && F.agree;
+  const [saving, setSaving] = useState(false);
   function save() {
+    if (saving) return;
     var prof = {
+      remoteId: pr.remoteId || null,
       name: F.name.trim(),
       type: F.type,
       venueId: F.venueIds[0], // the main venue
@@ -47,14 +52,30 @@ export function OrgSetup(p) {
       status: pr.status || 'pending',
       since: pr.since || new Date().toISOString()
     };
-    orgSave(c, Object.assign({}, org, { profile: prof }));
-    if (pr.name) {
-      c.back();
-      c.toast('Profile saved');
-    } else {
-      c.set({ mode: 'host', stack: ['orghome'], dir: 'mode' });
-      c.toast('You’re set up. This is hosting mode');
+    function done(saved) {
+      orgSave(c, Object.assign({}, org, { profile: saved }));
+      if (pr.name) {
+        c.back();
+        c.toast('Profile saved');
+      } else {
+        c.set({ mode: 'host', stack: ['orghome'], dir: 'mode' });
+        c.toast('You’re set up. This is hosting mode');
+      }
     }
+    if (!remoteOn) return done(prof);
+    // with Supabase on, the profile and venues are saved to the database first
+    setSaving(true);
+    pushProfile(prof).then(
+      (saved) => {
+        setSaving(false);
+        done(saved);
+      },
+      (e) => {
+        setSaving(false);
+        haptic.error();
+        c.toast(sayError(e));
+      }
+    );
   }
   return (
     <div className="full col pad-top" style={{ gap: '24px', paddingTop: '52px', paddingBottom: '32px' }}>
@@ -149,8 +170,8 @@ export function OrgSetup(p) {
         />
       </div>
       <div className="bottom-stack" style={{ alignItems: 'stretch' }}>
-        <Button variant="primary" size="lg" block disabled={!ok} onClick={save}>
-          {pr.name ? 'Save profile' : 'Continue'}
+        <Button variant="primary" size="lg" block disabled={!ok || saving} onClick={save}>
+          {saving ? 'Saving…' : pr.name ? 'Save profile' : 'Continue'}
         </Button>
         {!ok ? (
           <span className="meta" style={{ textAlign: 'center' }}>

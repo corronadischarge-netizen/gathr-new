@@ -170,7 +170,8 @@ export function AuthForm(p) {
           <label className="meta" htmlFor={p.id + '-code'}>
             {'Code sent to ' + F.email.trim()}
           </label>
-          <div ref={codeRow}>{/* shakes on a wrong code; React never rewrites its class */}
+          <div ref={codeRow}>
+            {/* shakes on a wrong code; React never rewrites its class */}
             <div className={'field-row' + (F.err ? ' has-err' : '')}>
               <input
                 ref={codeIn}

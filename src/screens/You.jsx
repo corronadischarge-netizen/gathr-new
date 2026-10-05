@@ -55,6 +55,14 @@ export function You(p) {
       ['spotlight', 'red']
     ]
   ];
+  // gathr admins (and only them) get a way in to approvals
+  if (S.isAdmin)
+    rows.unshift([
+      'gathr admin',
+      'Verify organisers and put nights live',
+      () => c.go('admin'),
+      ['megaphone', 'violet']
+    ]);
   return (
     <div className="px col" style={{ padding: '52px 16px 140px', gap: '26px' }}>
       <div className="rowc" style={{ gap: '16px' }}>

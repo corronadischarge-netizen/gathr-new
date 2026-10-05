@@ -9,7 +9,11 @@ export function useSheetExit(sheet, hostRef, layerRef) {
   if (last.current.sheet !== sheet) {
     var el = hostRef.current,
       closing = !sheet && el;
-    last.current = { sheet: sheet, node: closing ? copyOf(el) : null, poster: closing && last.current.sheet === 'poster' };
+    last.current = {
+      sheet: sheet,
+      node: closing ? copyOf(el) : null,
+      poster: closing && last.current.sheet === 'poster'
+    };
   }
   useLayoutEffect(() => {
     var layer = layerRef.current,

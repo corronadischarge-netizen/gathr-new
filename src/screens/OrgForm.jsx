@@ -4,7 +4,9 @@ import { VENUES } from '../data/listings';
 import { KINDS, ORG_KEY, SOUNDS, STAGS, orgLoad, orgSave, orgVenueIds, syncOrg } from '../data/organisers';
 import { Button, Chip } from '../design-system';
 import { store } from '../lib/utils';
+import { haptic } from '../lib/haptics';
 import { Auth } from '../services/auth';
+import { pushNight, remoteOn, sayError } from '../services/remote';
 import { eyebrow, i3, meta, stop } from '../ui/helpers';
 
 /* 4 · list or edit a night */
@@ -84,14 +86,32 @@ export function OrgForm(p) {
   if (D.entry === 'paid' && !(+D.price > 0)) need.push('a price');
   if (!D.stag) need.push('your stag policy');
   if (!D.poster) need.push('a poster');
+  const [saving, setSaving] = useState(null); // 'draft' or 'review' while a save is on its way
   function save(status) {
+    if (saving) return;
     var o = Object.assign({}, D, {
       title: D.title.trim(),
       status: status,
       venueId: D.venueId || pr.venueId,
       updated: new Date().toISOString()
     });
-    var list = (org.events || []).filter((x) => x.id !== o.id).concat(o);
+    if (!remoteOn) return saved(o, status);
+    // with Supabase on, the poster is uploaded and the night saved to the database first
+    setSaving(status);
+    pushNight(o, status, pr).then(
+      (n) => {
+        setSaving(null);
+        saved(n, status, o.id);
+      },
+      (e) => {
+        setSaving(null);
+        haptic.error();
+        c.toast(sayError(e));
+      }
+    );
+  }
+  function saved(o, status, oldId) {
+    var list = (org.events || []).filter((x) => x.id !== o.id && x.id !== oldId).concat(o);
     orgSave(c, Object.assign({}, org, { events: list }));
     c.set({
       stack: (S.mode === 'host' ? ['orghome'] : ['you', 'orghome']).concat('orgevent'),
@@ -387,8 +407,18 @@ export function OrgForm(p) {
       )}
       {meta('Government ID is checked for everyone. That’s Pune law.')}
       <div className="bottom-stack" style={{ alignItems: 'stretch' }}>
-        <Button variant="brand" size="lg" block disabled={need.length > 0} onClick={() => save('review')}>
-          {ex && ex.status === 'live' ? 'Save and send for a check' : 'Submit for review'}
+        <Button
+          variant="brand"
+          size="lg"
+          block
+          disabled={need.length > 0 || !!saving}
+          onClick={() => save('review')}
+        >
+          {saving === 'review'
+            ? 'Sending…'
+            : ex && ex.status === 'live'
+              ? 'Save and send for a check'
+              : 'Submit for review'}
         </Button>
         {need.length ? (
           <span className="meta" style={{ textAlign: 'center' }} aria-live="polite">
@@ -399,8 +429,12 @@ export function OrgForm(p) {
             gathr checks the rules and poster, then it goes live
           </span>
         )}
-        <Button variant="ghost" disabled={D.title.trim().length < 3} onClick={() => save('draft')}>
-          Save as draft
+        <Button
+          variant="ghost"
+          disabled={D.title.trim().length < 3 || !!saving}
+          onClick={() => save('draft')}
+        >
+          {saving === 'draft' ? 'Saving…' : 'Save as draft'}
         </Button>
       </div>
     </div>

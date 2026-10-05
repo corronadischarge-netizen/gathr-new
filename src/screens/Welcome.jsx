@@ -46,7 +46,14 @@ export function Welcome(p) {
   var swipe = {
     onPointerDown: (ev) => {
       if (ev.pointerType === 'mouse' && ev.button !== 0) return;
-      sx.current = { x: ev.clientX, y: ev.clientY, t: ev.timeStamp, on: false, dx: 0, k: ev.currentTarget.getBoundingClientRect().width / ev.currentTarget.offsetWidth || 1 };
+      sx.current = {
+        x: ev.clientX,
+        y: ev.clientY,
+        t: ev.timeStamp,
+        on: false,
+        dx: 0,
+        k: ev.currentTarget.getBoundingClientRect().width / ev.currentTarget.offsetWidth || 1
+      };
     },
     onPointerMove: (ev) => {
       var s = sx.current;

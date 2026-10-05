@@ -2,7 +2,8 @@
    where it's missing (iPhone, desktop) these do nothing and never throw. */
 function buzz(pattern) {
   try {
-    if (typeof navigator !== 'undefined' && typeof navigator.vibrate === 'function') navigator.vibrate(pattern);
+    if (typeof navigator !== 'undefined' && typeof navigator.vibrate === 'function')
+      navigator.vibrate(pattern);
   } catch (e) {}
 }
 

@@ -13,10 +13,16 @@ export function PosterLayer(p) {
       origin = document.querySelector('.phone > .screen:not(.ghost):not(.under) .ev-hero-img');
     if (!el || !origin || reducedMotion() || !el.animate) return;
     function grow() {
-      el.animate([{ transform: flipTo(el, origin), opacity: 0.4 }, { transform: 'none', opacity: 1 }], {
-        duration: ms('--motion-slow'),
-        easing: 'cubic-bezier(0, 0, 0.2, 1)'
-      });
+      el.animate(
+        [
+          { transform: flipTo(el, origin), opacity: 0.4 },
+          { transform: 'none', opacity: 1 }
+        ],
+        {
+          duration: ms('--motion-slow'),
+          easing: 'cubic-bezier(0, 0, 0.2, 1)'
+        }
+      );
     }
     if (el.complete && el.naturalWidth) grow();
     else el.addEventListener('load', grow, { once: true });
