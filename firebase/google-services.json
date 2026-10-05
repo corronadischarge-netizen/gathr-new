@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "184924665497",
+    "project_id": "gathr-7782f",
+    "storage_bucket": "gathr-7782f.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:184924665497:android:f64a42aa0b291b13f3aa08",
+        "android_client_info": {
+          "package_name": "com.gathr.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAW0qndlN4XD7pR2HV5LSGxcekX-G_Hwng"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
