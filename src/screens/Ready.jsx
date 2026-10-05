@@ -2,6 +2,7 @@ import { BeforeYouGoCard } from '../cards/BeforeYouGoCard';
 import { APP_URL } from '../config';
 import { VENUES } from '../data/listings';
 import { Button, CrowdMeter, IconButton } from '../design-system';
+import { shareToast } from '../lib/utils';
 import { Share } from '../services/share';
 import { eyebrow, fav, note, statusChip, stop } from '../ui/helpers';
 
@@ -17,10 +18,11 @@ export function Ready(p) {
         <IconButton icon="arrow-left" label="Back" variant="solid" onClick={c.back} />
         <IconButton
           icon="share"
-          label="Send the night details on WhatsApp"
+          label="Share the night details"
           variant="solid"
           onClick={() =>
-            Share.whatsapp(
+            Share.link(
+              e.title,
               e.title +
                 '\n' +
                 v.name +
@@ -33,11 +35,14 @@ export function Ready(p) {
                 '\nMap: https://www.google.com/maps/search/?api=1&query=' +
                 v.lat +
                 ',' +
-                v.lng +
-                '\n' +
-                APP_URL +
-                '#e=' +
-                e.id
+                v.lng,
+              APP_URL + '#e=' + e.id
+            ).then(
+              (r) => {
+                var t = shareToast(r, 'Night details');
+                if (t) c.toast(t);
+              },
+              () => c.toast('Couldn’t share. Try again')
             )
           }
         />
@@ -68,25 +73,19 @@ export function Ready(p) {
       <BeforeYouGoCard e={e} />
       {note('Crowd is sample data.')}
       <div className="bottom-stack" style={{ alignItems: 'stretch' }}>
-        <div className="rowc" style={{ gap: '8px' }}>
-          <div style={{ flex: 1 }}>
-            <Button variant="subtle" block icon="navigation" onClick={() => Share.directions(v)}>
-              Directions
-            </Button>
-          </div>
-          <div style={{ flex: 1 }}>
-            <Button
-              variant="subtle"
-              block
-              icon="calendar"
-              onClick={() => {
-                Share.ics(e, v);
-                c.toast('Calendar file downloaded. Open it to add the night');
-              }}
-            >
-              Add to calendar
-            </Button>
-          </div>
+        <div className="btn-pair">
+          <Button variant="subtle" block icon="navigation" onClick={() => Share.directions(v)}>
+            Directions
+          </Button>
+          <Button
+            variant="subtle"
+            block
+            icon="calendar"
+            aria-label="Add to calendar"
+            onClick={() => Share.calendar(e, v)}
+          >
+            Calendar
+          </Button>
         </div>
         <Button variant="primary" size="lg" block icon="ticket" onClick={() => c.go('pass')}>
           Show my pass

@@ -69,7 +69,8 @@ export const Share = {
       '&body=' +
       encodeURIComponent(body || '');
   },
-  ics: (e, v) => {
+  /* Add to calendar: Google Calendar with the night filled in (works in the app, the browser and on iPhone) */
+  calendar: (e, v) => {
     var st = new Date(e.iso),
       en = new Date(e.iso);
     en.setHours(en.getHours() + 5);
@@ -79,30 +80,19 @@ export const Share = {
         .replace(/[-:]/g, '')
         .replace(/\.\d{3}/, '');
     }
-    var body = [
-      'BEGIN:VCALENDAR',
-      'VERSION:2.0',
-      'PRODID:-//gathr//EN',
-      'BEGIN:VEVENT',
-      'UID:' + e.id + '@gathr',
-      'DTSTAMP:' + f(new Date()),
-      'DTSTART:' + f(st),
-      'DTEND:' + f(en),
-      'SUMMARY:' + e.title,
-      'LOCATION:' + v.name + ', ' + v.area + ', Pune',
-      'DESCRIPTION:Show your gathr pass and ID at the door. ' + APP_URL + '#e=' + e.id,
-      'END:VEVENT',
-      'END:VCALENDAR'
-    ].join('\r\n');
-    var a = document.createElement('a');
-    a.href = URL.createObjectURL(new Blob([body], { type: 'text/calendar' }));
-    a.download = e.id + '.ics';
-    document.body.appendChild(a);
-    a.click();
-    setTimeout(() => {
-      URL.revokeObjectURL(a.href);
-      a.remove();
-    }, 500);
+    Share.open(
+      'https://calendar.google.com/calendar/render?action=TEMPLATE' +
+        '&text=' +
+        encodeURIComponent(e.title) +
+        '&dates=' +
+        f(st) +
+        '/' +
+        f(en) +
+        '&location=' +
+        encodeURIComponent(v.name + ', ' + v.area + ', Pune') +
+        '&details=' +
+        encodeURIComponent('Show your gathr pass and ID at the door. ' + APP_URL + '#e=' + e.id)
+    );
   },
   contactsSupported: !!(navigator.contacts && navigator.contacts.select),
   pickContacts: () => navigator.contacts.select(['name', 'tel'], { multiple: true }),

@@ -26,7 +26,7 @@ export function NewPlan(p) {
   }
   var pool = upcoming().filter((k) => !blockedFor(EVENTS[k], S.age));
   return (
-    <div className="full col pad-top" style={{ gap: '24px', paddingTop: '52px' }}>
+    <div className="full col pad-top plan-new" style={{ gap: '40px', paddingTop: '52px' }}>
       <div className="rowc between">
         <IconButton icon="arrow-left" label="Back" variant="solid" onClick={c.back} />
       </div>
@@ -35,9 +35,9 @@ export function NewPlan(p) {
         {eyebrow('Your group votes, you book once')}
         {stop('start a plan')}
       </div>
-      <div className="col" style={{ gap: '10px' }}>
+      <div className="col" style={{ gap: '12px' }}>
         <span className="g-section-title">Pick up to 3 nights</span>
-        <div className="col">
+        <div className="col" style={{ gap: '8px' }}>
           {pool.map((k) => {
             var e = EVENTS[k],
               on = d.opts.indexOf(k) >= 0;
@@ -61,7 +61,7 @@ export function NewPlan(p) {
           })}
         </div>
       </div>
-      <div className="col" style={{ gap: '10px' }}>
+      <div className="col" style={{ gap: '12px' }}>
         <span className="g-section-title">Voting closes</span>
         <div className="wrap">
           {['Tonight 10 pm', 'Thu 6 pm', 'Fri noon'].map((t) => (
