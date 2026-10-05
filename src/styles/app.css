@@ -634,3 +634,4 @@ html.is-sideways #root { visibility: hidden; }
 .report-row { min-height: 52px; }
 .report-dot { flex: none; width: 20px; height: 20px; border-radius: 50%; box-shadow: inset 0 0 0 2px var(--line-strong); }
 .report-row.on .report-dot { box-shadow: inset 0 0 0 6px var(--brand); }
+html.is-sideways .upright-skip { margin-top: 16px; min-height: 44px; padding: 0 16px; border: 0; background: none; color: var(--ink-muted); font: 600 14px/1 var(--font-sans); text-decoration: underline; cursor: pointer; }

@@ -22,8 +22,15 @@ function fit() {
   // a phone held sideways (a phone-sized screen with no mouse) is asked to turn upright; laptops, touchscreen
   // ones too, and desktop previews never are
   var mq = (s) => window.matchMedia && matchMedia(s).matches,
-    phone = mq('(hover: none) and (pointer: coarse)') && Math.min(screen.width, screen.height) <= 500;
-  root.classList.toggle('is-sideways', !!phone && w > hh);
+    phone =
+      /Android|iPhone|iPod/i.test(navigator.userAgent) &&
+      mq('(hover: none) and (pointer: coarse)') &&
+      Math.min(screen.width, screen.height) <= 500;
+  var skipped = false;
+  try {
+    skipped = sessionStorage.getItem('gathr.sideways') === 'ok'; // tapped "Use it sideways anyway"
+  } catch (e) {}
+  root.classList.toggle('is-sideways', !!phone && w > hh && !skipped);
   if (full) {
     root.style.setProperty('--scale', '1');
     root.style.setProperty('--mapk', Math.max(w / 390, hh / 844).toFixed(3));
