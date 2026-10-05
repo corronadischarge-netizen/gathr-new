@@ -563,13 +563,11 @@ button.ev-hero-img { border: 0; padding: 0; margin: 0; width: 100%; cursor: zoom
 
 /* ===== portrait only: a phone turned sideways in a browser sees this instead of a squashed app ===== */
 .upright { display: none; }
-@media (orientation: landscape) and (max-height: 520px) and (pointer: coarse) {
-  .upright { position: fixed; inset: 0; z-index: 1000; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; padding: 24px; background: var(--bg); color: var(--ink); text-align: center; }
-  .upright svg { margin-bottom: 8px; color: var(--brand-text); }
-  .upright-t { margin: 0; font: 700 20px/26px var(--font-sans); letter-spacing: -0.01em; }
-  .upright-s { margin: 0; font: 400 14px/20px var(--font-sans); color: var(--ink-muted); }
-  #root { visibility: hidden; }
-}
+html.is-sideways .upright { position: fixed; inset: 0; z-index: 1000; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; padding: 24px; background: var(--bg); color: var(--ink); text-align: center; }
+html.is-sideways .upright svg { margin-bottom: 8px; color: var(--brand-text); }
+html.is-sideways .upright-t { margin: 0; font: 700 20px/26px var(--font-sans); letter-spacing: -0.01em; }
+html.is-sideways .upright-s { margin: 0; font: 400 14px/20px var(--font-sans); color: var(--ink-muted); }
+html.is-sideways #root { visibility: hidden; }
 /* night card labels: Free in green with a ticket */
 .g-badge.tag-free { color: var(--go-text, var(--green-300)); }
 /* friends going: solid blue with white text, so it stands out next to the quiet labels */

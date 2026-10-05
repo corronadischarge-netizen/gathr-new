@@ -19,6 +19,11 @@ function fit() {
     w <= 560 || /full|app/.test(q) || (window.matchMedia && matchMedia('(display-mode: standalone)').matches);
   var root = document.documentElement;
   root.classList.toggle('is-full', !!full);
+  // a phone held sideways (a phone-sized screen with no mouse) is asked to turn upright; laptops, touchscreen
+  // ones too, and desktop previews never are
+  var mq = (s) => window.matchMedia && matchMedia(s).matches,
+    phone = mq('(hover: none) and (pointer: coarse)') && Math.min(screen.width, screen.height) <= 500;
+  root.classList.toggle('is-sideways', !!phone && w > hh);
   if (full) {
     root.style.setProperty('--scale', '1');
     root.style.setProperty('--mapk', Math.max(w / 390, hh / 844).toFixed(3));
