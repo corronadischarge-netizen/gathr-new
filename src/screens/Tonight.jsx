@@ -10,12 +10,14 @@ import { dayOf, todayTxt } from '../data/dates';
 import { blockedFor } from '../data/format';
 import { EVENTS, upcoming } from '../data/listings';
 import { FILTERS } from '../data/options';
+import { ENERGY } from '../data/taxonomy';
 import { IconButton } from '../design-system';
 import { eyebrow, i3, icon, meAvatar, meta, stop, svgIcon } from '../ui/helpers';
 import { Tap } from '../ui/Tap';
 
 function visible(S, e) {
   if (blockedFor(e, S.age)) return false;
+  if (S.energy && e.energy !== S.energy) return false;
   if (S.filter === 'all') return true;
   if (S.filter === 'friends') return e.nFriends > 0;
   return e.tags.indexOf(S.filter) >= 0;
@@ -108,6 +110,23 @@ export function Tonight(p) {
           );
         })}
       </div>
+      {/* energy: any, or only chill / groovy / high-energy nights (hosts on gathr set it) */}
+      <div className="px" style={{ paddingTop: '14px' }}>
+        <div className="energy-row" role="radiogroup" aria-label="Energy">
+          {[['', 'Any energy']].concat(ENERGY).map((x) => (
+            <button
+              key={x[0] || 'any'}
+              type="button"
+              role="radio"
+              aria-checked={(S.energy || '') === x[0]}
+              className={(S.energy || '') === x[0] ? 'on' : ''}
+              onClick={() => c.set({ energy: x[0] || null })}
+            >
+              {x[1]}
+            </button>
+          ))}
+        </div>
+      </div>
       {!Object.keys(S.nights).length ? (
         <div className="px" style={{ paddingTop: '20px' }}>
           <TuneWeekCard ctx={c} />
@@ -121,7 +140,7 @@ export function Tonight(p) {
       <div className="px col" style={{ paddingTop: '32px', gap: '10px' }}>
         <PickCard ctx={c} />
       </div>
-      <div key={'feed-' + S.filter} className={'col' + (swapped ? ' feed-swap' : '')}>
+      <div key={'feed-' + S.filter + (S.energy || '')} className={'col' + (swapped ? ' feed-swap' : '')}>
         {groups.length ? (
           groups.map((g) => (
             <div key={g[0][0]} className="col">

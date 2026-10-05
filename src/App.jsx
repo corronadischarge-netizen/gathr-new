@@ -154,7 +154,8 @@ export function App() {
     'myBookings',
     'glSeen',
     'cityWant',
-    'cityAsk'
+    'cityAsk',
+    'energy'
   ];
   (() => {
     var p = store('gathr.state');

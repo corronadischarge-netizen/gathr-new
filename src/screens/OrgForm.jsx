@@ -1,7 +1,8 @@
 import { useRef, useState } from 'react';
 import { OrgBack } from '../components/OrgBack';
 import { VENUES } from '../data/listings';
-import { KINDS, ORG_KEY, SOUNDS, STAGS, orgLoad, orgSave, orgVenueIds, syncOrg } from '../data/organisers';
+import { KindPicker, SoundPicker } from '../components/SoundPicker';
+import { ORG_KEY, STAGS, orgLoad, orgSave, orgVenueIds, syncOrg } from '../data/organisers';
 import { Button, Chip } from '../design-system';
 import { store } from '../lib/utils';
 import { haptic } from '../lib/haptics';
@@ -27,6 +28,10 @@ export function OrgForm(p) {
             title: '',
             kind: 'club',
             sounds: [],
+            family: '',
+            genre: '',
+            energy: '',
+            soundsLike: [],
             date: '',
             start: '21:00',
             end: '',
@@ -83,6 +88,7 @@ export function OrgForm(p) {
   if (D.title.trim().length < 3) need.push('a name');
   if (!D.date || D.date < minDate) need.push('a date from today');
   if (!D.start) need.push('a start time');
+  if (!D.family) need.push('a genre family');
   if (D.entry === 'paid' && !(+D.price > 0)) need.push('a price');
   if (!D.stag) need.push('your stag policy');
   if (!D.poster) need.push('a poster');
@@ -205,48 +211,8 @@ export function OrgForm(p) {
           </div>
         </div>
       ) : null}
-      <div className="col" style={{ gap: '10px' }}>
-        <span className="meta">Kind of night</span>
-        <div className="wrap" role="radiogroup" aria-label="Kind of night">
-          {KINDS.map((k) => (
-            <Chip
-              key={k[0]}
-              role="radio"
-              aria-checked={D.kind === k[0]}
-              selected={D.kind === k[0]}
-              onClick={() => upd({ kind: k[0] })}
-            >
-              {k[1]}
-            </Chip>
-          ))}
-        </div>
-      </div>
-      <div className="col" style={{ gap: '10px' }}>
-        <span className="meta">The sound · pick up to 3</span>
-        <div className="wrap">
-          {SOUNDS.map((x) => {
-            var on = D.sounds.indexOf(x) >= 0;
-            return (
-              <Chip
-                key={x}
-                selected={on}
-                onClick={() => {
-                  var s2 = D.sounds.slice();
-                  if (on) s2.splice(s2.indexOf(x), 1);
-                  else if (s2.length < 3) s2.push(x);
-                  else {
-                    c.toast('Three sounds is plenty');
-                    return;
-                  }
-                  upd({ sounds: s2 });
-                }}
-              >
-                {x}
-              </Chip>
-            );
-          })}
-        </div>
-      </div>
+      <KindPicker ctx={c} value={D} onChange={upd} example={D.title} />
+      <SoundPicker ctx={c} value={D} onChange={upd} />
       {F(
         'One line about the night (optional)',
         'of-about',

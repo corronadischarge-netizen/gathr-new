@@ -2,8 +2,8 @@
 export function kindOf(e) {
   var t = e.tags || [];
   if (t.indexOf('live') >= 0) return ['Live gig', 'speaker'];
-  if (t.indexOf('ladies') >= 0) return ['Girls’ night', 'cocktail'];
-  if (t.indexOf('themed') >= 0) return ['Themed party', 'sunglasses'];
+  if (t.indexOf('ladies') >= 0) return ['Ladies night', 'cocktail'];
+  if (t.indexOf('themed') >= 0) return ['Theme party', 'sunglasses'];
   return ['Club night', 'discoball'];
 }
 

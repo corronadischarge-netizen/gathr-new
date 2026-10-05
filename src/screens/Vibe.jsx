@@ -1,12 +1,13 @@
-import { MUSIC, NIGHTS } from '../data/options';
+import { FAMILIES, NIGHT_KINDS } from '../data/taxonomy';
 import { Button, Chip, IconButton } from '../design-system';
 import { eyebrow, i3, svgIcon } from '../ui/helpers';
 
 export function Vibe(p) {
   var c = p.ctx,
     S = c.S,
-    groups = { Music: NIGHTS.Sound, 'Kind of night': NIGHTS.Setting };
-  var picked = Object.keys(S.nights).filter((k) => NIGHTS['Where you go out'].indexOf(k) < 0).length;
+    known = FAMILIES.map((f) => f[0]).concat(NIGHT_KINDS.map((k) => k[0]));
+  // the same genre families and kinds of night hosts pick from when they list a night
+  var picked = Object.keys(S.nights).filter((k) => known.indexOf(k) >= 0).length;
   function toggle(n) {
     c.set((o) => {
       var x = Object.assign({}, o.nights);
@@ -33,20 +34,19 @@ export function Vibe(p) {
       <div className="col" style={{ gap: '12px' }}>
         <span className="g-section-title">Music</span>
         <div className="vibe-grid">
-          {groups.Music.map((n, i) => {
-            var m = MUSIC[n] || ['discoball', 'violet'],
-              on = !!S.nights[n];
+          {FAMILIES.map((f, i) => {
+            var on = !!S.nights[f[0]];
             return (
               <button
-                key={n}
+                key={f[0]}
                 type="button"
                 aria-pressed={on}
-                className={'vibe-tile hue-' + m[1] + (on ? ' on' : '')}
+                className={'vibe-tile hue-' + f[3] + (on ? ' on' : '')}
                 style={{ '--d': i * 40 + 'ms' }}
-                onClick={() => toggle(n)}
+                onClick={() => toggle(f[0])}
               >
-                {i3(m[0], 56)}
-                <span>{n}</span>
+                {i3(f[2], 56)}
+                <span>{f[1]}</span>
                 {on ? (
                   <i className="vibe-check" aria-hidden>
                     {svgIcon(['M5 12.5l4.5 4.5L19 7'], 14)}
@@ -60,9 +60,9 @@ export function Vibe(p) {
       <div className="col" style={{ gap: '12px' }}>
         <span className="g-section-title">Kind of night</span>
         <div className="wrap">
-          {groups['Kind of night'].map((n) => (
-            <Chip key={n} selected={!!S.nights[n]} onClick={() => toggle(n)}>
-              {n}
+          {NIGHT_KINDS.map((k) => (
+            <Chip key={k[0]} selected={!!S.nights[k[0]]} onClick={() => toggle(k[0])}>
+              {k[1]}
             </Chip>
           ))}
         </div>

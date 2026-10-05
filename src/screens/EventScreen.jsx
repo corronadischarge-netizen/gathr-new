@@ -3,7 +3,8 @@ import { APP_URL } from '../config';
 import { MO, WD } from '../data/dates';
 import { kindOf } from '../data/eventKind';
 import { blockedFor, rupees } from '../data/format';
-import { KINDS, stagTxt } from '../data/organisers';
+import { stagTxt } from '../data/organisers';
+import { energyName, family, nightKind } from '../data/taxonomy';
 import { Badge, Button, IconButton } from '../design-system';
 import { shareToast } from '../lib/utils';
 import { Share } from '../services/share';
@@ -19,14 +20,17 @@ export function EventScreen(p) {
     blocked = blockedFor(e, S.age);
   var onThis = S.planned === e.id;
   var cta = e.rsvp ? 'RSVP' : e.src === 'district' || (e.org && !e.door) ? 'Get tickets' : 'Get on the list';
-  var kind = e.org ? (KINDS.filter((k) => k[0] === e.kindKey)[0] || KINDS[0]).slice(1) : kindOf(e),
-    sounds = e.genre
-      .split(',')
-      .map((x) => {
-        x = x.trim();
-        return x.charAt(0).toUpperCase() + x.slice(1);
-      })
-      .filter((x) => x && !/themed party|girls|club night|live gig/i.test(x));
+  var kind = e.org ? nightKind(e.kindKey).slice(1) : kindOf(e),
+    fam = family(e.family),
+    sounds = fam
+      ? [fam[1]].concat(e.exactGenre ? [e.exactGenre] : [])
+      : e.genre
+          .split(',')
+          .map((x) => {
+            x = x.trim();
+            return x.charAt(0).toUpperCase() + x.slice(1);
+          })
+          .filter((x) => x && !/themed party|girls|club night|live gig/i.test(x));
   var d = new Date(e.iso),
     dayShort = WD[d.getDay()].slice(0, 3) + ' ' + d.getDate() + ' ' + MO[d.getMonth()];
   /* door check in one line: what's certain, what isn't */
@@ -129,6 +133,18 @@ export function EventScreen(p) {
             {' · ' + v.area.split(',')[0]}
           </p>
           {sounds.length ? <p className="ev-sound">{sounds.join(' · ')}</p> : null}
+          {/* energy, and the artists the night sounds like */}
+          {e.energy || (e.soundsLike || []).length ? (
+            <div className="ev-like">
+              {e.energy ? <span className={'energy-tag en-' + e.energy}>{energyName(e.energy)}</span> : null}
+              {(e.soundsLike || []).length ? <span className="ev-like-lbl">Sounds like</span> : null}
+              {(e.soundsLike || []).map((a) => (
+                <span key={a} className="like-chip">
+                  {a}
+                </span>
+              ))}
+            </div>
+          ) : null}
           {e.about ? (
             <p className="ev-sound" style={{ color: 'var(--ink)' }}>
               {e.about}

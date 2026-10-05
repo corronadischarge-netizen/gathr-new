@@ -598,3 +598,24 @@ button.ev-hero-img { border: 0; padding: 0; margin: 0; width: 100%; cursor: zoom
 .city-tell::after { content: ""; position: absolute; inset: -4px 0; }
 .city-tell.on { background: none; color: var(--go-text); cursor: default; }
 .city-tell:focus-visible { outline: 2px solid transparent; box-shadow: var(--focus-ring); }
+/* ===== the night's sound: energy, sounds like, artist search ===== */
+.ev-like { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 8px; }
+.ev-like-lbl { font-size: 13px; color: var(--ink-muted); margin-left: 2px; }
+.like-chip { display: inline-flex; align-items: center; height: 28px; padding: 0 12px; border-radius: 9999px; background: var(--glass-scrim); box-shadow: inset 0 0 0 1px #ffffff2e; color: var(--ink); font: 600 13px/1 var(--font-sans); }
+.energy-tag { display: inline-flex; align-items: center; gap: 6px; height: 28px; padding: 0 12px; border-radius: 9999px; font: 700 12px/1 var(--font-sans); letter-spacing: .04em; text-transform: uppercase; color: #0a0a0a; }
+.energy-tag::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: currentColor; opacity: .7; }
+.energy-tag.en-chill { background: var(--blue-100); }
+.energy-tag.en-groovy { background: var(--yellow-300); }
+.energy-tag.en-high { background: var(--red-300); color: #fff; }
+.artist-list { display: flex; flex-direction: column; border-radius: 16px; background: var(--surface); box-shadow: inset 0 0 0 1px var(--line); overflow: hidden; }
+.artist-list button { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; min-height: 56px; justify-content: center; padding: 8px 16px; border: 0; border-top: 1px solid var(--line); background: none; color: var(--ink); font: inherit; text-align: left; cursor: pointer; }
+.artist-list button:first-child { border-top: 0; }
+.artist-list button:active { background: var(--night-800); }
+.artist-list button:focus-visible { outline: 2px solid var(--focus); outline-offset: -2px; }
+/* This week: the energy filter, a quiet row under the tiles */
+.energy-row { display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; }
+.energy-row::-webkit-scrollbar { display: none; }
+.energy-row button { flex: none; height: 36px; padding: 0 14px; border: 0; border-radius: 9999px; background: none; box-shadow: inset 0 0 0 1px var(--line); color: var(--ink-muted); font: 600 13px/1 var(--font-sans); cursor: pointer; position: relative; }
+.energy-row button::after { content: ""; position: absolute; inset: -4px 0; }
+.energy-row button.on { background: var(--brand); box-shadow: none; color: #fff; }
+.energy-row button:focus-visible { outline: 2px solid transparent; box-shadow: var(--focus-ring); }

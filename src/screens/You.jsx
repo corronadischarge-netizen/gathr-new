@@ -3,6 +3,7 @@ import { StatusCard } from '../cards/StatusCard';
 import { VENUES } from '../data/listings';
 import { AREA_LIST } from '../data/options';
 import { REC, levelOf, nightsCount } from '../data/sample';
+import { pickName } from '../data/taxonomy';
 import { Button } from '../design-system';
 import { eyebrow, icon, meAvatar, meta, note, sec, statusChip, stop, tile } from '../ui/helpers';
 import { Tap } from '../ui/Tap';
@@ -18,6 +19,7 @@ export function You(p) {
       'Your nights',
       Object.keys(S.nights)
         .filter((k) => AREA_LIST.indexOf(k) < 0)
+        .map(pickName)
         .join(', ') || 'Tune your week',
       () => c.go('vibe'),
       ['discoball', 'violet']

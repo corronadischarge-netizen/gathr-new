@@ -1,6 +1,7 @@
 import { MO, WD } from './dates';
 import { EVENTS, ORDER, VENUES } from './listings';
 import { passCode } from './sample';
+import { FAMILY_TAG, family, nightKind } from './taxonomy';
 import { store } from '../lib/utils';
 
 /* ================= ORGANISERS =================
@@ -41,25 +42,6 @@ export function orgVenuesLabel(pr) {
   return VENUES[ids[0]].name + (ids.length > 1 ? ' + ' + (ids.length - 1) + ' more' : '');
 }
 
-export const KINDS = [
-  ['club', 'Club night', 'discoball'],
-  ['girls', 'Girls’ night', 'cocktail'],
-  ['themed', 'Themed party', 'sunglasses'],
-  ['live', 'Live gig', 'speaker']
-];
-
-export const SOUNDS = [
-  'Bollywood',
-  'Commercial',
-  'Hip-hop',
-  'Techno',
-  'House',
-  'EDM',
-  'Afro',
-  'Live band',
-  'Indie'
-];
-
 export const STAGS = [
   ['welcome', 'Stags welcome'],
   ['groups', 'Couples and mixed groups only'],
@@ -90,14 +72,17 @@ export function stagTxt(k) {
 /* an organiser's night, in the same shape as a listed one, so every screen can show it */
 export function orgToEvent(o, prof) {
   var d = new Date(o.date + 'T' + (o.start || '21:00') + ':00+05:30'),
-    kind = KINDS.filter((k) => k[0] === o.kind)[0] || KINDS[0];
+    kind = nightKind(o.kind),
+    fam = family(o.family);
+  // filter tags: the family's (Bollywood, Hip-hop, Live gigs tiles), the kind's, and older nights' sounds
   var tags = (o.sounds || []).map((x) =>
     x
       .toLowerCase()
       .replace(/[^a-z]/g, '')
       .replace('liveband', 'live')
   );
-  tags.push({ club: 'commercial', girls: 'ladies', themed: 'themed', live: 'live' }[o.kind]);
+  if (fam) tags.push(FAMILY_TAG[fam[0]]);
+  tags.push({ ladies: 'ladies', themed: 'themed', gig: 'live', concert: 'live' }[kind[0]] || 'club');
   if (o.entry === 'free') tags.push('free');
   return {
     id: o.id,
@@ -111,9 +96,13 @@ export function orgToEvent(o, prof) {
     time: fmtTime(o.start),
     end: o.end ? fmtTime(o.end) : null,
     leave: '',
-    genre: (o.sounds || []).join(', ') || kind[1],
+    genre: o.genre || (fam && fam[1]) || (o.sounds || []).join(', ') || kind[1],
     tags: tags,
-    kindKey: o.kind,
+    kindKey: kind[0],
+    family: fam ? fam[0] : null,
+    exactGenre: o.genre || null,
+    energy: o.energy || null,
+    soundsLike: o.soundsLike || [],
     price: o.entry === 'paid' ? +o.price || 0 : o.entry === 'door' ? +o.price || null : 0,
     rsvp: o.entry === 'free',
     door: o.entry === 'door',

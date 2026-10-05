@@ -1,5 +1,6 @@
 import { VENUES } from '../data/listings';
 import { AREA_XY, orgVenueIds } from '../data/organisers';
+import { family, legacyKind } from '../data/taxonomy';
 import { Auth } from './auth';
 import { supabase, supabaseOn } from './supabase';
 
@@ -134,6 +135,10 @@ function nightFrom(r) {
     title: r.title,
     kind: r.kind,
     sounds: r.sounds || [],
+    family: r.family || '',
+    genre: r.genre || '',
+    energy: r.energy || '',
+    soundsLike: r.sounds_like || [],
     date: s.date,
     start: s.time,
     end: e ? e.time : '',
@@ -267,6 +272,10 @@ export function pushNight(o, status, pr) {
         title: o.title,
         kind: o.kind,
         sounds: o.sounds || [],
+        family: o.family || null,
+        genre: o.genre || null,
+        energy: o.energy || null,
+        sounds_like: o.soundsLike || [],
         about: o.about || null,
         poster_url: poster,
         starts_at: toIso(o.date, o.start),
@@ -279,10 +288,31 @@ export function pushNight(o, status, pr) {
         dress: o.dress || null,
         status: status
       };
-      var q = o.remote
-        ? c.from('events').update(row).eq('id', o.id).select().single()
-        : c.from('events').insert(row).select().single();
-      return q.then(ok);
+      function send(r) {
+        return (
+          o.remote
+            ? c.from('events').update(r).eq('id', o.id).select().single()
+            : c.from('events').insert(r).select().single()
+        ).then(ok);
+      }
+      return send(row).catch((err) => {
+        // a database that hasn't run the genres migration yet: save it the old way (genre names as sounds)
+        if (!/schema cache|events_kind_check/.test((err && err.message) || '')) throw err;
+        var old = Object.assign({}, row, {
+          kind: legacyKind(row.kind),
+          sounds: [o.genre || (family(o.family) || [])[1]].filter(Boolean).slice(0, 3)
+        });
+        ['family', 'genre', 'energy', 'sounds_like'].forEach((k) => delete old[k]);
+        return send(old).then((saved) =>
+          Object.assign(saved, {
+            family: o.family,
+            genre: o.genre,
+            energy: o.energy,
+            sounds_like: o.soundsLike,
+            kind: o.kind
+          })
+        );
+      });
     })
     .then(nightFrom);
 }
@@ -617,4 +647,35 @@ export function wantCity(city) {
 }
 export function cityCounts() {
   return db().then((c) => c.rpc('city_interest_counts').then(ok));
+}
+
+/* ---------------------------------------------------------------- "Suggest a new kind" of night (goes to gathr) */
+export function suggestKind(name, example) {
+  return db().then((c) => {
+    if (!me) throw new Error('Sign in again to send this.');
+    return c
+      .from('kind_suggestions')
+      .insert({ name: name, example: (example || '').slice(0, 90) || null })
+      .then(ok);
+  });
+}
+export function pullKindSuggestions() {
+  return db().then((c) =>
+    c
+      .from('kind_suggestions')
+      .select('id, name, example, created_at')
+      .eq('status', 'new')
+      .order('created_at')
+      .then(ok)
+  );
+}
+export function decideKind(id, added) {
+  return db().then((c) =>
+    c
+      .from('kind_suggestions')
+      .update({ status: added ? 'added' : 'declined' })
+      .eq('id', id)
+      .select('id')
+      .then(ok)
+  );
 }

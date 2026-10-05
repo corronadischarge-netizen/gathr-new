@@ -8,23 +8,6 @@ export const FILTERS = [
   ['friends', 'Friends going', 'champagne', 'red']
 ];
 
-/* Sound tiles on Tune your week: name -> [3D icon, colour] */
-export const MUSIC = {
-  Bollywood: ['mic', 'pink'],
-  Commercial: ['discoball', 'violet'],
-  'Hip-hop': ['headphones', 'yellow'],
-  'Live gigs': ['speaker', 'blue'],
-  EDM: ['spotlight', 'green'],
-  Techno: ['vinyl', 'red'],
-  Afro: ['wristband', 'pink']
-};
-
-export const NIGHTS = {
-  Sound: ['Bollywood', 'Commercial', 'Hip-hop', 'Live gigs', 'EDM', 'Techno', 'Afro'],
-  Setting: ['Club nights', 'Ladies nights', 'Themed parties', 'Gigs', 'Karaoke'],
-  'Where you go out': ['The Mills', 'KP', 'Shivaji Nagar', 'Baner']
-};
-
 /* Areas offered during onboarding */
 export const AREA_LIST = [
   'The Mills',
