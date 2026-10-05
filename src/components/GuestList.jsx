@@ -14,6 +14,10 @@ export function GuestList(p) {
   var qs = useState(''),
     q = qs[0],
     setQ = qs[1];
+  // one row per guest: name and passes; tap the name for the code, how they came and when they got in
+  var os = useState(null),
+    open = os[0],
+    setOpen = os[1];
   var st = orgStats(S, id),
     e = EVENTS[id] || {},
     passes = passCount(st.guests);
@@ -79,40 +83,57 @@ export function GuestList(p) {
               shown.map((g, i) => {
                 var isIn = !!st.ci[g.name],
                   partly = isIn && g.guestList && stillOut(g).length; // some of a guest-list party are in
+                var more = open === g.name;
                 return (
-                  <div key={g.name} className={'rowc org-guest' + (i ? ' sep' : '')} style={{ gap: '12px' }}>
-                    {fav(g.name.split(' ')[0], 36)}
-                    <div className="col" style={{ gap: '2px', flexGrow: 1, minWidth: 0 }}>
-                      <span className="title15">{g.name}</span>
-                      {meta(
-                        g.passes +
-                          (g.passes === 1 ? ' pass' : ' passes') +
-                          ' · ' +
-                          (g.code ? g.code + ' · ' : '') +
-                          (partly
-                            ? (g.inNames || []).length + ' of ' + (1 + (g.plusOnes || []).length) + ' in · '
-                            : '') +
-                          (st.ci[g.name] > 1
+                  <div key={g.name} className={'org-guest-wrap' + (i ? ' sep' : '')}>
+                    <div className="rowc org-guest" style={{ gap: '12px' }}>
+                      {fav(g.name.split(' ')[0], 36)}
+                      <button
+                        type="button"
+                        className="org-guest-main"
+                        aria-expanded={more}
+                        onClick={() => setOpen(more ? null : g.name)}
+                      >
+                        <span className="title15 org-guest-name">{g.name}</span>
+                        <span className="org-guest-n">
+                          {g.passes + (g.passes === 1 ? ' pass' : ' passes')}
+                        </span>
+                      </button>
+                      <button
+                        type="button"
+                        className={'org-in' + (isIn ? ' on' : '')}
+                        aria-pressed={isIn && !partly}
+                        aria-label={
+                          (partly ? 'Let the rest in: ' : isIn ? 'Undo check-in for ' : 'Check in ') + g.name
+                        }
+                        onClick={() => toggleIn(g.name)}
+                      >
+                        {isIn && !partly ? svgIcon(['M5 12.5l4.5 4.5L19 7'], 16) : null}
+                        {partly ? 'Let the rest in' : isIn ? 'In' : 'Check in'}
+                      </button>
+                    </div>
+                    {more ? (
+                      <p className="meta org-guest-more">
+                        {[
+                          g.passes + (g.passes === 1 ? ' pass' : ' passes'),
+                          g.code,
+                          partly
+                            ? (g.inNames || []).length + ' of ' + (1 + (g.plusOnes || []).length) + ' in'
+                            : null,
+                          (g.plusOnes || []).length ? 'with ' + g.plusOnes.join(', ') : null,
+                          st.ci[g.name] > 1
                             ? 'in at ' +
                               new Date(st.ci[g.name]).toLocaleTimeString('en-IN', {
                                 hour: 'numeric',
                                 minute: '2-digit'
                               })
-                            : g.booked)
-                      )}
-                    </div>
-                    <button
-                      type="button"
-                      className={'org-in' + (isIn ? ' on' : '')}
-                      aria-pressed={isIn && !partly}
-                      aria-label={
-                        (partly ? 'Let the rest in: ' : isIn ? 'Undo check-in for ' : 'Check in ') + g.name
-                      }
-                      onClick={() => toggleIn(g.name)}
-                    >
-                      {isIn && !partly ? svgIcon(['M5 12.5l4.5 4.5L19 7'], 16) : null}
-                      {partly ? 'Let the rest in' : isIn ? 'In' : 'Check in'}
-                    </button>
+                            : null,
+                          g.booked
+                        ]
+                          .filter(Boolean)
+                          .join(' · ')}
+                      </p>
+                    ) : null}
                   </div>
                 );
               })

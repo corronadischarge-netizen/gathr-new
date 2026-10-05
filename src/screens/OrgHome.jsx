@@ -62,7 +62,7 @@ export function OrgHome(p) {
           ) : (
             <Badge tone="now">Verification pending</Badge>
           )}
-          {pr.status === 'verified' ? null : meta('We’ll message @' + pr.insta)}
+          {pr.status === 'verified' ? null : meta('@' + pr.insta)}
         </div>
       </div>
       <div className="org-stats" role="list" aria-label="Upcoming nights, totals">

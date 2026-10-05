@@ -6,7 +6,7 @@ import { orgSave, orgVenueIds } from '../data/organisers';
 import { Button, Chip } from '../design-system';
 import { haptic } from '../lib/haptics';
 import { pushProfile, remoteOn, sayError } from '../services/remote';
-import { eyebrow, meta, stop } from '../ui/helpers';
+import { eyebrow, meta, note, stop } from '../ui/helpers';
 
 /* 2 · who you are and where you host */
 export function OrgSetup(p) {
@@ -124,9 +124,14 @@ export function OrgSetup(p) {
         custom={F.customVenues}
         onChange={(ids, custom) => upd({ venueIds: ids, customVenues: custom })}
       />
+      {note(
+        pr.name
+          ? 'Add or remove venues here any time.'
+          : 'You can add more venues later from your profile: Host · profile → Edit organiser profile.'
+      )}
       <div className="col" style={{ gap: '8px' }}>
         <label className="meta" htmlFor="og-insta">
-          Instagram · we message this account to confirm it’s you
+          Instagram · you or your brand, kept on your profile
         </label>
         <div className="field-row">
           <span className="cc">@</span>

@@ -266,7 +266,7 @@ export function OrgForm(p) {
       {F(
         'Date',
         'of-date',
-        <div className="field-row">
+        <div className={'field-row has-ph' + (D.date ? '' : ' is-empty')} data-ph="Pick a date">
           <input
             id="of-date"
             type="date"
@@ -281,7 +281,7 @@ export function OrgForm(p) {
           {F(
             'Starts',
             'of-start',
-            <div className="field-row">
+            <div className={'field-row has-ph' + (D.start ? '' : ' is-empty')} data-ph="8:00 pm">
               <input
                 id="of-start"
                 type="time"
@@ -295,7 +295,7 @@ export function OrgForm(p) {
           {F(
             'Ends (optional)',
             'of-end',
-            <div className="field-row">
+            <div className={'field-row has-ph' + (D.end ? '' : ' is-empty')} data-ph="1:30 am">
               <input id="of-end" type="time" value={D.end} onChange={(e) => upd({ end: e.target.value })} />
             </div>
           )}
