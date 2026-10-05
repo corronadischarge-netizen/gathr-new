@@ -14,7 +14,7 @@ export function EventCard(p) {
       <span className="g-ecard-fade" aria-hidden="true" />
       {p.badge ? (
         <div className="g-ecard-top">
-          <Badge tone={p.badgeTone || 'now'} live={p.live}>
+          <Badge tone={p.badgeTone || 'now'} live={p.live} className={p.badgeClass}>
             {p.badge}
           </Badge>
         </div>
