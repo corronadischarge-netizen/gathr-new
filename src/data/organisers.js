@@ -16,8 +16,30 @@ export const AREA_XY = {
   'Shivaji Nagar': [18.5306, 73.8478],
   'Viman Nagar': [18.5679, 73.9143],
   'FC Road': [18.5236, 73.8414],
-  'Sinhgad Road': [18.48, 73.825]
+  'Sinhgad Road': [18.48, 73.825],
+  Aundh: [18.559, 73.8078],
+  Camp: [18.5158, 73.877],
+  Erandwane: [18.5036, 73.8356],
+  'Karve Nagar': [18.4872, 73.8261],
+  Kothrud: [18.5074, 73.8077],
+  Wakad: [18.599, 73.76],
+  Hinjewadi: [18.5913, 73.7389]
 };
+
+/* The venues an organiser looks after: their main venue first, then the rest. Profiles saved before
+   organisers could pick several venues only have venueId. */
+export function orgVenueIds(pr) {
+  if (!pr) return [];
+  var ids = pr.venueIds && pr.venueIds.length ? pr.venueIds : pr.venueId ? [pr.venueId] : [];
+  return ids.filter((k, i) => ids.indexOf(k) === i);
+}
+
+/* "Kukoo", or "Kukoo + 2 more" */
+export function orgVenuesLabel(pr) {
+  var ids = orgVenueIds(pr).filter((k) => VENUES[k]);
+  if (!ids.length) return '';
+  return VENUES[ids[0]].name + (ids.length > 1 ? ' + ' + (ids.length - 1) + ' more' : '');
+}
 
 export const KINDS = [
   ['club', 'Club night', 'discoball'],
@@ -114,19 +136,25 @@ export function syncOrg(org) {
   });
   for (var i = ORDER.length - 1; i >= 0; i--) if (!EVENTS[ORDER[i]]) ORDER.splice(i, 1);
   var p = org.profile;
-  if (p && p.newVenue && p.venueId && !VENUES[p.venueId]) {
-    var xy = AREA_XY[p.newVenue.area] || [18.53, 73.87];
-    VENUES[p.venueId] = {
-      id: p.venueId,
-      name: p.newVenue.name,
-      area: p.newVenue.area,
+  // venues the organiser added themselves (not listed yet) go on the map too
+  var added = ((p && p.customVenues) || []).concat(
+    p && p.newVenue && p.venueId ? [Object.assign({ id: p.venueId }, p.newVenue)] : []
+  );
+  added.forEach((nv) => {
+    if (VENUES[nv.id]) return;
+    var xy = AREA_XY[nv.area] || [18.53, 73.87];
+    VENUES[nv.id] = {
+      id: nv.id,
+      name: nv.name,
+      area: nv.area,
       crowd: 'quiet',
       lat: xy[0] + 0.0012,
       lng: xy[1] + 0.0012,
       ic: 'spotlight',
-      hue: 'violet'
+      hue: 'violet',
+      added: true
     };
-  }
+  });
   (org.events || []).forEach((o) => {
     if (o.status === 'live' && VENUES[o.venueId]) {
       EVENTS[o.id] = orgToEvent(o, p);

@@ -1,5 +1,5 @@
 import { HostBar } from '../components/HostBar';
-import { VENUES } from '../data/listings';
+import { orgVenuesLabel } from '../data/organisers';
 import { Badge, Button } from '../design-system';
 import { OrgIntro } from './OrgIntro';
 import { eyebrow, icon, meta, note, stop } from '../ui/helpers';
@@ -10,14 +10,14 @@ export function HostProfile(p) {
     S = c.S,
     pr = S.org.profile;
   if (!pr) return <OrgIntro ctx={c} />;
-  var v = VENUES[pr.venueId];
+  var where = orgVenuesLabel(pr);
   return (
     <div className="full col pad-top" style={{ gap: '24px', paddingTop: '52px', paddingBottom: '140px' }}>
       <HostBar ctx={c} />
       <div className="col" style={{ gap: '6px' }}>
         {eyebrow(
           { venue: 'Venue', promoter: 'Promoter', collective: 'Collective' }[pr.type] +
-            (v ? ' · ' + v.name : '')
+            (where ? ' · ' + where : '')
         )}
         {stop(pr.name.toLowerCase())}
         <div className="rowc" style={{ gap: '8px' }}>
@@ -33,7 +33,7 @@ export function HostProfile(p) {
         {[
           [
             'Edit organiser profile',
-            'Name, venue, Instagram, door phone',
+            'Name, venues, Instagram, door phone',
             () => {
               c.go('orgsetup');
             },

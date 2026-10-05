@@ -1,8 +1,8 @@
 import { HostBar } from '../components/HostBar';
 import { OrgBack } from '../components/OrgBack';
 import { priceTxt } from '../data/format';
-import { EVENTS, VENUES, isPast, upcoming } from '../data/listings';
-import { ST_LBL, orgStats, orgToEvent, passCount } from '../data/organisers';
+import { EVENTS, isPast, upcoming } from '../data/listings';
+import { ST_LBL, orgStats, orgToEvent, orgVenueIds, orgVenuesLabel, passCount } from '../data/organisers';
 import { Badge, Button } from '../design-system';
 import { OrgIntro } from './OrgIntro';
 import { eyebrow, i3, meta, note, statusChip, stop, thumb } from '../ui/helpers';
@@ -14,18 +14,16 @@ export function OrgHome(p) {
     org = S.org,
     pr = org.profile;
   if (!pr) return <OrgIntro ctx={c} />;
-  var v = VENUES[pr.venueId];
   var own = (org.events || []).map((o) => ({
     id: o.id,
     o: o,
     e: EVENTS[o.id] || orgToEvent(o, pr),
     st: o.status === 'live' && isPast(orgToEvent(o, pr)) ? 'past' : o.status
   }));
-  var listed = pr.newVenue
-    ? []
-    : upcoming()
-        .filter((k) => EVENTS[k].venue === pr.venueId && !EVENTS[k].org)
-        .map((k) => ({ id: k, e: EVENTS[k], st: 'live', imported: true }));
+  var mine = orgVenueIds(pr);
+  var listed = upcoming()
+    .filter((k) => mine.indexOf(EVENTS[k].venue) >= 0 && !EVENTS[k].org)
+    .map((k) => ({ id: k, e: EVENTS[k], st: 'live', imported: true }));
   var all = own.concat(listed).sort((a, b) => new Date(a.e.iso) - new Date(b.e.iso));
   var up = all.filter((x) => x.st === 'live'),
     tot = { guests: 0, ci: 0, int: 0 };
@@ -54,7 +52,7 @@ export function OrgHome(p) {
       )}
       <div className="col" style={{ gap: '6px' }}>
         {eyebrow(
-          (v ? v.name + ' · ' : '') +
+          (orgVenuesLabel(pr) ? orgVenuesLabel(pr) + ' · ' : '') +
             { venue: 'Venue', promoter: 'Promoter', collective: 'Collective' }[pr.type]
         )}
         {stop(pr.name.toLowerCase())}

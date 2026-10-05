@@ -1,4 +1,5 @@
 import { EVENTS, isPast, upcoming } from './listings';
+import { orgVenueIds } from './organisers';
 
 /* the host's nights that are on or coming up, soonest first */
 export function hostNights(S) {
@@ -9,7 +10,8 @@ export function hostNights(S) {
     .filter((o) => o.status === 'live')
     .map((o) => o.id)
     .filter((k) => EVENTS[k] && !isPast(EVENTS[k]));
-  var listed = pr.newVenue ? [] : upcoming().filter((k) => EVENTS[k].venue === pr.venueId && !EVENTS[k].org);
+  var mine = orgVenueIds(pr),
+    listed = upcoming().filter((k) => mine.indexOf(EVENTS[k].venue) >= 0 && !EVENTS[k].org);
   return own.concat(listed).sort((a, b) => new Date(EVENTS[a].iso) - new Date(EVENTS[b].iso));
 }
 

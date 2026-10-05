@@ -3,7 +3,7 @@
 `migrations/` holds the database setup, in order:
 
 1. `20261001090000_foundation.sql`: profiles, organisers and their team (owners, door staff), venues, nights, bookings, door check-ins.
-2. `20261001090100_promoters.sql`: deals, agencies, promoters, private agency rates, per-night promoter codes, invites, link opens, payout lines.
+. `20261005090000_organiser_venues.sql`: organisers can look after several venues (the first is their main venue) and add a venue that isn’t listed; nights must be at one of their venues. Also adds the venues from District’s listings.
 
 Every table has row-level security, so each person only reads and changes what their role allows.
 

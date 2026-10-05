@@ -1,6 +1,7 @@
 import { useRef, useState } from 'react';
 import { OrgBack } from '../components/OrgBack';
-import { KINDS, ORG_KEY, SOUNDS, STAGS, orgLoad, orgSave, syncOrg } from '../data/organisers';
+import { VENUES } from '../data/listings';
+import { KINDS, ORG_KEY, SOUNDS, STAGS, orgLoad, orgSave, orgVenueIds, syncOrg } from '../data/organisers';
 import { Button, Chip } from '../design-system';
 import { store } from '../lib/utils';
 import { Auth } from '../services/auth';
@@ -87,7 +88,7 @@ export function OrgForm(p) {
     var o = Object.assign({}, D, {
       title: D.title.trim(),
       status: status,
-      venueId: pr.venueId,
+      venueId: D.venueId || pr.venueId,
       updated: new Date().toISOString()
     });
     var list = (org.events || []).filter((x) => x.id !== o.id).concat(o);
@@ -164,6 +165,26 @@ export function OrgForm(p) {
           />
         </div>
       )}
+      {orgVenueIds(pr).length > 1 ? (
+        <div className="col" style={{ gap: '10px' }}>
+          <span className="meta">Where</span>
+          <div className="wrap" role="radiogroup" aria-label="Venue for this night">
+            {orgVenueIds(pr)
+              .filter((k) => VENUES[k])
+              .map((k) => (
+                <Chip
+                  key={k}
+                  role="radio"
+                  aria-checked={(D.venueId || pr.venueId) === k}
+                  selected={(D.venueId || pr.venueId) === k}
+                  onClick={() => upd({ venueId: k })}
+                >
+                  {VENUES[k].name}
+                </Chip>
+              ))}
+          </div>
+        </div>
+      ) : null}
       <div className="col" style={{ gap: '10px' }}>
         <span className="meta">Kind of night</span>
         <div className="wrap" role="radiogroup" aria-label="Kind of night">

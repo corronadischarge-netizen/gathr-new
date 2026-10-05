@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { OrgBack } from '../components/OrgBack';
 import { Switch } from '../components/Switch';
-import { VENUES } from '../data/listings';
-import { AREA_XY, orgSave } from '../data/organisers';
+import { VenuePicker } from '../components/VenuePicker';
+import { orgSave, orgVenueIds } from '../data/organisers';
 import { Button, Chip } from '../design-system';
 import { eyebrow, meta, stop } from '../ui/helpers';
 
@@ -15,9 +15,11 @@ export function OrgSetup(p) {
   var fs = useState({
       name: pr.name || '',
       type: pr.type || 'venue',
-      venueId: pr.newVenue ? 'new' : pr.venueId || '',
-      vName: pr.newVenue ? pr.newVenue.name : '',
-      vArea: pr.newVenue ? pr.newVenue.area : '',
+      venueIds: orgVenueIds(pr),
+      // venues they added themselves (an older profile kept one as newVenue)
+      customVenues: (pr.customVenues || []).concat(
+        pr.newVenue ? [Object.assign({ id: pr.venueId }, pr.newVenue)] : []
+      ),
       insta: pr.insta || '',
       phone: pr.phone || S.phone || '',
       agree: !!pr.name
@@ -28,26 +30,18 @@ export function OrgSetup(p) {
     setF(Object.assign({}, F, x));
   }
   var okName = F.name.trim().length >= 2,
-    okVenue = F.venueId && (F.venueId !== 'new' || (F.vName.trim().length >= 2 && F.vArea)),
+    okVenue = F.venueIds.length > 0,
     okInsta = /^@?[a-z0-9._]{2,30}$/i.test(F.insta.trim()),
     okPhone = !F.phone || /^[6-9]\d{9}$/.test(F.phone);
   var ok = okName && okVenue && okInsta && okPhone && F.agree;
-  var venues = Object.keys(VENUES).filter((k) => k.indexOf('v_') !== 0);
   function save() {
-    var vid =
-      F.venueId === 'new'
-        ? 'v_' +
-          F.vName
-            .trim()
-            .toLowerCase()
-            .replace(/[^a-z0-9]+/g, '')
-            .slice(0, 20)
-        : F.venueId;
     var prof = {
       name: F.name.trim(),
       type: F.type,
-      venueId: vid,
-      newVenue: F.venueId === 'new' ? { name: F.vName.trim(), area: F.vArea } : null,
+      venueId: F.venueIds[0], // the main venue
+      venueIds: F.venueIds,
+      customVenues: F.customVenues.filter((x) => F.venueIds.indexOf(x.id) >= 0),
+      newVenue: null,
       insta: F.insta.trim().replace(/^@/, ''),
       phone: F.phone,
       status: pr.status || 'pending',
@@ -103,61 +97,12 @@ export function OrgSetup(p) {
           ))}
         </div>
       </div>
-      <div className="col" style={{ gap: '10px' }}>
-        <span className="meta">{F.type === 'venue' ? 'Your venue' : 'Where you usually host'}</span>
-        <div className="wrap" role="radiogroup" aria-label="Venue">
-          {venues
-            .map((k) => (
-              <Chip
-                key={k}
-                role="radio"
-                aria-checked={F.venueId === k}
-                selected={F.venueId === k}
-                onClick={() => upd({ venueId: k })}
-              >
-                {VENUES[k].name}
-              </Chip>
-            ))
-            .concat(
-              <Chip
-                key="new"
-                icon="map-pin"
-                role="radio"
-                aria-checked={F.venueId === 'new'}
-                selected={F.venueId === 'new'}
-                onClick={() => upd({ venueId: 'new' })}
-              >
-                A venue not listed
-              </Chip>
-            )}
-        </div>
-        {F.venueId === 'new' ? (
-          <div className="col fade-up" style={{ gap: '10px' }}>
-            <div className="field-row">
-              <input
-                aria-label="Venue name"
-                value={F.vName}
-                maxLength={40}
-                placeholder="Venue name"
-                onChange={(e) => upd({ vName: e.target.value })}
-              />
-            </div>
-            <div className="wrap" role="radiogroup" aria-label="Area">
-              {Object.keys(AREA_XY).map((a) => (
-                <Chip
-                  key={a}
-                  role="radio"
-                  aria-checked={F.vArea === a}
-                  selected={F.vArea === a}
-                  onClick={() => upd({ vArea: a })}
-                >
-                  {a}
-                </Chip>
-              ))}
-            </div>
-          </div>
-        ) : null}
-      </div>
+      <VenuePicker
+        label={F.type === 'venue' ? 'Your venues' : 'Venues you look after'}
+        ids={F.venueIds}
+        custom={F.customVenues}
+        onChange={(ids, custom) => upd({ venueIds: ids, customVenues: custom })}
+      />
       <div className="col" style={{ gap: '8px' }}>
         <label className="meta" htmlFor="og-insta">
           Instagram · we message this account to confirm it’s you
@@ -212,7 +157,7 @@ export function OrgSetup(p) {
             {!okName
               ? 'Add a name'
               : !okVenue
-                ? 'Pick a venue'
+                ? 'Add at least one venue'
                 : !okInsta
                   ? 'Add your Instagram'
                   : !F.agree

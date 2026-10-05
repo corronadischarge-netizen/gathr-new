@@ -25,6 +25,7 @@ function jumpToHosting(c, key) {
           name: 'Kukoo',
           type: 'venue',
           venueId: 'kukoo',
+          venueIds: ['kukoo'],
           newVenue: null,
           insta: 'kukoo.pune',
           phone: '',
