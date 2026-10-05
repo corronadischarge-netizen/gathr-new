@@ -22,7 +22,7 @@ export function WeekEventCard(p) {
       ? [
           <>
             <Icon name="users" size={14} />
-            {e.nFriends + ' friends going'}
+            {e.nFriends + ' friends'}
           </>,
           'quiet',
           'tag-going'
