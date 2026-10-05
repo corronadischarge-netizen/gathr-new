@@ -62,7 +62,9 @@ export function EventScreen(p) {
           type="button"
           className="g-media ev-hero-img"
           aria-label="See the full poster"
-          style={{ backgroundImage: 'url(' + e.img + ')' }}
+          style={{
+            backgroundImage: 'linear-gradient(var(--poster-dim), var(--poster-dim)), url(' + e.img + ')'
+          }}
           onClick={() => c.set({ sheet: 'poster' })}
         >
           <span className="g-grain" style={{ opacity: 0.16 }} />
@@ -172,9 +174,10 @@ export function EventScreen(p) {
           <button type="button" className="ev-row" onClick={() => c.set({ sheet: 'rules' })}>
             <span className="ev-row-ic">{i3('pass', 40)}</span>
             <span className="col" style={{ gap: '4px', flexGrow: 1, minWidth: 0, textAlign: 'left' }}>
-              <span className="rowc" style={{ gap: '8px' }}>
+              {/* the verdict always sits at the right end of the title line */}
+              <span className="rowc ev-verdict-line">
                 <span className="title15">Who gets in</span>
-                <Badge tone={verdict[1]}>
+                <Badge tone={verdict[1]} className="ev-verdict">
                   <span key={verdict[0]} className={verdictChanged ? 'swap-in' : undefined}>
                     {verdict[0]}
                   </span>

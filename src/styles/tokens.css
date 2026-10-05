@@ -56,6 +56,9 @@
   --glass-fill: #ffffff14;
   --glass-fill-strong: #1c1c1cb8;
   --glass-scrim: #0a0a0a99;
+  /* posters: a bottom fade that keeps white text readable on any image, and a light dim over a full-bleed poster */
+  --poster-fade: linear-gradient(180deg, transparent 0%, #0a0a0aa6 30%, #0a0a0af0 60%, var(--night-950) 100%);
+  --poster-dim: #0a0a0a47;
   --glass-tonal: #ffffff38;
   --glass-edge: #ffffff1f;
   --depth-light: #ffffff12;

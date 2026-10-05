@@ -79,7 +79,10 @@ body { margin: 0; background: #050505; overflow: hidden; }
 
 /* event image */
 .ph-label { position: absolute; left: 0; right: 0; top: 150px; display: flex; flex-direction: column; align-items: center; gap: 8px; color: var(--night-600); }
-.img-fade { position: absolute; left: 0; right: 0; top: 40%; bottom: 0; background: linear-gradient(180deg, transparent, #0a0a0ad9 55%, var(--night-950)); }
+.img-fade { position: absolute; left: 0; right: 0; top: 35%; bottom: 0; background: var(--poster-fade); }
+/* night cards and the pick: the same darker fade behind the words */
+.g-ecard-fade { inset: 30% 0 0 0; background: var(--poster-fade); }
+.g-feature.is-image::after { background: linear-gradient(180deg, transparent 30%, #0a0a0a8c 55%, #0a0a0ae6 80%, var(--night-950)); }
 
 /* chrome */
 .tabwrap { position: absolute; left: 16px; right: 16px; bottom: 24px; z-index: 4; }
@@ -566,3 +569,5 @@ button.ev-hero-img { border: 0; padding: 0; margin: 0; width: 100%; cursor: zoom
 .g-badge.tag-free { color: var(--go-text, var(--green-300)); }
 /* friends going: solid blue with white text, so it stands out next to the quiet labels */
 .g-badge.tag-going { background: var(--blue-500); color: #fff; box-shadow: none; -webkit-backdrop-filter: none; backdrop-filter: none; }
+.ev-verdict-line { gap: 8px; justify-content: space-between; min-width: 0; }
+.ev-verdict { flex: none; margin-left: auto; }
