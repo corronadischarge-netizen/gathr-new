@@ -48,7 +48,9 @@ export function Tonight(p) {
             <IconButton
               icon="bell"
               label={S.notifSeen ? 'Updates' : 'Updates, new'}
-              onClick={() => c.go('notifs', { notifSeen: true })}
+              onClick={() =>
+                c.go('notifs', { notifSeen: true, glSeen: (S.myGuestLists || []).map((g) => g.entryId) })
+              }
             />
             {S.notifSeen ? null : <i className="bell-dot" aria-hidden />}
           </span>

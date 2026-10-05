@@ -7,6 +7,7 @@
 3. `20261005090000_organiser_venues.sql`: organisers can look after several venues (the first is their main venue) and add a venue that isn’t listed; nights must be at one of their venues. Also adds the venues from District’s listings.
 4. `20261005100000_posters.sql`: a public storage bucket for night posters; only an organiser's owners can add or remove posters, in their own folder.
 5. `20261006090000_event_guests.sql`: lets a night's team (owners and door staff) see who's booked, with the name on each booking, while profiles stay private.
+6. `20261006100000_guest_lists.sql`: guest lists (free entry for named people) from the host or a promoter, with caps; guests take free passes only if their sign-in email is on the list; promoters can be paid per guest-list person. Replaces event_guests() so the door also sees guest-list people.
 
 Every table has row-level security, so each person only reads and changes what their role allows.
 

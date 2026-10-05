@@ -60,7 +60,7 @@ export function HostDoor(p) {
             />
           </div>
           {meta(
-            inP.length + ' of ' + st.guests.length + ' bookings in' + (st.sample ? ' · sample guestlist' : '')
+            inP.length + ' of ' + st.guests.length + ' bookings in' + (st.sample ? ' · sample bookings' : '')
           )}
         </div>
       ) : (

@@ -37,3 +37,8 @@ export function shareToast(r, what) {
         ? 'Saved to your downloads'
         : null;
 }
+
+/* "Rahul’s", "Kukoo Nights’" */
+export function poss(name) {
+  return name + (/s$/i.test(name) ? '’' : '’s');
+}

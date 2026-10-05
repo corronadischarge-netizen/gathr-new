@@ -47,7 +47,7 @@ export function You(p) {
       'Host a night',
       S.org && S.org.profile
         ? 'Switch to hosting · ' + S.org.profile.name
-        : 'List free · see your guestlist and turn-ups',
+        : 'List free · see who’s coming and who turns up',
       () => {
         if (S.org && S.org.profile) c.toHost();
         else c.go('orgintro');

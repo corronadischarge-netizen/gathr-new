@@ -28,6 +28,9 @@ export function sayError(e) {
   if (/Pick one of your venues/.test(m)) return 'Pick one of your venues for this night.';
   if (/main venue/.test(m)) return m;
   if (/guestlist is full/.test(m)) return 'This night is full. There are no passes left.';
+  if (/The night is full/.test(m)) return 'This night is full. There are no passes left.';
+  if (/guest list is full|not on this guest list|plus-one a name/.test(m)) return m.replace(/\.?\s*$/, '.');
+  if (e && e.code === '23505' && /guest_list/.test(m)) return 'That email is already on this guest list.';
   if (/row-level security|permission/i.test(m)) return 'You don’t have permission to do that.';
   if (/fetch|network|Failed to fetch/i.test(m)) return 'No connection. Check your internet and try again.';
   return m || 'Something went wrong. Try again.';
@@ -370,6 +373,7 @@ function bookingFrom(b) {
     couples: b.couples,
     stags: b.stags,
     girls: b.girls,
+    guests: b.guests || 0, // guest-list people (free entry)
     passes: b.passes,
     amount: b.amount
   };
@@ -418,9 +422,122 @@ export function pullGuests(eventId) {
       rows.map((g) => ({
         name: g.name,
         passes: g.passes,
-        code: g.code,
-        booked: g.via_promoter ? 'Through a promoter' : 'Booked on gathr',
+        code: g.code, // empty for guest-list people who haven't taken their passes yet
+        booked: g.guest_list
+          ? 'Guest list · ' + g.guest_list + (g.code ? '' : ' · passes not taken yet')
+          : g.via_promoter
+            ? 'Through a promoter'
+            : 'Booked on gathr',
+        plusOnes: g.plus_ones || [],
+        guestList: g.guest_list || null,
         bookingId: g.booking_id
       }))
     );
+}
+
+/* ---------------------------------------------------------------- guest lists (step 4): free entry, named people */
+/* Whose guest lists a night has (the host's, and promoters'): for "Whose list?" when booking. */
+export function pullEventLists(eventId) {
+  return db()
+    .then((c) => c.rpc('event_guest_lists', { ev: eventId }))
+    .then(ok)
+    .then((rows) => rows.map((r) => ({ listId: r.list_id, owner: r.owner, isHost: r.is_host })));
+}
+/* The guest lists you're on (matched by the email you signed in with), for nights still to come. */
+export function pullMyGuestLists() {
+  return db().then((c) => {
+    if (!me) return [];
+    return c
+      .rpc('my_guest_lists')
+      .then(ok)
+      .then((rows) =>
+        rows.map((r) => ({
+          entryId: r.entry_id,
+          event: r.event_id,
+          listId: r.list_id,
+          owner: r.owner,
+          plusOnes: r.plus_ones || [],
+          bookingId: r.booking_id
+        }))
+      );
+  });
+}
+/* Take your free passes from a list you're on. */
+export function claimGuestList(eventId, listId) {
+  return db()
+    .then((c) => c.rpc('claim_guest_list', { ev: eventId, list: listId }))
+    .then(ok)
+    .then(bookingFrom);
+}
+/* Host: everyone on every guest list for one of their nights. */
+export function pullListPeople(eventId) {
+  return db().then((c) =>
+    c
+      .from('guest_list_entries')
+      .select(
+        'id, list_id, name, email, plus_ones, note, booking_id, created_at, guest_lists(promoter_id, promoters(display_name))'
+      )
+      .eq('event_id', eventId)
+      .is('removed_at', null)
+      .order('created_at')
+      .then(ok)
+      .then((rows) =>
+        rows.map((r) => ({
+          id: r.id,
+          listId: r.list_id,
+          name: r.name,
+          email: r.email,
+          plusOnes: r.plus_ones || [],
+          note: r.note || '',
+          taken: !!r.booking_id,
+          by: r.guest_lists && r.guest_lists.promoters ? r.guest_lists.promoters.display_name : null // null = your own list
+        }))
+      )
+  );
+}
+/* Host: add someone to your own list for a night (the list is made the first time). */
+export function addToHostList(eventId, guest) {
+  var c;
+  return db()
+    .then((cl) => {
+      c = cl;
+      return c.from('guest_lists').select('id').eq('event_id', eventId).is('promoter_id', null).then(ok);
+    })
+    .then((have) =>
+      have.length
+        ? have[0].id
+        : c
+            .from('guest_lists')
+            .insert({ event_id: eventId })
+            .select('id')
+            .single()
+            .then(ok)
+            .then((l) => l.id)
+    )
+    .then((listId) =>
+      c
+        .from('guest_list_entries')
+        .insert({
+          list_id: listId,
+          name: guest.name,
+          email: guest.email,
+          plus_ones: guest.plusOnes,
+          note: guest.note || null,
+          added_by: me
+        })
+        .select('id')
+        .single()
+        .then(ok)
+    );
+}
+export function removeFromList(entryId) {
+  return db()
+    .then((c) =>
+      c
+        .from('guest_list_entries')
+        .update({ removed_at: new Date().toISOString() })
+        .eq('id', entryId)
+        .select('id')
+    )
+    .then(ok);
 }

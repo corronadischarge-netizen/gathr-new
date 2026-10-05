@@ -4,6 +4,7 @@ import { priceTxt, rupees } from '../data/format';
 import { DOOR_OK, levelOf, nightsCount, passCode } from '../data/sample';
 import { Badge, Button } from '../design-system';
 import { passPayload } from '../lib/passQr';
+import { poss } from '../lib/utils';
 import { Share } from '../services/share';
 import { i3, meta, thumb } from '../ui/helpers';
 
@@ -13,11 +14,15 @@ export function PassCard(p) {
     S = c.S,
     e = p.e,
     v = p.v;
+  // a guest-list pass: free entry from the host or a promoter, for you and your named plus-ones
+  var gl = S.myBookings && S.myBookings[e.id] && S.myBookings[e.id].guests ? S.myBookings[e.id] : null;
+  var from = gl && (S.myGuestLists || []).filter((g) => g.bookingId === gl.id)[0];
+  if (gl && from) gl = Object.assign({ listOwner: from.owner, plusOnes: from.plusOnes }, gl);
   return (
     <div className="g-card card col pass-card" style={{ marginTop: '24px', padding: '20px', gap: '16px' }}>
       {i3('wristband', 96, 'pass-ic')}
       <div className="rowc" style={{ gap: '8px', flexWrap: 'wrap', paddingRight: '64px' }}>
-        <Badge tone="go">{e.rsvp ? 'RSVP confirmed' : 'Booked'}</Badge>
+        <Badge tone="go">{gl ? 'Guest list · free entry' : e.rsvp ? 'RSVP confirmed' : 'Booked'}</Badge>
         <Badge tone="neutral">{levelOf(nightsCount(S))[0]}</Badge>
         {DOOR_OK[v.id] ? <Badge tone="neutral">Door confirmed</Badge> : null}
       </div>
@@ -29,11 +34,14 @@ export function PassCard(p) {
             e.time +
               (e.gates ? ' · gates ' + e.gates : '') +
               ' · ' +
-              (e.price
-                ? S.paidSplit
-                  ? '₹' + e.price.toLocaleString('en-IN') + ' paid (your share)'
-                  : '₹' + (e.price * S.guests).toLocaleString('en-IN') + ' paid'
-                : priceTxt(e))
+              (gl
+                ? (gl.listOwner ? poss(gl.listOwner) + ' guest list' : 'guest list') +
+                  (gl.plusOnes && gl.plusOnes.length ? ' · you + ' + gl.plusOnes.join(', ') : '')
+                : e.price
+                  ? S.paidSplit
+                    ? '₹' + e.price.toLocaleString('en-IN') + ' paid (your share)'
+                    : '₹' + (e.price * S.guests).toLocaleString('en-IN') + ' paid'
+                  : priceTxt(e))
           )}
         </div>
       </div>

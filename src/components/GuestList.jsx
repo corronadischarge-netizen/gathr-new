@@ -5,7 +5,7 @@ import { Button, SearchField } from '../design-system';
 import { Share } from '../services/share';
 import { fav, meta, svgIcon } from '../ui/helpers';
 
-/* the guestlist for one night: search, check in by hand, download */
+/* who's coming to one night (bookings and guest-list people): search, check in by hand, download */
 export function GuestList(p) {
   var c = p.ctx,
     S = c.S,
@@ -46,15 +46,15 @@ export function GuestList(p) {
         [rows.map((r) => r.map((x) => '"' + String(x).replace(/"/g, '""') + '"').join(',')).join('\n')],
         { type: 'text/csv' }
       ),
-      (e.id || id) + '-guestlist.csv'
+      (e.id || id) + '-whos-coming.csv'
     );
-    c.toast('Guestlist downloaded');
+    c.toast('List downloaded');
   }
   return (
     <section className="col" style={{ gap: '12px' }} aria-labelledby="oe-list">
       <div className="sec-row">
         <h2 id="oe-list" className="g-section-title" style={{ margin: 0 }}>
-          Guestlist
+          Who’s coming
         </h2>
         {meta(
           inPeople + ' of ' + st.guests.length + ' in · ' + passes + (passes === 1 ? ' pass' : ' passes')
@@ -111,7 +111,7 @@ export function GuestList(p) {
             )}
           </div>
           <Button variant="subtle" block icon="arrow-up-right" onClick={csv}>
-            Download guestlist (CSV)
+            Download the list (CSV)
           </Button>
         </div>
       ) : (

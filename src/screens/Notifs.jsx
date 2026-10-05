@@ -1,4 +1,6 @@
+import { EVENTS, VENUES } from '../data/listings';
 import { IconButton } from '../design-system';
+import { poss } from '../lib/utils';
 import { icon, meta, note, tile } from '../ui/helpers';
 import { Tap } from '../ui/Tap';
 
@@ -6,6 +8,26 @@ export function Notifs(p) {
   var c = p.ctx,
     S = c.S,
     items = [];
+  // guest lists you're on: tapping opens the night with "Guest list" already picked
+  (S.myGuestLists || []).forEach((g) => {
+    var e = EVENTS[g.event];
+    if (!e) return;
+    items.push([
+      ['wristband', 'green'],
+      'You’re on ' + poss(g.owner) + ' guest list',
+      e.title +
+        ' · ' +
+        e.date +
+        (VENUES[e.venue] ? ' at ' + VENUES[e.venue].name : '') +
+        ' · free entry' +
+        (g.plusOnes.length ? ' for you + ' + g.plusOnes.length : '') +
+        (g.bookingId ? ' · passes taken' : ''),
+      () => {
+        c.set({ bookMode: 'guest', bookList: g.listId });
+        c.openEvent(g.event, 'list');
+      }
+    ]);
+  });
   if (S.saved.twin)
     items.push([
       ['ticket', 'pink'],

@@ -64,7 +64,7 @@ export function HostProfile(p) {
       <div className="ev-card col" style={{ gap: '6px' }}>
         <span className="title15">Door staff</span>
         {meta(
-          'Invite bouncers to scan passes from their own phones, with no access to money or editing. Turns on once guestlists sync online.'
+          'Invite bouncers to scan passes from their own phones, with no access to money or editing. Turns on once door check-ins sync online.'
         )}
       </div>
       <Button variant="primary" size="lg" block onClick={c.toGuest}>

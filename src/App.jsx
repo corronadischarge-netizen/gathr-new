@@ -148,7 +148,8 @@ export function App() {
     'notifSeen',
     'mode',
     'hostNight',
-    'myBookings'
+    'myBookings',
+    'glSeen'
   ];
   (() => {
     var p = store('gathr.state');
@@ -267,6 +268,16 @@ export function App() {
       .catch(() => {});
     Remote.amAdmin()
       .then((yes) => set({ isAdmin: yes }))
+      .catch(() => {});
+    // guest lists you're on: a new one lights the bell on This week
+    feedReady
+      .then(() => Remote.pullMyGuestLists())
+      .then((l) =>
+        set((o) => ({
+          myGuestLists: l,
+          notifSeen: l.some((g) => (o.glSeen || []).indexOf(g.entryId) < 0) ? false : o.notifSeen
+        }))
+      )
       .catch(() => {});
     // your bookings for gathr nights follow you to any phone; the newest upcoming one is your plan
     feedReady

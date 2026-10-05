@@ -17,7 +17,7 @@ export function HostCtaCard(p) {
       {i3('spotlight', 52)}
       <div className="col" style={{ gap: '2px', flexGrow: 1 }}>
         <span className="title15">Hosting a night in Pune?</span>
-        {meta('List it free. See your guestlist and who turns up.')}
+        {meta('List it free. See who’s coming and who turns up.')}
       </div>
       {icon('chevron-right')}
     </Tap>

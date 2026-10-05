@@ -14,7 +14,7 @@ export function OrgIntro(p) {
   var perks = [
     [
       'pass',
-      'Your guestlist, live',
+      'Who’s coming, live',
       'Who booked, how many passes, who turned up. Check people in at the door from your phone.'
     ],
     ['ticket', 'Free or paid, your call', 'Free RSVP, paid passes or pay at the door. No listing fee.'],

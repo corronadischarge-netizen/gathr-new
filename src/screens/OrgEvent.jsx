@@ -10,7 +10,7 @@ import { OrgHome } from './OrgHome';
 import { Share } from '../services/share';
 import { i3, meta, note, statusChip, thumb } from '../ui/helpers';
 
-/* 5 · one night: status, funnel, audience, guestlist with door check-in */
+/* 5 · one night: status, funnel, audience, who's coming, with door check-in */
 export function OrgEvent(p) {
   var c = p.ctx,
     S = c.S,

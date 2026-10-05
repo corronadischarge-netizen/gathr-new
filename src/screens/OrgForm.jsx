@@ -339,11 +339,11 @@ export function OrgForm(p) {
             </div>,
             D.entry === 'paid'
               ? meta('Guests pay on gathr. No fees are added on top of your price.')
-              : meta('Guests get on the list free and pay you at the door.')
+              : meta('Guests book free on gathr and pay you at the door.')
           )
         : meta('Guests RSVP on gathr and get a pass. You see every name.')}
       {F(
-        'Guestlist cap (optional)',
+        'Capacity (optional)',
         'of-cap',
         <div className="field-row">
           <input
@@ -355,7 +355,7 @@ export function OrgForm(p) {
             onChange={(e) => upd({ capacity: e.target.value.replace(/\D/g, '').slice(0, 4) })}
           />
         </div>,
-        meta('We stop taking bookings when the list is full.')
+        meta('We stop taking bookings when the night is full. Guest-list passes count too.')
       )}
       <div className="org-sec">
         <span className="ev-lbl">Who gets in</span>
