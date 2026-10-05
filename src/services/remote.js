@@ -27,6 +27,7 @@ export function sayError(e) {
   var m = (e && e.message) || '';
   if (/Pick one of your venues/.test(m)) return 'Pick one of your venues for this night.';
   if (/main venue/.test(m)) return m;
+  if (/guestlist is full/.test(m)) return 'This night is full. There are no passes left.';
   if (/row-level security|permission/i.test(m)) return 'You don’t have permission to do that.';
   if (/fetch|network|Failed to fetch/i.test(m)) return 'No connection. Check your internet and try again.';
   return m || 'Something went wrong. Try again.';
@@ -340,4 +341,86 @@ export function decideNight(id, live) {
       .select('id')
       .then(ok)
   );
+}
+
+/* ---------------------------------------------------------------- you: profile and bookings (step 3) */
+/* Your private profile. Only the name reaches a host, on your bookings for their nights. */
+export function pushMe(S) {
+  var name = ((S.me && S.me.name) || '').trim().slice(0, 80);
+  var row = {
+    first_name: name.split(/\s+/)[0].slice(0, 40),
+    full_name: name,
+    phone: /^[6-9]\d{9}$/.test(S.phone || '') ? S.phone : null,
+    age_band: ['18 to 20', '21 to 24', '25 or older'].indexOf(S.age) >= 0 ? S.age : null
+  };
+  return db().then((c) => {
+    if (!me) return null;
+    return c
+      .from('profiles')
+      .upsert(Object.assign({ id: me }, row))
+      .then(ok);
+  });
+}
+
+function bookingFrom(b) {
+  return {
+    id: b.id,
+    event: b.event_id,
+    code: b.code,
+    couples: b.couples,
+    stags: b.stags,
+    girls: b.girls,
+    passes: b.passes,
+    amount: b.amount
+  };
+}
+/* Book a gathr night: the database checks the night's rules (stags, capacity) and makes the pass code. */
+export function book(eventId, couples, stags, girls, payRef) {
+  return db()
+    .then((c) =>
+      c.rpc('create_booking', {
+        ev: eventId,
+        n_couples: couples,
+        n_stags: stags,
+        n_girls: girls,
+        ref: null,
+        pay_ref: payRef || null
+      })
+    )
+    .then(ok)
+    .then(bookingFrom);
+}
+export function cancelBooking(id) {
+  return db()
+    .then((c) => c.rpc('cancel_booking', { bk: id }))
+    .then(ok);
+}
+/* Your bookings for nights that haven't ended, so passes follow you to another phone. */
+export function pullMyBookings() {
+  return db().then((c) => {
+    if (!me) return [];
+    return c
+      .from('bookings')
+      .select('*')
+      .eq('user_id', me)
+      .eq('status', 'booked')
+      .order('created_at')
+      .then(ok)
+      .then((rows) => rows.map(bookingFrom));
+  });
+}
+/* Who's coming to one of your nights (the night's team only). */
+export function pullGuests(eventId) {
+  return db()
+    .then((c) => c.rpc('event_guests', { ev: eventId }))
+    .then(ok)
+    .then((rows) =>
+      rows.map((g) => ({
+        name: g.name,
+        passes: g.passes,
+        code: g.code,
+        booked: g.via_promoter ? 'Through a promoter' : 'Booked on gathr',
+        bookingId: g.booking_id
+      }))
+    );
 }

@@ -16,7 +16,7 @@ export function passPayload(eid, code, passes) {
 
 function parsePass(txt) {
   var t = String(txt || '').trim(),
-    m = /^G1\.([A-Za-z0-9_]+)\.(G-[A-Z0-9]+)\.(\d+)\.([a-z0-9]+)$/.exec(t);
+    m = /^G1\.([A-Za-z0-9_-]+)\.(G-[A-Z0-9]+)\.(\d+)\.([a-z0-9]+)$/.exec(t);
   if (!m) return null;
   if (chk('G1.' + m[1] + '.' + m[2] + '.' + m[3] + '|gathr-door') !== m[4]) return { bad: true };
   return { eid: m[1], code: m[2], passes: +m[3] };

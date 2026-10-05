@@ -103,6 +103,7 @@ export function orgToEvent(o, prof) {
     id: o.id,
     src: 'gathr',
     org: true,
+    remote: !!o.remote, // saved in Supabase, so it's booked through the database
     title: o.title,
     venue: o.venueId,
     day: WD[d.getDay()].slice(0, 3).toLowerCase(),
@@ -210,8 +211,11 @@ export function orgStats(S, id) {
     ci = (org.checkins || {})[id] || {};
   var guests;
   if (e && e.org) {
-    guests =
-      S.planned === id
+    // nights in Supabase: everyone who booked, from any phone (loaded by the app when hosting)
+    var fromDb = S.remoteGuests && S.remoteGuests[id];
+    guests = fromDb
+      ? fromDb.slice()
+      : S.planned === id
         ? [
             {
               name: (S.me && S.me.name) || S.email || 'Guest',

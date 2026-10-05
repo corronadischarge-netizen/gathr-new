@@ -4,6 +4,7 @@ import { ReviewPanel } from './components/ReviewPanel';
 import { Scanner } from './components/Scanner';
 import { REVIEW } from './config';
 import { EVENTS, VENUES, isPast } from './data/listings';
+import { hostNights } from './data/hostNights';
 import { ORG_KEY, orgLoad, setRemoteFeed, syncOrg } from './data/organisers';
 import { TabBar } from './design-system';
 import { useEdgeSwipe } from './hooks/useEdgeSwipe';
@@ -146,7 +147,8 @@ export function App() {
     'payId',
     'notifSeen',
     'mode',
-    'hostNight'
+    'hostNight',
+    'myBookings'
   ];
   (() => {
     var p = store('gathr.state');
@@ -242,7 +244,7 @@ export function App() {
      database's, keeping nights they haven't saved to it yet. */
   useEffect(() => {
     if (!Remote.remoteOn) return;
-    Remote.pullVenues()
+    var feedReady = Remote.pullVenues()
       .then(() => Remote.pullFeed())
       .then((feed) => {
         setRemoteFeed(feed);
@@ -266,7 +268,40 @@ export function App() {
     Remote.amAdmin()
       .then((yes) => set({ isAdmin: yes }))
       .catch(() => {});
+    // your bookings for gathr nights follow you to any phone; the newest upcoming one is your plan
+    feedReady
+      .then(() => Remote.pullMyBookings())
+      .then((list) => {
+        var mine = {};
+        list.forEach((b) => (mine[b.event] = b));
+        set((o) => {
+          var next = { myBookings: mine };
+          var up = list.filter((b) => EVENTS[b.event] && !isPast(EVENTS[b.event])).pop();
+          if (up && !(o.planned && EVENTS[o.planned] && !isPast(EVENTS[o.planned])))
+            Object.assign(next, { planned: up.event, guests: up.passes, onList: true });
+          return next;
+        });
+      })
+      .catch(() => {});
   }, [S.signedIn]);
+  /* your name, phone and age band go to your private profile (hosts see only the name on your bookings) */
+  useEffect(() => {
+    if (!Remote.remoteOn || !S.signedIn) return;
+    var t = setTimeout(() => {
+      Remote.pushMe(S).catch(() => {});
+    }, 800);
+    return () => clearTimeout(t);
+  }, [S.signedIn, S.me && S.me.name, S.phone, S.age]);
+  /* hosting: who's coming to your gathr nights, from every phone (refreshed when you open a host screen) */
+  useEffect(() => {
+    if (!Remote.remoteOn || S.mode !== 'host' || !S.org || !S.org.profile) return;
+    var ids = hostNights(S).filter((k) => EVENTS[k] && EVENTS[k].remote);
+    ids.forEach((id) => {
+      Remote.pullGuests(id)
+        .then((list) => set((o) => ({ remoteGuests: Object.assign({}, o.remoteGuests, { [id]: list }) })))
+        .catch(() => {});
+    });
+  }, [S.mode, S.stack[S.stack.length - 1], S.feedAt, S.org]);
   useEffect(() => {
     if (scrTop() !== 'event') return;
     var v = store('gathr.views') || {};

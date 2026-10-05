@@ -68,6 +68,8 @@ export function gpWinner(gp, vote) {
 }
 
 export function passCode(S, e) {
+  // a booking saved in Supabase has its own code, made by the database
+  if (S.myBookings && S.myBookings[e.id]) return S.myBookings[e.id].code;
   var x = S.payId || e.id + (S.email || 'guest'),
     n = 0;
   for (var i = 0; i < x.length; i++) n = (n * 31 + x.charCodeAt(i)) >>> 0;

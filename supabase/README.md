@@ -6,6 +6,7 @@
 2. `20261001090100_promoters.sql`: deals, agencies, promoters, private agency rates, per-night promoter codes, invites, link opens, payout lines.
 3. `20261005090000_organiser_venues.sql`: organisers can look after several venues (the first is their main venue) and add a venue that isn’t listed; nights must be at one of their venues. Also adds the venues from District’s listings.
 4. `20261005100000_posters.sql`: a public storage bucket for night posters; only an organiser's owners can add or remove posters, in their own folder.
+5. `20261006090000_event_guests.sql`: lets a night's team (owners and door staff) see who's booked, with the name on each booking, while profiles stay private.
 
 Every table has row-level security, so each person only reads and changes what their role allows.
 
