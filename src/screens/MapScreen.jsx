@@ -364,21 +364,20 @@ export function MapScreen(p) {
                 {icon('chevron-right')}
               </Tap>
             ))}
-            <div className="rowc" style={{ gap: '8px' }}>
-              <Button variant="subtle" icon="navigation" onClick={() => Share.directions(v)}>
+            {/* two equal buttons that always fit on one line */}
+            <div className="btn-pair">
+              <Button variant="subtle" icon="navigation" block onClick={() => Share.directions(v)}>
                 Directions
               </Button>
-              <div style={{ flexGrow: 1 }}>
-                {e ? (
-                  <Button variant="primary" icon="ticket" block onClick={() => c.openEvent(e.id, 'list')}>
-                    {e.rsvp ? 'RSVP' : e.src === 'district' ? 'Get tickets' : 'Get on the list'}
-                  </Button>
-                ) : (
-                  <Button variant="primary" icon="arrow-right" block onClick={() => c.tab('tonight')}>
-                    See what’s on this week
-                  </Button>
-                )}
-              </div>
+              {e ? (
+                <Button variant="primary" icon="ticket" block onClick={() => c.openEvent(e.id, 'list')}>
+                  {e.rsvp ? 'RSVP' : e.src === 'district' ? 'Get tickets' : 'Get on the list'}
+                </Button>
+              ) : (
+                <Button variant="primary" icon="arrow-right" block onClick={() => c.tab('tonight')}>
+                  What’s on
+                </Button>
+              )}
             </div>
           </Sheet>
         </div>

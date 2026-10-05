@@ -93,7 +93,12 @@ body { margin: 0; background: #050505; overflow: hidden; }
 .g-feature { min-height: 164px; }
 .g-ecard { height: 300px; }
 .g-vhero { height: 620px; border-radius: 0 0 32px 32px; padding-top: 52px; }
-.g-sheet { max-height: 780px; overflow-y: auto; }
+.g-sheet { max-height: 780px; overflow-y: auto; overflow-x: hidden; overscroll-behavior: contain; }
+/* two buttons side by side, equal width; a long label shortens with … instead of pushing the sheet wider */
+.btn-pair { display: flex; gap: 8px; min-width: 0; }
+.btn-pair > * { flex: 1 1 0; min-width: 0; }
+.btn-pair .g-btn { padding-left: 12px; padding-right: 12px; }
+.btn-pair .g-btn > span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
 /* real-data additions */
 .thumb { flex: none; border-radius: 16px; background-color: var(--night-800); background-size: cover; background-position: center; box-shadow: inset 0 0 0 1px #ffffff14; }
