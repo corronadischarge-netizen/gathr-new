@@ -1,8 +1,9 @@
+import { ModeSwitchCard } from '../cards/ModeSwitchCard';
 import { HostBar } from '../components/HostBar';
 import { orgVenuesLabel } from '../data/organisers';
-import { Badge, Button } from '../design-system';
+import { Badge } from '../design-system';
 import { OrgIntro } from './OrgIntro';
-import { eyebrow, icon, meta, note, stop } from '../ui/helpers';
+import { eyebrow, icon, meta, stop } from '../ui/helpers';
 
 /* Profile: who you host as, and the way back to going out */
 export function HostProfile(p) {
@@ -29,6 +30,7 @@ export function HostProfile(p) {
           {meta('@' + pr.insta)}
         </div>
       </div>
+      <ModeSwitchCard ctx={c} to="guest" />
       <div className="ev-card col ev-rows">
         {[
           [
@@ -67,10 +69,6 @@ export function HostProfile(p) {
           'Invite bouncers to scan passes from their own phones, with no access to money or editing. Turns on once door check-ins sync online.'
         )}
       </div>
-      <Button variant="primary" size="lg" block onClick={c.toGuest}>
-        Switch to going out
-      </Button>
-      {note('Same account in both modes. Your passes and plans are in going-out mode.')}
     </div>
   );
 }
