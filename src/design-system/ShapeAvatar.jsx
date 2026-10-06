@@ -29,23 +29,19 @@ export function ShapeAvatar(p) {
         </defs>
         <g clipPath={'url(#' + id + ')'}>
           <rect width={1} height={1} fill={fillOf(hue)} />
-          {p.image ? (
-            <image href={p.image} width={1} height={1} preserveAspectRatio="xMidYMid slice" />
-          ) : (
-            <text
-              x={0.5}
-              y={0.62}
-              textAnchor="middle"
-              fontSize={0.36}
-              fontWeight={800}
-              fill={textOn(hue)}
-              fontFamily="var(--font-sans)"
-            >
-              {(p.name || '?').charAt(0)}
-            </text>
-          )}
+          {p.image ? <image href={p.image} width={1} height={1} preserveAspectRatio="xMidYMid slice" /> : null}
         </g>
       </svg>
+      {/* the initial is HTML laid over the shape, so it's centred by layout rather than a guessed baseline */}
+      {p.image ? null : (
+        <span
+          className="g-shape-ini"
+          aria-hidden="true"
+          style={{ width: size + 'px', height: size + 'px', fontSize: Math.round(size * 0.4) + 'px', color: textOn(hue) }}
+        >
+          {(p.name || '?').trim().charAt(0).toUpperCase()}
+        </span>
+      )}
       {p.name ? (
         <figcaption>
           <b>{p.name}</b>

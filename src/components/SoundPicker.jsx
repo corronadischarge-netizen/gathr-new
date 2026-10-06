@@ -117,7 +117,7 @@ export function SoundPicker(p) {
   return (
     <>
       <div className="col" style={{ gap: '10px' }}>
-        <span className="meta">Sounds like · up to 3 artists (optional)</span>
+        <span className="meta">{(like.length > 1 ? 'Artists' : 'Artist') + ' · up to 3 (optional)'}</span>
         {like.length ? (
           <div className="wrap">
             {like.map((a) => (

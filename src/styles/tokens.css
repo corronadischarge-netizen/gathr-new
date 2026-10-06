@@ -43,6 +43,10 @@
   --on-ink: var(--night-950);
   --brand-text: var(--violet-300);
   --brand-soft: #531aff33;
+  /* a chosen chip, tile or filter: a lighter grey with a thin edge. Violet stays for the tab bar, switches and brand moments */
+  --selected-fill: var(--night-700);
+  --selected-edge: inset 0 0 0 1.5px var(--night-500);
+  --on-selected: var(--ink);
   --now: var(--yellow-300);
   --go: var(--green-300);
   --people: var(--pink-300);

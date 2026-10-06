@@ -1,4 +1,3 @@
-import { useRef } from 'react';
 import { APP_URL } from '../config';
 import { MO, WD } from '../data/dates';
 import { kindOf } from '../data/eventKind';
@@ -33,17 +32,8 @@ export function EventScreen(p) {
           .filter((x) => x && !/themed party|girls|club night|live gig/i.test(x));
   var d = new Date(e.iso),
     dayShort = WD[d.getDay()].slice(0, 3) + ' ' + d.getDate() + ' ' + MO[d.getMonth()];
-  /* door check in one line: what's certain, what isn't */
-  var unknown = e.org ? 0 : 1 + (e.dress ? 1 : 0);
-  var verdict = blocked
-    ? ['Not for you', 'limit']
-    : unknown
-      ? ['Check ' + unknown + (unknown === 1 ? ' thing' : ' things'), 'now']
-      : ['Confirmed', 'go'];
-  // when the verdict changes (your age was just set), its words fade in while the badge colour shifts
-  var lastVerdict = useRef({ v: verdict[0], at: 0 });
-  if (lastVerdict.current.v !== verdict[0]) lastVerdict.current = { v: verdict[0], at: Date.now() };
-  var verdictChanged = Date.now() - lastVerdict.current.at < 400;
+  /* door check in one line, as plain words: what's certain, what's up to the door. No verdict badge: the door
+     decides, and the Age box above already says when a night isn't for you. */
   var doorLine = blocked
     ? 'This night is ' + e.age + '+. You’re ' + S.age + '.'
     : e.org
@@ -133,11 +123,13 @@ export function EventScreen(p) {
             {' · ' + v.area.split(',')[0]}
           </p>
           {sounds.length ? <p className="ev-sound">{sounds.join(' · ')}</p> : null}
-          {/* energy, and the artists the night sounds like */}
+          {/* energy, and the night's artists */}
           {e.energy || (e.soundsLike || []).length ? (
             <div className="ev-like">
               {e.energy ? <span className={'energy-tag en-' + e.energy}>{energyName(e.energy)}</span> : null}
-              {(e.soundsLike || []).length ? <span className="ev-like-lbl">Sounds like</span> : null}
+              {(e.soundsLike || []).length ? (
+                <span className="ev-like-lbl">{e.soundsLike.length > 1 ? 'Artists' : 'Artist'}</span>
+              ) : null}
               {(e.soundsLike || []).map((a) => (
                 <span key={a} className="like-chip">
                   {a}
@@ -193,16 +185,8 @@ export function EventScreen(p) {
           <button type="button" className="ev-row" onClick={() => c.set({ sheet: 'rules' })}>
             <span className="ev-row-ic">{i3('pass', 40)}</span>
             <span className="col" style={{ gap: '4px', flexGrow: 1, minWidth: 0, textAlign: 'left' }}>
-              {/* the verdict always sits at the right end of the title line */}
-              <span className="rowc ev-verdict-line">
-                <span className="title15">Who gets in</span>
-                <Badge tone={verdict[1]} className="ev-verdict">
-                  <span key={verdict[0]} className={verdictChanged ? 'swap-in' : undefined}>
-                    {verdict[0]}
-                  </span>
-                </Badge>
-              </span>
-              <span className="meta">{doorLine}</span>
+              <span className="title15">Who gets in</span>
+              <span className={'meta' + (blocked ? ' err-txt' : '')}>{doorLine}</span>
             </span>
             {icon('chevron-right')}
           </button>

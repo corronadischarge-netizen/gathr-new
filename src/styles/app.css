@@ -290,7 +290,7 @@ html.is-full .map-ctrls { bottom: calc(132px + env(safe-area-inset-bottom, 0px))
 
 
 .plan-crew .g-shape { margin: 0; }
-.plan-crew .g-shape > :not(svg) { display: none; }
+.plan-crew .g-shape figcaption { display: none; }
 .rel > .head-ic { top: -40px; }
 
 /* =============== colour tone-down (30 Sep): one brand colour, the 3D icons carry the colour ===============
@@ -299,8 +299,8 @@ html.is-full .map-ctrls { bottom: calc(132px + env(safe-area-inset-bottom, 0px))
 .hue-yellow, .hue-green, .hue-red, .hue-pink, .hue-violet, .hue-blue { --hb: var(--night-800); --hi: var(--ink); }
 .card-slot .g-ecard-cta { background: var(--night-50); color: var(--night-950); }
 .mood { background: var(--night-900); box-shadow: inset 0 0 0 1px var(--line-strong); color: var(--ink); }
-.mood.on { background: var(--brand); color: #fff; box-shadow: none; }
-.vibe-tile.on { background: var(--brand); color: #fff; }
+.mood.on { background: var(--selected-fill); color: var(--on-selected); box-shadow: var(--selected-edge); }
+.vibe-tile.on { background: var(--selected-fill); color: var(--on-selected); box-shadow: var(--selected-edge); }
 .vibe-tile .i3 { filter: drop-shadow(0 6px 10px #0009); }
 /* day stickers keep their colour and tilt: the one playful accent on the home feed */
 .day-tag.hue-yellow { --hb: var(--yellow-300); --hi: #0a0a0a; }
@@ -333,16 +333,15 @@ html.is-full .map-ctrls { bottom: calc(132px + env(safe-area-inset-bottom, 0px))
 .ck.info { background: var(--night-700); color: var(--night-50); font-style: italic; }
 .seg { display: flex; padding: 4px; border-radius: 9999px; background: var(--night-900); box-shadow: inset 0 0 0 1px var(--line); }
 .seg button { flex: 1; height: 40px; border: 0; border-radius: 9999px; background: transparent; color: var(--night-300); font: 600 14px/1 var(--font-sans); cursor: pointer; }
-.seg button.on { background: var(--brand); color: #fff; }
+.seg button.on { background: var(--selected-fill); color: var(--on-selected); box-shadow: var(--selected-edge); }
 .seg button:focus-visible { outline: 2px solid transparent; box-shadow: var(--focus-ring); }
 .price-big { font-family: var(--font-display); font-size: 22px; line-height: 28px; font-weight: 700; letter-spacing: -0.03em; }
 .friends-btn { display: inline-flex; align-items: center; gap: 10px; padding: 6px 12px 6px 6px; border: 0; border-radius: 9999px; background: var(--night-900); box-shadow: inset 0 0 0 1px var(--line); color: var(--ink); cursor: pointer; }
 .mini-crew { display: inline-flex; }
 .mini-crew > * { margin-right: -8px; }
 .mini-crew > *:last-child { margin-right: 4px; }
-.mini-crew .g-shape > :not(svg), .crew .g-shape figcaption { }
 .mini-crew .g-shape { margin: 0; }
-.mini-crew .g-shape > :not(svg) { display: none; }
+.mini-crew .g-shape figcaption { display: none; }
 .pick-row { gap: 12px; min-height: 68px; border-radius: 16px; padding: 0 8px; margin: 0 -8px; }
 .pick-row.on { background: var(--brand-soft, #531aff26); }
 .pick-box { flex: none; width: 24px; height: 24px; border-radius: 8px; box-shadow: inset 0 0 0 1.5px var(--line-strong); display: grid; place-items: center; color: #fff; }
@@ -389,7 +388,7 @@ html.is-full .map-ctrls { bottom: calc(132px + env(safe-area-inset-bottom, 0px))
 .pass-chip.wait { background: var(--night-800); color: var(--night-300); }
 
 .no-cap { margin: 0 !important; }
-.no-cap > :not(svg) { display: none !important; }
+.no-cap figcaption { display: none !important; }
 .wc-ic2 { right: 26px !important; top: 176px !important; }
 .toast { white-space: normal !important; width: max-content; max-width: calc(100% - 32px); text-align: center; box-sizing: border-box; }
 .total-row { padding: 14px 0 2px; border-top: 1px solid var(--line); }
@@ -572,8 +571,6 @@ html.is-sideways #root { visibility: hidden; }
 .g-badge.tag-free { color: var(--go-text, var(--green-300)); }
 /* friends going: solid blue with white text, so it stands out next to the quiet labels */
 .g-badge.tag-going { background: var(--blue-500); color: #fff; box-shadow: none; -webkit-backdrop-filter: none; backdrop-filter: none; }
-.ev-verdict-line { gap: 8px; justify-content: space-between; min-width: 0; }
-.ev-verdict { flex: none; margin-left: auto; }
 /* Start a plan: night rows with room around them (the venue picker's .pick-row rules come later in this file) */
 .plan-new .pick-row { min-height: 64px; padding: 8px; margin: 0 -8px; width: auto; border-top: 0; border-radius: 16px; }
 .plan-new .pick-row.on { background: var(--brand-soft, #531aff26); }
@@ -590,7 +587,7 @@ html.is-sideways #root { visibility: hidden; }
 .city-chip svg { color: var(--ink-muted); }
 .city-row { min-height: 60px; }
 .city-ic { flex: none; width: 36px; height: 36px; border-radius: 12px; display: grid; place-items: center; background: var(--night-800); color: var(--ink-muted); }
-.city-ic.on { background: var(--brand); color: #fff; }
+.city-ic.on { background: var(--selected-fill); color: var(--on-selected); box-shadow: var(--selected-edge); }
 .city-tick { color: var(--brand-text); display: grid; place-items: center; }
 .city-tell { flex: none; display: inline-flex; align-items: center; gap: 6px; height: 36px; padding: 0 14px; border: 0; border-radius: 9999px; background: var(--night-800); color: var(--ink); font: 600 13px/1 var(--font-sans); cursor: pointer; position: relative; }
 .city-tell::after { content: ""; position: absolute; inset: -4px 0; }
@@ -615,7 +612,7 @@ html.is-sideways #root { visibility: hidden; }
 .energy-row::-webkit-scrollbar { display: none; }
 .energy-row button { flex: none; height: 36px; padding: 0 14px; border: 0; border-radius: 9999px; background: none; box-shadow: inset 0 0 0 1px var(--line); color: var(--ink-muted); font: 600 13px/1 var(--font-sans); cursor: pointer; position: relative; }
 .energy-row button::after { content: ""; position: absolute; inset: -4px 0; }
-.energy-row button.on { background: var(--brand); box-shadow: none; color: #fff; }
+.energy-row button.on { background: var(--selected-fill); box-shadow: var(--selected-edge); color: var(--on-selected); }
 .energy-row button:focus-visible { outline: 2px solid transparent; box-shadow: var(--focus-ring); }
 /* guest lists: one line per guest or promoter, details on tap */
 .gl-row { display: block; min-height: 0; padding: 0; }
