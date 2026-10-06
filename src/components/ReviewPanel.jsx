@@ -69,6 +69,7 @@ export function ReviewPanel(p) {
       ['you', 'You · status'],
       ['venuedash', 'Venue view'],
       ['notifs', 'Updates'],
+      ['promoinvite', 'Promoter invite'],
       ['map', 'Map'],
       ['venue', 'Venue'],
       ['search', 'Search'],

@@ -7,7 +7,7 @@ import { addToList, myPromoterLists, pullMyListPeople, removeFromList, sayError 
 import { Share } from '../services/share';
 import { eyebrow, meta, note, stop } from '../ui/helpers';
 
-function whenTxt(iso) {
+export function whenTxt(iso) {
   var d = new Date(new Date(iso).getTime() + 330 * 60000); // Pune time
   var h = d.getUTCHours(),
     m = d.getUTCMinutes();

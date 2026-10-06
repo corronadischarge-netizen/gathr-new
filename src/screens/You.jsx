@@ -57,6 +57,13 @@ export function You(p) {
       ['spotlight', 'red']
     ]
   ];
+  // a host sent you a promoter invite as a code (the link opens it directly)
+  rows.splice(rows.length - 1, 0, [
+    'Promoter invite',
+    'Got a code from a host? Enter it here',
+    () => c.go('promoinvite', { piCode: null }),
+    ['wristband', 'yellow']
+  ]);
   // promoters: the nights hosts invited them to, with their own guest lists
   if ((S.promoting || []).length)
     rows.unshift([

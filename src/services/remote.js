@@ -36,6 +36,10 @@ export function sayError(e) {
   if (e && e.code === '23505' && /phone/.test(m)) return 'That phone number is already on this guest list.';
   if (e && e.code === '23505' && /guest_list/.test(m)) return 'That email is already on this guest list.';
   if (/already have a list|That's you|waiting for its promoter/.test(m)) return m.replace(/\.?\s*$/, '.');
+  if (/already accepted|already been used|night has ended|your own night|Add your name|A cap is between|Sign in first/.test(m))
+    return m.replace(/\.?\s*$/, '.');
+  if (/promoter_invite/.test(m) && /schema cache|does not exist/.test(m))
+    return 'Invite links need the latest gathr database update.';
   if (e && e.code === '23505' && /night_reports/.test(m))
     return 'You’ve already reported this night. Thanks.';
   if (/null value in column "email"|schema cache/.test(m))
@@ -564,13 +568,15 @@ export function pullListPeople(eventId) {
 }
 /* the host's own list for a night: the one with no promoter and no invite (made the first time) */
 function hostListId(c, eventId) {
-  return c
-    .from('guest_lists')
-    .select('id')
-    .eq('event_id', eventId)
-    .is('promoter_id', null)
-    .is('invite_email', null)
+  var own = () => c.from('guest_lists').select('id').eq('event_id', eventId).is('promoter_id', null).is('invite_email', null);
+  return own()
+    .is('invite_code', null)
     .then(ok)
+    .catch((e) => {
+      // a database without invite links yet (migration 20261009090000)
+      if (!/schema cache|invite_code/.test((e && e.message) || '')) throw e;
+      return own().then(ok);
+    })
     .catch((e) => {
       // a database without promoter invites yet (migration 20261008110000)
       if (!/schema cache|invite_email/.test((e && e.message) || '')) throw e;
@@ -623,20 +629,43 @@ export function pullListSummary(eventId) {
         email: r.invite_email,
         cap: r.cap,
         people: r.people,
-        came: r.came
+        came: r.came,
+        code: r.invite_code || null
       }))
     );
 }
-/* Host: invite a promoter to one night by email, with a cap in people. */
-export function invitePromoter(eventId, email, name, cap) {
-  return db().then((c) =>
-    c
-      .from('guest_lists')
-      .insert({ event_id: eventId, invite_email: email, invite_name: name || null, cap: cap || null })
-      .select('id')
-      .single()
-      .then(ok)
-  );
+/* Host: an invite link for one night (the promoter's details come when they accept). Resolves { listId, code }. */
+export function createPromoterInvite(eventId, cap, note) {
+  return db()
+    .then((c) => c.rpc('create_promoter_invite', { ev: eventId, cap_n: cap || null, note: note || null }))
+    .then(ok)
+    .then((rows) => ({ listId: rows[0].list_id, code: rows[0].code }));
+}
+/* Anyone with a code: the night it's for, before signing in. state: open | taken | ended | withdrawn */
+export function promoterInvitePreview(code) {
+  return db()
+    .then((c) => c.rpc('promoter_invite_preview', { code: code }))
+    .then(ok)
+    .then((rows) => {
+      var r = rows[0] || { state: 'withdrawn' };
+      return {
+        state: r.state,
+        event: r.event_id,
+        title: r.title,
+        startsAt: r.starts_at,
+        venue: r.venue,
+        area: r.area,
+        host: r.host,
+        cap: r.cap,
+        poster: r.poster_url
+      };
+    });
+}
+/* Accept an invite: the list becomes yours. Resolves the night's id. */
+export function acceptPromoterInvite(code, name) {
+  return db()
+    .then((c) => c.rpc('accept_promoter_invite', { code: code, display: name }))
+    .then(ok);
 }
 /* Host: withdraw an invite nobody has taken yet, or change a list's cap. */
 export function withdrawInvite(listId) {

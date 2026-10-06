@@ -34,7 +34,8 @@ export function Notifs(p) {
     night_submitted: ['ticket', 'blue'],
     night_rejected: ['megaphone', 'red'],
     night_review: ['megaphone', 'violet'],
-    night_reported: ['megaphone', 'red']
+    night_reported: ['megaphone', 'red'],
+    promoter_joined: ['wristband', 'green']
   };
   (S.inbox || [])
     .filter((n) => LOOK[n.kind])

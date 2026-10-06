@@ -11,6 +11,7 @@ import { TabBar } from './design-system';
 import { useEdgeSwipe } from './hooks/useEdgeSwipe';
 import { useSheetExit } from './hooks/useSheetExit';
 import { useScreenTransition } from './hooks/useScreenTransition';
+import { cleanCode } from './lib/promoterInvite';
 import { store } from './lib/utils';
 import { TABS } from './navigation';
 import { Admin } from './screens/Admin';
@@ -32,6 +33,7 @@ import { OrgForm } from './screens/OrgForm';
 import { OrgHome } from './screens/OrgHome';
 import { OrgIntro } from './screens/OrgIntro';
 import { OrgSetup } from './screens/OrgSetup';
+import { PromoInvite } from './screens/PromoInvite';
 import { Promoting } from './screens/Promoting';
 import { Pass } from './screens/Pass';
 import { Phone } from './screens/Phone';
@@ -172,8 +174,15 @@ export function App() {
     }
     if (s0.mode === 'host' && s0.org && s0.org.profile && s0.seen) s0.stack = ['hostdoor'];
     else s0.mode = 'guest';
-    var m = /#(e|plan)=([^&]+)(.*)$/.exec(location.hash);
+    var m = /#(e|plan|pi)=([^&]+)(.*)$/.exec(location.hash);
     if (m) s0.mode = 'guest';
+    // a promoter invite link: the invite, ready to sign in and accept
+    if (m && m[1] === 'pi') {
+      s0.piCode = cleanCode(decodeURIComponent(m[2]));
+      s0.stack = ['tonight', 'promoinvite'];
+      s0.dir = 'fwd';
+      s0.seen = true;
+    }
     if (m && m[1] === 'e' && EVENTS[decodeURIComponent(m[2])]) {
       s0.stack = ['tonight', 'event'];
       s0.cur = decodeURIComponent(m[2]);
@@ -243,7 +252,8 @@ export function App() {
       }));
       var r = store('gathr.resume');
       store('gathr.resume', null);
-      if (r && EVENTS[r.cur])
+      if (r && r.pi) set({ mode: 'guest', stack: ['tonight', 'promoinvite'], piCode: r.pi, dir: 'fwd' });
+      else if (r && EVENTS[r.cur])
         set({ stack: ['tonight', 'event'], cur: r.cur, sheet: 'list', guests: r.guests || 2, dir: 'fwd' });
     });
   }, []);
@@ -349,6 +359,10 @@ export function App() {
     ) {
       if (!mine || !(S.org.events || []).some((o) => o.id === ev)) return; // their nights are still loading
       set({ pendingOpen: null, mode: 'host', stack: ['orghome', 'orgevent'], orgView: ev, dir: 'fwd' });
+    } else if (d.kind === 'promoter_joined') {
+      // someone accepted your invite: that night's guest lists, where their list now shows
+      if (!mine) return;
+      set({ pendingOpen: null, mode: 'host', stack: ['hostguests'], hostNight: ev, dir: 'mode' });
     } else if (d.kind === 'promoter_invite') {
       set({ pendingOpen: null, mode: 'guest', stack: ['you', 'promoting'], dir: 'fwd' });
     } else if (d.kind === 'verified') {
@@ -511,6 +525,7 @@ export function App() {
     hostprofile: HostProfile,
     orgintro: OrgIntro,
     orgsetup: OrgSetup,
+    promoinvite: PromoInvite,
     promoting: Promoting,
     orghome: OrgHome,
     orgform: OrgForm,

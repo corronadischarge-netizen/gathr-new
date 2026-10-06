@@ -2,10 +2,11 @@ import { useEffect, useState } from 'react';
 import { EVENTS, VENUES } from '../data/listings';
 import { Button, IconButton } from '../design-system';
 import { haptic } from '../lib/haptics';
-import { okEmail, poss } from '../lib/utils';
+import { inviteMessage } from '../lib/promoterInvite';
+import { poss, shareToast } from '../lib/utils';
 import {
   addToHostList,
-  invitePromoter,
+  createPromoterInvite,
   pullListPeople,
   pullListSummary,
   remoteOn,
@@ -20,8 +21,8 @@ import { GuestForm } from './GuestForm';
 /* The guest lists for one night. Free entry for named people; nobody can ask to be on one.
    · Your list: you add each guest by name, with their email (they get it in gathr), their phone (you can
      WhatsApp them) or neither (the door finds them by name).
-   · Promoters: you invite a promoter to this night by email, with a cap. Once they sign in with that email they
-     add their own people. You see each list: how many are on it and how many came. */
+   · Promoters: you make an invite for this night, with a cap, and share it on WhatsApp or anywhere. The first
+     person to accept gets the list and adds their own people. You see each list: how many are on it and who came. */
 export function HostGuestList(p) {
   var c = p.ctx,
     id = p.id,
@@ -99,18 +100,32 @@ export function HostGuestList(p) {
       (err) => c.toast(sayError(err))
     );
   }
+  /* the phone's share sheet with the invite message: WhatsApp, Instagram, SMS, wherever */
+  function share(code, cap) {
+    var m = inviteMessage({
+      host: (c.S.org.profile || {}).name || 'A host',
+      title: e.title,
+      when: e.date + ' · ' + e.time,
+      cap: cap,
+      code: code
+    });
+    return Share.link('Promote ' + e.title, m.text, m.link).then((r) => {
+      var t = shareToast(r, 'Invite');
+      if (t) c.toast(t);
+    });
+  }
   function invite() {
     var f = inviting,
       cap = +f.cap || null;
-    if (busy || !okEmail(f.email) || (f.cap && !(cap > 0 && cap <= 500))) return;
+    if (busy || (f.cap && !(cap > 0 && cap <= 500))) return;
     setBusy(true);
-    invitePromoter(id, f.email.trim(), f.name.trim(), cap).then(
-      () => {
+    createPromoterInvite(id, cap, f.note.trim()).then(
+      (inv) => {
         setBusy(false);
         haptic.success();
-        c.toast('Invite sent. They’ll see it when they sign in with ' + f.email.trim().toLowerCase());
         setInviting(null);
         load();
+        share(inv.code, cap);
       },
       (err) => {
         setBusy(false);
@@ -200,7 +215,7 @@ export function HostGuestList(p) {
         </div>
         {lists === false ? meta('Promoter invites need the latest gathr database update.') : null}
         {lists && !promos.length && !inviting
-          ? meta('Invite a promoter to this night with a cap. They add their own people; you see who came.')
+          ? meta('Send a promoter an invite on WhatsApp or anywhere. They add their own people; you see who came.')
           : null}
         {promos.map((l) => {
           var more = open === l.listId,
@@ -218,23 +233,30 @@ export function HostGuestList(p) {
                   <span className="title15 org-guest-name">{l.owner}</span>
                   <span className="org-guest-n">
                     {l.waiting
-                      ? 'Invited'
+                      ? 'Not accepted yet'
                       : l.people + (l.cap ? ' of ' + l.cap : '') + ' · ' + l.came + ' came'}
                   </span>
                 </button>
-                {l.waiting ? (
-                  <Button variant="ghost" size="sm" onClick={() => withdraw(l)}>
-                    Withdraw
-                  </Button>
-                ) : null}
               </div>
               {l.waiting ? (
-                <p className="meta" style={{ margin: '0 0 10px' }}>
-                  {'Waiting for ' +
-                    l.email +
-                    ' to sign in to gathr' +
-                    (l.cap ? ' · cap ' + l.cap + ' people' : '')}
-                </p>
+                <div className="col" style={{ gap: 'var(--space-2)', paddingBottom: 'var(--space-3)' }}>
+                  <p className="meta" style={{ margin: 0 }}>
+                    {(l.code
+                      ? 'Code ' + l.code + ' · works once, until the night ends'
+                      : 'Waiting for ' + l.email + ' to sign in to gathr') +
+                      (l.cap ? ' · up to ' + l.cap + ' people' : '')}
+                  </p>
+                  <div className="rowc" style={{ gap: 'var(--space-2)' }}>
+                    {l.code ? (
+                      <Button variant="subtle" size="sm" icon="share" onClick={() => share(l.code, l.cap)}>
+                        Share again
+                      </Button>
+                    ) : null}
+                    <Button variant="ghost" size="sm" onClick={() => withdraw(l)}>
+                      Withdraw
+                    </Button>
+                  </div>
+                </div>
               ) : null}
               {more ? (
                 theirs.length ? (
@@ -253,23 +275,11 @@ export function HostGuestList(p) {
             <span className="title15">Invite a promoter to this night</span>
             <div className="field-row">
               <input
-                aria-label="Promoter’s name"
-                placeholder="Their name, as guests know them"
+                aria-label="Who’s it for? Only you see this"
+                placeholder="Who’s it for? Only you see this (optional)"
                 maxLength={30}
-                value={inviting.name}
-                onChange={(ev) => setInviting(Object.assign({}, inviting, { name: ev.target.value }))}
-              />
-            </div>
-            <div className="field-row">
-              <input
-                aria-label="Promoter’s email"
-                type="email"
-                inputMode="email"
-                autoCapitalize="none"
-                spellCheck={false}
-                placeholder="The email they’ll sign in to gathr with"
-                value={inviting.email}
-                onChange={(ev) => setInviting(Object.assign({}, inviting, { email: ev.target.value }))}
+                value={inviting.note}
+                onChange={(ev) => setInviting(Object.assign({}, inviting, { note: ev.target.value }))}
               />
             </div>
             <div className="field-row">
@@ -285,28 +295,20 @@ export function HostGuestList(p) {
                 }
               />
             </div>
-            {inviting.email && !okEmail(inviting.email) ? (
-              <span className="meta err-txt">Enter an email like name@gmail.com</span>
-            ) : null}
             {note(
-              'Each guest counts with their plus-ones. Promoters aren’t tied to your venue; they can work any night.'
+              'You’ll send it on WhatsApp or anywhere. The first person to accept gets the list. Each guest counts with their plus-ones.'
             )}
             <div className="btn-pair">
               <Button variant="subtle" block onClick={() => setInviting(null)}>
                 Cancel
               </Button>
-              <Button
-                variant="primary"
-                block
-                disabled={!okEmail(inviting.email) || inviting.name.trim().length < 2 || busy}
-                onClick={invite}
-              >
-                {busy ? 'Sending…' : 'Send invite'}
+              <Button variant="primary" icon="share" block disabled={busy} onClick={invite}>
+                {busy ? 'Making invite…' : 'Share invite'}
               </Button>
             </div>
           </div>
         ) : lists !== false ? (
-          <Button variant="subtle" icon="user" onClick={() => setInviting({ name: '', email: '', cap: '' })}>
+          <Button variant="subtle" icon="user" onClick={() => setInviting({ note: '', cap: '' })}>
             Invite a promoter
           </Button>
         ) : null}

@@ -10,6 +10,20 @@
 6. `20261006100000_guest_lists.sql`: guest lists (free entry for named people) from the host or a promoter, with caps; guests take free passes only if their sign-in email is on the list; promoters can be paid per guest-list person. Replaces event_guests() so the door also sees guest-list people.
 7. `20261007090000_door_checkins.sql`: door check-ins for guest lists: people come in by name (some now, the rest later, never twice), promoters are credited for their guest-list people, a door phone can undo its own check-in for 10 minutes, and payout lines count guest-list people.
 8. `20261007100000_notifications.sql`: notifications (in Updates and pushed to phones) when you're added to a guest list, your night goes live or is sent back, or you're verified. Needs the `push` Edge Function deployed first (see firebase/README.md).
+9. `20261008090000_city_interest.sql`: other cities: "Tell me when" taps, so gathr knows where to open next and who to tell.
+10. `20261008100000_genres.sql`: what a night sounds like (genre family, exact genre, energy, artists) and what kind of night it is.
+11. `20261008110000_guest_lists_v2.sql`: guests added by email, phone or name only; promoter invites by email with a cap.
+12. `20261008120000_review.sql`: reviewing nights at scale: trusted hosts go live straight away, automatic flags, guest reports, and notifications to the host when a night is submitted, live, sent back or not approved (with gathr's reason).
+13. `20261009090000_promoter_invite_links.sql`: promoter invites by link or code, shared on WhatsApp or anywhere. Whoever accepts first gets the list, and the host is told who joined.
+
+## When the web app is hosted
+
+Promoter invites are shared as a code until gathr has a public web address. Once it does (Firebase Hosting is the
+simplest, since the project already uses Firebase):
+
+1. In `src/config.js`, set `publicUrl` to the address, e.g. `'https://gathr.web.app/'`. Invites then carry a link too.
+2. In Supabase, **Authentication → URL Configuration**: add the address to **Redirect URLs**, so signing in with
+   Google comes back to it.
 
 Every table has row-level security, so each person only reads and changes what their role allows.
 

@@ -15,7 +15,10 @@ export const CFG = Object.assign(
     },
     sms: { provider: 'off', firebase: null },
     payments: { provider: 'demo', razorpayKeyId: '' },
-    contactEmail: 'hello@gathr.app'
+    contactEmail: 'hello@gathr.app',
+    /* Where the gathr web app is hosted, e.g. 'https://gathr.web.app/'. Links people share (promoter invites)
+       point here. Empty until it's hosted: invites are then shared as a code to type into the app. */
+    publicUrl: ''
   },
   window.GATHR_CONFIG || {}
 );

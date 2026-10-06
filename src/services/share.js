@@ -28,23 +28,26 @@ export const Share = {
     });
   } /* resolves 'shared' | 'copied' | 'cancelled' */,
   link: (title, text, url) => {
+    // a message without a link (url empty) shares just the text
+    var all = url ? text + ' ' + url : text,
+      what = url ? { title: title, text: text, url: url } : { title: title, text: text };
     // the installed app: the phone's own share sheet (the app's web view has no navigator.share)
     if (isNative())
       return import('@capacitor/share')
-        .then((m) => m.Share.share({ title: title, text: text, url: url, dialogTitle: title }))
+        .then((m) => m.Share.share(Object.assign({ dialogTitle: title }, what)))
         .then(
           () => 'shared',
-          (e) => (/cancel/i.test((e && e.message) || '') ? 'cancelled' : Share.copy(text + ' ' + url))
+          (e) => (/cancel/i.test((e && e.message) || '') ? 'cancelled' : Share.copy(all))
         );
     if (navigator.share)
-      return navigator.share({ title: title, text: text, url: url }).then(
+      return navigator.share(what).then(
         () => 'shared',
         (e) => {
           if (e && e.name === 'AbortError') return 'cancelled';
-          return Share.copy(text + ' ' + url);
+          return Share.copy(all);
         }
       );
-    return Share.copy(text + ' ' + url);
+    return Share.copy(all);
   },
   open: (u) => {
     var w = window.open(u, '_blank');
