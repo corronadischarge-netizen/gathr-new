@@ -48,9 +48,26 @@ export function MapScreen(p) {
   var e = evs[0];
   var el = useRef(null),
     mr = useRef(null),
-    setRef = useRef(c.set);
+    setRef = useRef(c.set),
+    hitsRef = useRef(null); // the venues matching the search (null: no search), for pins drawn later
   setRef.current = c.set;
   const [failed, setFailed] = useState(false);
+  /* search stays on the map: venues by name or area. Matching pins stay lit, the rest fade. */
+  const [q, setQ] = useState('');
+  var qq = q.trim().toLowerCase(),
+    hits = qq
+      ? Object.keys(VENUES)
+          .filter((k) => (VENUES[k].name + ' ' + VENUES[k].area).toLowerCase().indexOf(qq) >= 0)
+          .sort((a, b) => VENUES[b].name.toLowerCase().startsWith(qq) - VENUES[a].name.toLowerCase().startsWith(qq))
+      : [],
+    areaOf = (k) => VENUES[k].area.split(',')[0],
+    areas = qq
+      ? hits
+          .map(areaOf)
+          .filter((a, i, l) => l.indexOf(a) === i && a.toLowerCase().indexOf(qq) >= 0)
+          .map((a) => [a, hits.filter((k) => areaOf(k) === a)])
+          .filter((x) => x[1].length > 1)
+      : [];
   // the venue card slides away when closed, like the other sheets
   var slot = useRef(null),
     slotExit = useRef(null);
@@ -217,8 +234,17 @@ export function MapScreen(p) {
           .setLngLat([lng / g.ks.length, lat / g.ks.length])
           .addTo(m);
         cm.getElement().style.zIndex = 5;
+        cm._ks = g.ks;
         clusters.push(cm);
       });
+      dim();
+    }
+    /* while searching, a pin (or a group pin) with no matching venue fades */
+    function dim() {
+      var h = hitsRef.current,
+        off = (ks) => !!h && !ks.some((k) => h.indexOf(k) >= 0);
+      keys.forEach((k) => mk[k].getElement().classList.toggle('is-dim', off([k])));
+      clusters.forEach((x) => x.getElement().classList.toggle('is-dim', off(x._ks)));
     }
     m.on('zoomend', sync);
     m.on('load', sync);
@@ -226,7 +252,7 @@ export function MapScreen(p) {
       setRef.current({ mapSel: null });
     });
     sync();
-    mr.current = { m: m, mk: mk };
+    mr.current = { m: m, mk: mk, dim: dim };
     var t = setTimeout(() => {
       m.resize();
       sync();
@@ -258,6 +284,25 @@ export function MapScreen(p) {
       });
     }
   }, [S.mapSel]);
+  hitsRef.current = qq ? hits : null;
+  useEffect(() => {
+    if (mr.current) mr.current.dim();
+  }, [qq]);
+  function pick(k) {
+    setQ('');
+    if (document.activeElement) document.activeElement.blur();
+    c.set({ mapSel: k });
+  }
+  function showArea(ks) {
+    var r = mr.current;
+    setQ('');
+    if (document.activeElement) document.activeElement.blur();
+    if (!r) return;
+    var b = new maplibregl.LngLatBounds();
+    ks.forEach((k) => b.extend([VENUES[k].lng, VENUES[k].lat]));
+    c.set({ mapSel: null });
+    r.m.fitBounds(b, { padding: { top: 140, bottom: 150, left: 60, right: 70 }, maxZoom: 16, duration: ms('--motion-slower') });
+  }
   function zoom(d) {
     var r = mr.current;
     if (!r) return;
@@ -310,15 +355,58 @@ export function MapScreen(p) {
       >
         <div style={{ flexGrow: 1 }}>
           <SearchField
-            placeholder="Search venues, nights, artists"
-            aria-label="Search"
-            onFocus={() => c.tab('search')}
+            placeholder="Search venues or areas"
+            aria-label="Search venues on the map"
+            value={q}
+            onChange={(ev) => setQ(ev.target.value)}
+            onKeyDown={(ev) => {
+              if (ev.key === 'Escape') setQ('');
+              if (ev.key === 'Enter' && hits.length) pick(hits[0]);
+            }}
           />
         </div>
       </div>
-      <div className="map-chip" style={{ zIndex: 5 }}>
-        Crowd is sample data · pins are approximate
-      </div>
+      {qq ? (
+        <div className="map-results g-glass" role="list" aria-label="Venues on the map">
+          {areas.map((x) => (
+            <button key={'a' + x[0]} type="button" role="listitem" className="map-res" onClick={() => showArea(x[1])}>
+              <span className="map-res-ic">{icon('map-pin', 18)}</span>
+              <span className="col map-res-txt">
+                <span className="title15">{x[0]}</span>
+                {meta(x[1].length + ' venues · show them all')}
+              </span>
+            </button>
+          ))}
+          {hits.slice(0, 6).map((k) => (
+            <button key={k} type="button" role="listitem" className="map-res" onClick={() => pick(k)}>
+              {i3(VENUES[k].ic, 36)}
+              <span className="col map-res-txt">
+                <span className="title15">{VENUES[k].name}</span>
+                {meta(areaOf(k))}
+              </span>
+            </button>
+          ))}
+          {!hits.length ? (
+            <div className="col map-res-none">
+              {meta('No venues called “' + q.trim() + '” on the map.')}
+              <button
+                type="button"
+                className="link-btn"
+                onClick={() => {
+                  c.set({ query: q.trim() });
+                  c.tab('search');
+                }}
+              >
+                Search nights and artists instead
+              </button>
+            </div>
+          ) : null}
+        </div>
+      ) : (
+        <div className="map-chip" style={{ zIndex: 5 }}>
+          Crowd is sample data · pins are approximate
+        </div>
+      )}
       {!v ? (
         <div className="map-ctrls">
           <button type="button" aria-label="Zoom in" onClick={() => zoom(1)}>

@@ -408,6 +408,15 @@ html.is-full .real-map .maplibregl-ctrl-bottom-right { bottom: calc(96px + env(s
 .vpin-wrap { width: 52px; height: 60px; cursor: pointer; }
 .vpin-wrap:focus-visible { outline: 2px solid var(--night-50); outline-offset: 2px; border-radius: 16px; }
 .map-ctrls { z-index: 5; bottom: 124px; }
+/* map search: results under the bar, matching pins stay lit */
+.map-results { position: absolute; left: var(--space-4); right: var(--space-4); top: 112px; z-index: 6; display: flex; flex-direction: column; padding: var(--space-2); border-radius: var(--radius-lg); max-height: 52%; overflow-y: auto; box-sizing: border-box; }
+.map-res { display: flex; align-items: center; gap: var(--space-3); min-height: 56px; padding: var(--space-2) var(--space-3); border: 0; border-radius: var(--radius-md); background: transparent; color: var(--ink); font: inherit; text-align: left; cursor: pointer; }
+.map-res:hover, .map-res:active { background: var(--glass-fill); }
+.map-res:focus-visible { outline: 2px solid transparent; box-shadow: var(--focus-ring); }
+.map-res-ic { flex: none; width: 36px; height: 36px; display: grid; place-items: center; border-radius: var(--radius-full); background: var(--surface-raised); color: var(--ink-muted); }
+.map-res-txt { gap: 2px; min-width: 0; }
+.map-res-none { gap: var(--space-1); padding: var(--space-2) var(--space-3); }
+.vpin-wrap.is-dim .vpin { opacity: .28; } /* the inner pin: MapLibre sets the marker's own opacity inline */
 .map-fail { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; text-align: center; padding: 0 40px; z-index: 2; }
 
 /* ===== welcome in 3 steps, with room to breathe ===== */
