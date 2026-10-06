@@ -750,6 +750,10 @@ export function saveDevice(token, platform) {
     .then((c) => (me ? c.rpc('save_device', { tok: token, plat: platform }) : { data: null }))
     .then(ok);
 }
+/* This phone stops being yours for pushes (logging out). */
+export function forgetDevice(token) {
+  return db().then((c) => (me ? c.from('device_tokens').delete().eq('token', token).then(ok) : null));
+}
 /* Your notifications, newest first (including ones sent to your email before you joined). */
 export function pullInbox() {
   return db().then((c) => {

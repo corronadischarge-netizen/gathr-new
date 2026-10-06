@@ -48,7 +48,7 @@ import { Wrapped } from './screens/Wrapped';
 import { You } from './screens/You';
 import { Auth } from './services/auth';
 import * as Door from './services/door';
-import { startPush } from './services/push';
+import { forgetPush, startPush } from './services/push';
 import * as Remote from './services/remote';
 import { Pay } from './services/payments';
 import { SheetLayer } from './sheets/SheetLayer';
@@ -56,8 +56,13 @@ import { SheetLayer } from './sheets/SheetLayer';
 /* Android's system back gesture already goes back, so the in-app edge swipe is for iPhone and the web */
 const ANDROID = /Android/i.test(navigator.userAgent);
 
+/* Everything on this device that belongs to the person signed in. Logging out removes all of it
+   (the "use it sideways" choice and unsent door check-ins aren't theirs, so they stay). */
+const PERSONAL_KEYS = ['gathr.me', 'gathr.state', 'gathr.resume', 'gathr.views'];
+
 export function App() {
-  var s0 = {
+  /* a first visit: nobody signed in, nothing saved */
+  var blank = () => ({
     stack: ['welcome'],
     dir: 'tab',
     login: false,
@@ -86,14 +91,7 @@ export function App() {
     onWay: false,
     toast: null,
     wstep: 0,
-    me: (() => {
-      var d = { name: '', handle: '', area: '', bio: '', photo: null, upi: '' };
-      try {
-        var x = JSON.parse(localStorage.getItem('gathr.me') || 'null');
-        if (x) d = Object.assign(d, x);
-      } catch (e) {}
-      return d;
-    })(),
+    me: { name: '', handle: '', area: '', bio: '', photo: null, upi: '' },
     org: orgLoad(),
     orgEdit: null,
     orgView: null,
@@ -123,7 +121,9 @@ export function App() {
       stage: 'voting',
       booked: null
     }
-  };
+  });
+  var s0 = blank();
+  s0.me = Object.assign(s0.me, store('gathr.me') || {});
   /* returning visitors pick up where they left off: bookings, saves, plans, sign-in and settings live on the device */
   var PERSIST = [
     'saved',
@@ -459,6 +459,18 @@ export function App() {
     ven: ven,
     plan: plan,
     planVen: plan ? VENUES[plan.venue] : null
+  };
+  /* Log out: end the session and wipe the person from this phone and from the screen. The whole state is
+     replaced (not merged), so their name, photo, bookings, lists and inbox can't linger. Without Supabase the
+     organiser exists only on this phone, so it stays rather than being lost. */
+  ctx.signOut = () => {
+    forgetPush().then(() => Auth.signOut());
+    PERSONAL_KEYS.forEach((k) => store(k, null));
+    if (Remote.remoteOn) {
+      store(ORG_KEY, null);
+      syncOrg(orgLoad());
+    }
+    setS(Object.assign(blank(), { org: Remote.remoteOn ? orgLoad() : S.org, feedAt: S.feedAt, toast: 'Logged out' }));
   };
   ctx.openEvent = (id, sheet) => {
     var gate = EVENTS[id].age >= 21 && !S.age;

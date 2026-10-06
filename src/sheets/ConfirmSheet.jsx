@@ -1,9 +1,6 @@
 import { srcName } from '../data/format';
 import { VENUES } from '../data/listings';
 import { Button, Sheet } from '../design-system';
-import { ORG_KEY, orgLoad, syncOrg } from '../data/organisers';
-import { store } from '../lib/utils';
-import { Auth } from '../services/auth';
 import { cancelBooking, remoteOn, sayError } from '../services/remote';
 
 /* "Are you sure?" for cancelling a booking (sheet 'cancel') or logging out (sheet 'logout') */
@@ -60,7 +57,7 @@ export function ConfirmSheet(p) {
                 );
               } else if (!S.busy) cancelled();
             } else {
-              signOut();
+              c.signOut();
             }
           }}
         >
@@ -82,28 +79,5 @@ export function ConfirmSheet(p) {
         o.gp && o.gp.booked === o.planned ? Object.assign({}, o.gp, { stage: 'voting', booked: null }) : o.gp
     }));
     c.toast('Booking cancelled');
-  }
-  function signOut() {
-    Auth.signOut();
-    // with Supabase on, their organiser lives in the database: don't leave a copy for the next person
-    if (remoteOn) {
-      store(ORG_KEY, null);
-      syncOrg(orgLoad());
-    }
-    c.set({
-      org: remoteOn ? orgLoad() : S.org,
-      isAdmin: false,
-      myBookings: {},
-      remoteGuests: {},
-      mode: 'guest',
-      stack: ['welcome'],
-      sheet: null,
-      dir: 'tab',
-      login: false,
-      signedIn: false,
-      email: '',
-      wstep: 0
-    });
-    c.toast('Logged out');
   }
 }

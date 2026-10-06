@@ -1,9 +1,10 @@
-import { remoteOn, saveDevice } from './remote';
+import { forgetDevice, remoteOn, saveDevice } from './remote';
 
 /* App notifications on the phone (step 6). In the installed Android app, once someone is signed in, this asks
    permission to send notifications, saves the phone's push address to their account, and opens the right place
    when a notification is tapped. The browser and demo mode skip it; Updates still shows everything. */
 var started = false;
+var device = null; // this phone's push address once Firebase gives it: [token, 'android' | 'ios']
 // set by the build when it includes Firebase's settings (firebase/google-services.json): without them, Android
 // would crash on registering, so notifications stay off
 const BUILT_WITH_FIREBASE = import.meta.env.VITE_PUSH === '1';
@@ -25,13 +26,19 @@ export function openFrom(c, data) {
 
 export function startPush(c) {
   var platform = nativePlatform();
-  if (!remoteOn || !BUILT_WITH_FIREBASE || !platform || started) return;
+  if (!remoteOn || !BUILT_WITH_FIREBASE || !platform) return;
+  // someone signed in again on this phone (after a log out): it's theirs now
+  if (started) {
+    if (device) saveDevice(device[0], device[1]).catch(() => {});
+    return;
+  }
   started = true;
   import('@capacitor/push-notifications')
     .then((m) => {
       var P = m.PushNotifications;
       P.addListener('registration', (t) => {
-        saveDevice(t.value, platform === 'ios' ? 'ios' : 'android').catch(() => {});
+        device = [t.value, platform === 'ios' ? 'ios' : 'android'];
+        saveDevice(device[0], device[1]).catch(() => {});
       });
       P.addListener('pushNotificationReceived', (n) => {
         // the app is open: a short toast, and Updates refreshes
@@ -52,4 +59,10 @@ export function startPush(c) {
     .catch(() => {
       started = false;
     });
+}
+
+/* Logging out: stop this phone getting the person's notifications. Runs before the session ends (deleting
+   the row needs it). */
+export function forgetPush() {
+  return device ? forgetDevice(device[0]).catch(() => {}) : Promise.resolve();
 }
