@@ -1,9 +1,9 @@
 import { GuestList } from '../components/GuestList';
 import { OrgBack } from '../components/OrgBack';
-import { APP_URL } from '../config';
+import { APP_URL, CFG } from '../config';
 import { priceTxt } from '../data/format';
-import { EVENTS, VENUES, isPast } from '../data/listings';
-import { ST_LBL, hashN, orgLoad, orgSave, orgStats, orgToEvent, passCount } from '../data/organisers';
+import { EVENTS, VENUES } from '../data/listings';
+import { ST_LBL, hashN, nightStage, orgLoad, orgSave, orgStats, orgToEvent, passCount } from '../data/organisers';
 import { Button } from '../design-system';
 import { shareToast } from '../lib/utils';
 import { OrgHome } from './OrgHome';
@@ -20,7 +20,7 @@ export function OrgEvent(p) {
   var e = EVENTS[id] || (o ? orgToEvent(o, org.profile) : null);
   if (!e) return <OrgHome ctx={c} />;
   var st = orgStats(S, id),
-    status = o ? (o.status === 'live' && isPast(e) ? 'past' : o.status) : 'live',
+    status = o ? nightStage(o, e) : 'live',
     lb = ST_LBL[status];
   var passes = passCount(st.guests),
     inCount = st.guests.filter((g) => st.ci[g.name]).reduce((a, g) => a + g.passes, 0);
@@ -44,7 +44,7 @@ export function OrgEvent(p) {
       <OrgBack
         c={c}
         right={
-          o ? (
+          o && status !== 'rejected' ? (
             <Button variant="subtle" size="sm" onClick={() => c.go('orgform', { orgEdit: id })}>
               Edit
             </Button>
@@ -74,8 +74,33 @@ export function OrgEvent(p) {
         <div className="demo-box">
           <b>gathr is checking this night</b>
           <span>
-            We look at the poster and door rules, usually within a day. You’ll get an email when it’s live.
+            We look at the poster and door rules, usually within a day. You’ll get an update here when it’s live.
           </span>
+        </div>
+      ) : null}
+      {status === 'back' ? (
+        <div className="host-notice is-warn" role="status">
+          <div className="col host-notice-txt" style={{ padding: 'var(--space-4)' }}>
+            <span className="title15">gathr sent this night back</span>
+            <span className="host-notice-body">{o.reviewNote}</span>
+            <span className="host-notice-more">Fix the details and send it again. It isn’t listed until then.</span>
+            <div style={{ paddingTop: 'var(--space-2)' }}>
+              <Button variant="primary" size="sm" onClick={() => c.go('orgform', { orgEdit: id })}>
+                Fix and send again
+              </Button>
+            </div>
+          </div>
+        </div>
+      ) : null}
+      {status === 'rejected' ? (
+        <div className="host-notice is-no" role="status">
+          <div className="col host-notice-txt" style={{ padding: 'var(--space-4)' }}>
+            <span className="title15">gathr didn’t approve this night</span>
+            <span className="host-notice-body">{o.reviewNote || 'It doesn’t fit gathr’s rules.'}</span>
+            <span className="host-notice-more">
+              {'It won’t be listed. Think this is a mistake? Email ' + CFG.contactEmail + '.'}
+            </span>
+          </div>
         </div>
       ) : null}
       {status === 'draft' ? (

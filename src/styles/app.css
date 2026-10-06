@@ -351,6 +351,7 @@ html.is-full .map-ctrls { bottom: calc(132px + env(safe-area-inset-bottom, 0px))
 .st-go { background: var(--brand); color: #fff; }
 .st-wait { background: var(--night-800); color: var(--night-300); }
 .st-no { background: #f0483d26; color: var(--limit-text); }
+.st-warn { background: #fbff8724; color: var(--yellow-300); }
 .crew-item { gap: 6px; }
 .vote-bar { height: 6px; border-radius: 9999px; background: var(--night-800); overflow: hidden; }
 .vote-bar i { display: block; height: 100%; border-radius: inherit; background: var(--brand); }
@@ -528,6 +529,18 @@ button.ev-hero-img { border: 0; padding: 0; margin: 0; width: 100%; cursor: zoom
 .field-row input[type=date], .field-row input[type=time] { color-scheme: dark; }
 /* ===== host mode + scanner (30 Sep) ===== */
 .host-bar { gap: 8px; min-height: 44px; }
+/* what gathr decided about your night: a tinted card with a strong edge, at the top of every hosting tab */
+.host-notice { --tone: var(--line-strong); --tint: var(--surface-raised); display: flex; align-items: flex-start; border-radius: var(--radius-lg); background: var(--tint); box-shadow: inset 0 0 0 1.5px var(--tone); margin-top: calc(var(--space-2) * -1); }
+.host-notice.is-no { --tone: var(--red-300); --tint: #f0483d24; }
+.host-notice.is-warn { --tone: var(--yellow-300); --tint: #fbff871c; }
+.host-notice.is-ok { --tone: var(--green-300); --tint: #3ecf7e1f; }
+.host-notice-main { flex: 1; min-width: 0; display: flex; align-items: flex-start; gap: var(--space-3); padding: var(--space-4) 0 var(--space-4) var(--space-4); border: 0; background: transparent; color: var(--ink); font: inherit; text-align: left; cursor: pointer; border-radius: var(--radius-lg); }
+.host-notice-main:focus-visible, .host-notice-x:focus-visible { outline: 2px solid transparent; box-shadow: var(--focus-ring); }
+.host-notice-ic { flex: none; width: 40px; height: 40px; display: grid; place-items: center; }
+.host-notice-txt { gap: var(--space-1); min-width: 0; }
+.host-notice-body { font-size: 14px; line-height: 20px; color: var(--ink); }
+.host-notice-more { font-size: 13px; line-height: 18px; font-weight: 600; color: var(--ink-muted); }
+.host-notice-x { flex: none; width: 44px; height: 44px; margin: var(--space-2) var(--space-2) 0 0; display: grid; place-items: center; border: 0; border-radius: var(--radius-full); background: transparent; color: var(--ink-muted); cursor: pointer; }
 .host-pill { display: inline-flex; align-items: center; gap: 8px; height: 32px; padding: 0 12px; border-radius: 9999px; background: #3ecf7e1f; box-shadow: inset 0 0 0 1px #3ecf7e55; color: var(--go-text); font: 700 12px/1 var(--font-sans); letter-spacing: .04em; max-width: 60%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .host-pill i { width: 8px; height: 8px; border-radius: 50%; background: var(--green-300); flex: none; }
 .host-tabbar .g-tab.is-active { background: var(--green-300); color: #0a0a0a; box-shadow: none; }

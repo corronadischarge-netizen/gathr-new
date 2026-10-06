@@ -1,8 +1,8 @@
 import { HostBar } from '../components/HostBar';
 import { OrgBack } from '../components/OrgBack';
 import { priceTxt } from '../data/format';
-import { EVENTS, isPast, upcoming } from '../data/listings';
-import { ST_LBL, orgStats, orgToEvent, orgVenueIds, orgVenuesLabel, passCount } from '../data/organisers';
+import { EVENTS, upcoming } from '../data/listings';
+import { ST_LBL, nightStage, orgStats, orgToEvent, orgVenueIds, orgVenuesLabel, passCount } from '../data/organisers';
 import { Badge, Button } from '../design-system';
 import { OrgIntro } from './OrgIntro';
 import { eyebrow, i3, meta, note, statusChip, stop, thumb } from '../ui/helpers';
@@ -18,7 +18,7 @@ export function OrgHome(p) {
     id: o.id,
     o: o,
     e: EVENTS[o.id] || orgToEvent(o, pr),
-    st: o.status === 'live' && isPast(orgToEvent(o, pr)) ? 'past' : o.status
+    st: nightStage(o, orgToEvent(o, pr))
   }));
   var mine = orgVenueIds(pr);
   var listed = upcoming()

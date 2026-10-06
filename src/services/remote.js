@@ -159,7 +159,9 @@ function nightFrom(r) {
     about: r.about || '',
     poster: r.poster_url,
     venueId: r.venue_id,
-    status: r.status === 'removed' ? 'draft' : r.status,
+    // only gathr removes a night, so for the host a removed night is one gathr didn't approve
+    status: r.status === 'removed' ? 'rejected' : r.status,
+    reviewNote: r.review_note || '', // gathr's reason when it sends a night back or doesn't approve it
     updated: r.updated_at
   };
 }
@@ -189,7 +191,6 @@ export function pullMine() {
           .from('events')
           .select('*')
           .eq('organiser_id', id)
-          .neq('status', 'removed')
           .order('starts_at')
           .then(ok)
       ]).then((x) => ({ profile: profileFrom(x[0], x[1]), events: x[2].map(nightFrom) }));

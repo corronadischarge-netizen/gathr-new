@@ -1,5 +1,5 @@
 import { MO, WD } from './dates';
-import { EVENTS, ORDER, VENUES } from './listings';
+import { EVENTS, ORDER, VENUES, isPast } from './listings';
 import { passCode } from './sample';
 import { FAMILY_TAG, family, nightKind } from './taxonomy';
 import { store } from '../lib/utils';
@@ -298,10 +298,19 @@ export function orgSave(c, org) {
 /* 3 · the dashboard: totals and every night with its status */
 export const ST_LBL = {
   draft: ['Draft', 'wait'],
+  back: ['Sent back', 'warn'],
   review: ['In review', 'wait'],
   live: ['Live', 'ok'],
-  past: ['Past', 'wait']
+  past: ['Past', 'wait'],
+  rejected: ['Not approved', 'no']
 };
+
+/* where one of your nights stands, as the host sees it: a draft gathr returned with a note is "sent back" */
+export function nightStage(o, ev) {
+  if (o.status === 'live' && ev && isPast(ev)) return 'past';
+  if (o.status === 'draft' && o.reviewNote) return 'back';
+  return ST_LBL[o.status] ? o.status : 'draft';
+}
 
 export function setCheckin(c, id, name, on) {
   var cur = orgLoad();
