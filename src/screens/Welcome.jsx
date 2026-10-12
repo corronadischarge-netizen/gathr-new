@@ -14,9 +14,9 @@ export function Welcome(p) {
     i = S.wstep || 0,
     last = i === 2;
   var steps = [
-    ['pune after dark', 'Every night out in the city, in one place.'],
-    ['know who gets in', 'Age, ID, dress and stag rules on every night, before you pay.'],
-    ['go out together', 'Vote with friends, book once, send everyone their pass.']
+    ['pune after dark', 'Every night out in the city, in one place'],
+    ['know who gets in', 'Age, ID, dress and stag rules on every night, before you pay'],
+    ['go out together', 'Vote with friends, book once, send everyone their pass']
   ];
   /* Steps move sideways: swipe (the step follows your finger), Next and Skip all do the same thing.
      The new step slides in from the side you're heading to. */
@@ -104,7 +104,7 @@ export function Welcome(p) {
           {i3('discoball', 70, 'bob')}
         </span>
         <span className="w-3d" style={{ '--d': '500ms', '--r': '10deg', left: '232px', top: '40px' }}>
-          {i3('ticket', 62, 'bob', { animationDelay: '-1.4s' })}
+          {i3('ticket', 62)}
         </span>
       </div>
     );
@@ -120,7 +120,7 @@ export function Welcome(p) {
           ].map((r) => (
             <div key={r[1]} className="ck-row">
               <span className={'ck ' + (r[0] ? 'ok' : 'info')}>
-                {r[0] ? svgIcon(['M5 12.5l4.5 4.5L19 7'], 14) : 'i'}
+                {r[0] ? svgIcon(['M5 12.5l4.5 4.5L19 7'], 16) : 'i'}
               </span>
               <span>{r[1]}</span>
             </div>
@@ -158,7 +158,7 @@ export function Welcome(p) {
           {i3('champagne', 80, 'bob')}
         </span>
         <span className="w-3d" style={{ '--d': '380ms', '--r': '8deg', left: '222px', top: '176px' }}>
-          {i3('wristband', 66, 'bob', { animationDelay: '-1.2s' })}
+          {i3('wristband', 66)}
         </span>
       </div>
     );

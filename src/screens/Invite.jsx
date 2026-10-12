@@ -3,7 +3,7 @@ import { InviteOptionCard } from '../cards/InviteOptionCard';
 import { EVENTS, VENUES } from '../data/listings';
 import { Button, IconButton } from '../design-system';
 import { Share } from '../services/share';
-import { eyebrow, i3, note, stop } from '../ui/helpers';
+import { eyebrow, i3, note, nameTitle } from '../ui/helpers';
 import { Tonight } from './Tonight';
 
 /* A friend opens a plan link: vote, then send the vote back on WhatsApp */
@@ -21,7 +21,7 @@ export function Invite(p) {
       <div className="rel">
         {i3('champagne', 88, 'head-ic bob')}
         {eyebrow(inv.by + ' asked you to vote' + (inv.deadline ? ' · closes ' + inv.deadline : ''))}
-        {stop(inv.name.toLowerCase())}
+        {nameTitle(inv.name)}
       </div>
       <div className="col" style={{ gap: '12px' }} role="radiogroup" aria-label="Pick a night">
         {inv.opts.map((k) => (
@@ -49,7 +49,7 @@ export function Invite(p) {
           See everything on this week
         </Button>
       </div>
-      {note('No account needed to vote.')}
+      {note('No account needed to vote')}
     </div>
   );
 }

@@ -52,7 +52,7 @@ export function ScanResult(p) {
       <div className="rowc" style={{ gap: '12px' }}>
         <span className="scan-res-ic" aria-hidden>
           {r.tone === 'green'
-            ? svgIcon(['M5 12.5l4.5 4.5L19 7'], 22)
+            ? svgIcon(['M5 12.5l4.5 4.5L19 7'], 20)
             : r.tone === 'amber'
               ? '!'
               : svgIcon(['M6 6l12 12', 'M18 6L6 18'], 20)}

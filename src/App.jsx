@@ -7,7 +7,7 @@ import { EVENTS, VENUES, isPast } from './data/listings';
 import { NEXT_CITIES } from './data/options';
 import { hostNights } from './data/hostNights';
 import { ORG_KEY, orgLoad, setRemoteFeed, syncOrg } from './data/organisers';
-import { TabBar } from './design-system';
+import { TabBar, Toast } from './design-system';
 import { useEdgeSwipe } from './hooks/useEdgeSwipe';
 import { useSheetExit } from './hooks/useSheetExit';
 import { useScreenTransition } from './hooks/useScreenTransition';
@@ -108,6 +108,7 @@ export function App() {
     sent: false,
     shareNights: true,
     ishaan: null,
+    upHidden: [],
     credit: 150,
     checkedIn: false,
     after: null,
@@ -145,6 +146,7 @@ export function App() {
     'phoneOk',
     'shareNights',
     'ishaan',
+    'upHidden',
     'checkedIn',
     'seen',
     'paidSplit',
@@ -452,7 +454,7 @@ export function App() {
       () => {
         set({ toast: null });
       },
-      S.toastAct && S.toastAct.for === S.toast ? 4000 : 2400
+      S.toastAct && S.toastAct.for === S.toast ? 5000 : 2400
     );
     return () => {
       clearTimeout(id);
@@ -626,7 +628,7 @@ export function App() {
     <div className={'stage' + (REVIEW ? ' has-review' : '')}>
       {REVIEW ? <ReviewPanel ctx={ctx} scr={scr} /> : null}
       <div className="phone-wrap">
-        <div className="phone" ref={phoneRef}>
+        <div className={'phone' + (S.mode === 'host' ? ' host-mode' : '')} ref={phoneRef}>
           {Under ? (
             <div ref={underRef} className="screen under" aria-hidden="true" inert="">
               <Under ctx={ctx} />
@@ -654,23 +656,22 @@ export function App() {
           {S.scanning ? <Scanner ctx={ctx} /> : null}
           {S.sheet ? <SheetLayer ctx={ctx} hostRef={sheetRef} /> : null}
           <div ref={sheetExitRef} className="sheet-exit" aria-hidden="true" />
-          <div className="toast-live" role="status" aria-live="polite">
+          <div className={'toast-live' + (showTabs ? ' over-tabs' : '')} aria-live="polite">
             {S.toast ? (
-              <div key={S.toast} className="toast">
+              <Toast
+                key={S.toast}
+                action={S.toastAct && S.toastAct.for === S.toast ? S.toastAct.label : null}
+                onAction={S.toastAct && S.toastAct.run}
+              >
                 {S.toast}
-                {S.toastAct && S.toastAct.for === S.toast ? (
-                  <button type="button" className="toast-act" onClick={S.toastAct.run}>
-                    {S.toastAct.label}
-                  </button>
-                ) : null}
-              </div>
+              </Toast>
             ) : null}
           </div>
         </div>
       </div>
       {REVIEW ? (
         <p className="hint">
-          {'Review mode · real Pune listings from District and Sort My Scene · crowd, friends and votes are sample data · ' +
+          {'Review mode · real Pune listings from District and Sort My Scene · bookings, friends and votes are sample data · ' +
             (Auth.live ? 'sign-in live' : 'sign-in in demo mode') +
             ' · ' +
             (Pay.live ? 'Razorpay live' : 'payments in demo mode')}

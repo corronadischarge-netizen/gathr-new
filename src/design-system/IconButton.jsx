@@ -11,7 +11,7 @@ export function IconButton(p) {
       className={cx('g-ibtn', 'g-ibtn-' + (p.variant || 'glass'), p.active && 'is-active', p.className)}
       style={p.size ? { width: p.size + 'px', height: p.size + 'px' } : undefined}
     >
-      <Icon name={p.icon} size={22} />
+      <Icon name={p.icon} size={24} />
     </button>
   );
 }

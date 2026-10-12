@@ -1,7 +1,7 @@
 import { BeforeYouGoCard } from '../cards/BeforeYouGoCard';
 import { APP_URL } from '../config';
 import { VENUES } from '../data/listings';
-import { Button, CrowdMeter, IconButton } from '../design-system';
+import { ActionBar, CrowdMeter, IconButton } from '../design-system';
 import { shareToast } from '../lib/utils';
 import { Share } from '../services/share';
 import { eyebrow, fav, note, statusChip, stop } from '../ui/helpers';
@@ -52,7 +52,7 @@ export function Ready(p) {
         {stop('starts at ' + e.time)}
       </div>
       <div className="rowc" style={{ gap: '8px' }}>
-        <CrowdMeter level={v.crowd} line="Expected on the night" />
+        <CrowdMeter booked={v.booked} cap={v.cap} level={v.crowd} />
       </div>
       {grp ? (
         <div className="col" style={{ gap: '14px' }}>
@@ -71,25 +71,16 @@ export function Ready(p) {
         </div>
       ) : null}
       <BeforeYouGoCard e={e} />
-      {note('Crowd is sample data.')}
+      {note('Bookings are sample data')}
       <div className="bottom-stack" style={{ alignItems: 'stretch' }}>
-        <div className="btn-pair">
-          <Button variant="subtle" block icon="navigation" onClick={() => Share.directions(v)}>
-            Directions
-          </Button>
-          <Button
-            variant="subtle"
-            block
-            icon="calendar"
-            aria-label="Add to calendar"
-            onClick={() => Share.calendar(e, v)}
-          >
-            Calendar
-          </Button>
-        </div>
-        <Button variant="primary" size="lg" block icon="ticket" onClick={() => c.go('pass')}>
-          Show my pass
-        </Button>
+        {/* showing a pass doesn't book anything, so the main button is white */}
+        <ActionBar
+          icons={[
+            { icon: 'navigation', label: 'Get directions', onClick: () => Share.directions(v) },
+            { icon: 'calendar-plus', label: 'Add to calendar', onClick: () => Share.calendar(e, v) }
+          ]}
+          main={{ label: 'Show my pass', icon: 'ticket', variant: 'primary', onClick: () => c.go('pass') }}
+        />
       </div>
     </div>
   );

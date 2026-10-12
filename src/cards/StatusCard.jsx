@@ -26,14 +26,13 @@ export function StatusCard(p) {
         </div>
       ) : null}
       <p className="body" style={{ margin: 0 }}>
-        {lv[2] + '.'}
+        {lv[2]}
       </p>
       <div className="rowc between credit-row">
         <div className="col" style={{ gap: '2px' }}>
           <span className="title15">{rupees(S.credit) + ' planner credit'}</span>
-          {meta('Earned by booking for your group. Used at checkout.')}
+          {meta('Earned by booking for your group. Used at checkout')}
         </div>
-        {i3('ticket', 44)}
       </div>
     </div>
   );

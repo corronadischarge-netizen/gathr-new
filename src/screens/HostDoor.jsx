@@ -67,7 +67,7 @@ export function HostDoor(p) {
         <div className="g-card card col empty-card">
           {i3('spotlight', 64)}
           <span className="title16">No nights on right now</span>
-          {meta('List a night and its door opens here.')}
+          {meta('List a night and its door opens here')}
           <Button variant="subtle" size="sm" onClick={() => c.go('orgform', { orgEdit: null })}>
             List a night
           </Button>
@@ -75,10 +75,10 @@ export function HostDoor(p) {
       )}
       {e ? (
         <button type="button" className="scan-cta" onClick={() => c.set({ scanning: true, hostNight: id })}>
-          <span className="scan-cta-ic">{svgIcon(SCAN_IC, 32)}</span>
+          <span className="scan-cta-ic">{svgIcon(SCAN_IC, 24)}</span>
           <span className="col" style={{ gap: '2px', textAlign: 'left' }}>
             <span className="scan-cta-t">Scan a pass</span>
-            <span className="meta" style={{ color: '#ffffffcc' }}>
+            <span className="meta" style={{ color: 'color-mix(in srgb, var(--night-950) 70%, transparent)' }}>
               Point the camera at the guest’s QR
             </span>
           </span>

@@ -21,7 +21,7 @@ export function RateNightCard(p) {
       </div>
       <div className="hr" />
       <div className="col" style={{ gap: '10px' }}>
-        <span className="g-section-title">{'How was ' + v.name + '?'}</span>
+        <span className="title15">{'How was ' + v.name + '?'}</span>
         <div className="wrap">
           {['Worth it', 'Too packed', 'Door was rough'].map((r) => (
             <Chip

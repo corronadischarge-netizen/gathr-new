@@ -55,7 +55,7 @@ export function NewPlan(p) {
                   <span className="title15">{e.title}</span>
                   {meta(e.date + ' · ' + VENUES[e.venue].name + ' · ' + priceTxt(e))}
                 </div>
-                <span className="pick-box">{on ? svgIcon(['M5 12.5l4.5 4.5L19 7'], 14) : null}</span>
+                <span className="pick-box">{on ? svgIcon(['M5 12.5l4.5 4.5L19 7'], 16) : null}</span>
               </Tap>
             );
           })}
@@ -70,7 +70,7 @@ export function NewPlan(p) {
             </Chip>
           ))}
         </div>
-        {meta('At the deadline, the top night wins and you book it for everyone.')}
+        {meta('At the deadline, the top night wins and you book it for everyone')}
       </div>
       <div className="bottom-stack" style={{ alignItems: 'stretch' }}>
         <Button
@@ -144,7 +144,7 @@ export function NewPlan(p) {
             ? 'Invite by WhatsApp · ' + d.opts.length + (d.opts.length === 1 ? ' night' : ' nights')
             : 'Pick at least one night'}
         </Button>
-        {note('Friends open the link in their browser. No app needed to vote.')}
+        {note('Friends open the link in their browser. No app needed to vote')}
       </div>
     </div>
   );

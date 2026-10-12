@@ -14,8 +14,8 @@ export function NoMatchCard(p) {
       </span>
       <p className="meta" style={{ margin: '0 0 8px' }}>
         {en
-          ? 'Hosts on gathr say how hard their night goes. Try any energy.'
-          : 'Try another filter, or search for a venue or artist.'}
+          ? 'Hosts on gathr say how hard their night goes. Try any energy'
+          : 'Try another filter, or search for a venue or artist'}
       </p>
       <Button variant="subtle" size="sm" onClick={() => c.set({ filter: 'all', energy: null })}>
         Show all nights

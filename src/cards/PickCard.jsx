@@ -11,10 +11,10 @@ export function PickCard(p) {
       <Tap onClick={() => c.openEvent('twin')} className="tap" aria-label="This week's pick">
         <FeatureCard
           image={EVENTS.twin.img}
-          kicker="Pick of the fortnight"
+          kicker="Pick of the fortnight · Fri 9 Oct"
           kickerIcon="sparkles"
           title="Twin Strings live at Epitome"
-          action="Fri 9 Oct"
+          action="See the night"
           ctaSpan
         />
       </Tap>

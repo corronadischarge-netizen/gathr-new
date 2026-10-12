@@ -60,7 +60,7 @@ export function OrgEvent(p) {
           </span>
         )}
         <div className="col" style={{ gap: '4px', minWidth: 0 }}>
-          <h1 className="g-display disp" style={{ fontSize: '24px', lineHeight: '28px', margin: 0 }}>
+          <h1 className="g-display disp" style={{ fontSize: '32px', lineHeight: '28px', margin: 0 }}>
             {e.title}
           </h1>
           {meta(e.date + ' · ' + e.time + ' · ' + priceTxt(e))}
@@ -74,7 +74,7 @@ export function OrgEvent(p) {
         <div className="demo-box">
           <b>gathr is checking this night</b>
           <span>
-            We look at the poster and door rules, usually within a day. You’ll get an update here when it’s live.
+            We look at the poster and door rules, usually within a day. You’ll get an update here when it’s live
           </span>
         </div>
       ) : null}
@@ -83,7 +83,7 @@ export function OrgEvent(p) {
           <div className="col host-notice-txt" style={{ padding: 'var(--space-4)' }}>
             <span className="title15">gathr sent this night back</span>
             <span className="host-notice-body">{o.reviewNote}</span>
-            <span className="host-notice-more">Fix the details and send it again. It isn’t listed until then.</span>
+            <span className="host-notice-more">Fix the details and send it again. It isn’t listed until then</span>
             <div style={{ paddingTop: 'var(--space-2)' }}>
               <Button variant="primary" size="sm" onClick={() => c.go('orgform', { orgEdit: id })}>
                 Fix and send again
@@ -96,9 +96,9 @@ export function OrgEvent(p) {
         <div className="host-notice is-no" role="status">
           <div className="col host-notice-txt" style={{ padding: 'var(--space-4)' }}>
             <span className="title15">gathr didn’t approve this night</span>
-            <span className="host-notice-body">{o.reviewNote || 'It doesn’t fit gathr’s rules.'}</span>
+            <span className="host-notice-body">{o.reviewNote || 'It doesn’t fit gathr’s rules'}</span>
             <span className="host-notice-more">
-              {'It won’t be listed. Think this is a mistake? Email ' + CFG.contactEmail + '.'}
+              {'It won’t be listed. Think this is a mistake? Email ' + CFG.contactEmail}
             </span>
           </div>
         </div>
@@ -106,7 +106,7 @@ export function OrgEvent(p) {
       {status === 'draft' ? (
         <div className="demo-box">
           <b>Draft · only you can see this</b>
-          <span>Finish the details and submit it for review.</span>
+          <span>Finish the details and submit it for review</span>
         </div>
       ) : null}
       {status === 'live' && o ? (
@@ -218,13 +218,13 @@ export function OrgEvent(p) {
         ) : (
           <div className="ev-card">
             {meta(
-              'Age mix and favourite sounds show once 20 people are interested. Below that, it could single people out.'
+              'Age mix and favourite sounds show once 20 people are interested. Below that, it could single people out'
             )}
           </div>
         )}
       </section>
       <GuestList ctx={c} id={id} live={status === 'live'} />
-      {st.sample ? note('Numbers for listed nights are sample data until the venue lists on gathr.') : null}
+      {st.sample ? note('Numbers for listed nights are sample data until the venue lists on gathr') : null}
       {o ? (
         <Button variant="ghost" style={{ color: 'var(--limit-text)' }} onClick={remove}>
           {status === 'live' ? 'Take this night down' : 'Delete this night'}

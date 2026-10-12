@@ -3,8 +3,7 @@ import { App } from './App';
 import { listenForSelections } from './lib/haptics';
 
 // Styles, in the same order the original single-page app declared them
-import './styles/fonts.css';
-import './styles/tokens.css';
+import '../gathr-design/tokens.css'; // gathr tokens and fonts, straight from the design system
 import './design-system/design-system.css';
 import 'maplibre-gl/dist/maplibre-gl.css';
 import './styles/app.css';

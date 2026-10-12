@@ -27,3 +27,8 @@ export function blockedFor(e, age) {
 export function rupees(n) {
   return '₹' + n.toLocaleString('en-IN');
 }
+
+/* the booking button (design rules): "Get passes" for paid nights, "Get on the list" for free ones (RSVP included) */
+export function bookLabel(e) {
+  return !e.rsvp && (e.src === 'district' || (e.org && !e.door)) ? 'Get passes' : 'Get on the list';
+}

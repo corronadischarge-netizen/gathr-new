@@ -1,6 +1,6 @@
 import { EVENTS } from '../data/listings';
 import { gpVoted } from '../data/sample';
-import { ShapeAvatar } from '../design-system';
+import { Avatar } from '../design-system';
 import { i3, icon } from '../ui/helpers';
 import { Tap } from '../ui/Tap';
 
@@ -31,13 +31,8 @@ export function GroupPlanCard(p) {
                 S.gp.deadline}
         </span>
         <div className="plan-crew">
-          {[
-            ['Zoya', 'flower', 'pink'],
-            ['Aman', 'arch', 'yellow'],
-            ['Kavya', 'circle', 'green'],
-            ['Kabir', 'pill', 'blue']
-          ].map((x) => (
-            <ShapeAvatar key={x[0]} shape={x[1]} hue={x[2]} name={x[0]} size={36} />
+          {['Zoya', 'Aman', 'Kavya', 'Kabir'].map((n) => (
+            <Avatar key={n} name={n} size={36} />
           ))}
           <span className="plan-go">
             {S.gp && S.gp.stage === 'booked' ? 'Open' : S.vote ? 'See votes' : 'Vote'}

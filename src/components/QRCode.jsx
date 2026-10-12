@@ -21,9 +21,9 @@ export function QRCode(p) {
       role="img"
       aria-label={p.label || 'Pass QR code'}
       shapeRendering="crispEdges"
-      style={{ display: 'block', background: '#fff', borderRadius: '12px' }}
+      style={{ display: 'block', background: 'var(--white)', borderRadius: '12px' }}
     >
-      <path d={d} fill="#0a0a0a" />
+      <path d={d} style={{ fill: 'var(--night-950)' }} />
     </svg>
   );
 }

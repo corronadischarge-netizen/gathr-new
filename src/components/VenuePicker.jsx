@@ -185,7 +185,7 @@ export function VenuePicker(p) {
               {(hits.length ? 'Not here? ' : 'No venue called “' + q.trim() + '” yet. ') + 'Add it'}
             </button>
           ) : !ids.length ? (
-            meta('Pick every venue you look after. You can add more later.')
+            meta('Pick every venue you look after. You can add more later')
           ) : null}
         </div>
       )}

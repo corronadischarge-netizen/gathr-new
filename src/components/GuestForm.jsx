@@ -64,10 +64,10 @@ export function GuestForm(p) {
       ) : (
         meta(
           who.email
-            ? 'They’ll get it in gathr and take their passes there.'
+            ? 'They’ll get it in gathr and take their passes there'
             : who.phone
-              ? 'You can send it to them on WhatsApp. The door finds them by name.'
-              : 'Name only: the door finds them by name.'
+              ? 'You can send it to them on WhatsApp. The door finds them by name'
+              : 'Name only: the door finds them by name'
         )
       )}
       {f.plusOnes.map((n, i) => (

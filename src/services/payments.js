@@ -1,5 +1,5 @@
 import { CFG } from '../config';
-import { loadScript } from '../lib/utils';
+import { loadScript, token } from '../lib/utils';
 
 /* Payments: demo by default, Razorpay Checkout when a key is added */
 export const Pay = {
@@ -15,7 +15,7 @@ export const Pay = {
     return loadScript('https://checkout.razorpay.com/v1/checkout.js')
       .catch(() => {
         throw new Error(
-          'Couldn’t open the payment window. Check your internet connection. You haven’t been charged.'
+          'Couldn’t open the payment window. Check your internet connection. You haven’t been charged'
         );
       })
       .then(
@@ -28,18 +28,18 @@ export const Pay = {
               name: 'gathr',
               description: o.title,
               prefill: { email: o.email || '', contact: o.phone ? '+91' + o.phone : '' },
-              theme: { color: '#531aff' },
+              theme: { color: token('brand') },
               handler: (r) => {
                 ok({ id: r.razorpay_payment_id });
               },
               modal: {
                 ondismiss: () => {
-                  no(new Error('Payment cancelled. You haven’t been charged.'));
+                  no(new Error('Payment cancelled. You haven’t been charged'));
                 }
               }
             });
             rz.on('payment.failed', (r) => {
-              no(new Error((r.error && r.error.description) || 'Payment failed. You haven’t been charged.'));
+              no(new Error((r.error && r.error.description) || 'Payment failed. You haven’t been charged'));
             });
             rz.open();
           })

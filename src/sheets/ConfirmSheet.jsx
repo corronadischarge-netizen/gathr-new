@@ -16,7 +16,7 @@ export function ConfirmSheet(p) {
       subtitle={
         isCancel
           ? pe.title + ' · ' + VENUES[pe.venue].name + ' · ' + pe.date
-          : 'Your passes and plans come back when you log in again.'
+          : 'Your passes and plans come back when you log in again'
       }
       onClose={close}
     >
@@ -27,7 +27,7 @@ export function ConfirmSheet(p) {
             '. Refunds follow the organiser’s policy on ' +
             srcName(pe) +
             '.'
-          : 'Log back in any time with Google or your email.'}
+          : 'Log back in any time with Google or your email'}
       </p>
       <div className="col" style={{ gap: '10px' }}>
         <Button variant="primary" size="lg" block onClick={close}>

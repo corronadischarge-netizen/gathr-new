@@ -230,7 +230,7 @@ export function AuthForm(p) {
       ) : null}
       {!Auth.live && step === 'email' ? (
         <p className="note" style={{ textAlign: 'center' }}>
-          Demo mode: codes show on screen until email sign-in is connected.
+          Demo mode: codes show on screen until email sign-in is connected
         </p>
       ) : null}
     </div>

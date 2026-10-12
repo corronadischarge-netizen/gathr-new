@@ -1,24 +1,30 @@
 import { useEffect, useRef, useState } from 'react';
 import maplibregl from 'maplibre-gl';
 import { IMAGES_3D } from '../assets/images';
-import { priceTxt } from '../data/format';
+import { bookLabel, priceTxt } from '../data/format';
 import { EVENTS, VENUES, upcoming } from '../data/listings';
-import { Button, CrowdMeter, SearchField, Sheet } from '../design-system';
+import { ActionBar, CrowdMeter, SearchField, Sheet } from '../design-system';
+import { CROWD, fmtNum } from '../design-system/utils';
 import { useSheetExit } from '../hooks/useSheetExit';
 import { ms } from '../lib/motion';
+import { token } from '../lib/utils';
 import { Share } from '../services/share';
-import { i3, icon, meta, note, sampleTag, svgIcon, thumb } from '../ui/helpers';
+import { i3, icon, meta, note, rowIcon, sampleTag, svgIcon, thumb } from '../ui/helpers';
 import { Tap } from '../ui/Tap';
 
+/* Booked so far on a pin: the level word with its dot, or the count for walk-in venues (no level, no dot) */
+function pinCrowd(x, html) {
+  if (x.crowd) {
+    var word = CROWD[x.crowd].label;
+    return html ? '<i style="background:var(--crowd-' + x.crowd + ')"></i>' + word : word;
+  }
+  return x.booked != null ? fmtNum(x.booked) + ' booked' : '';
+}
+
 function pinHtml(x, sel, count) {
-  var cr = x.crowd
-    ? '<span class="vpin-crowd"><i style="background:var(--crowd-' +
-      x.crowd +
-      ')"></i>' +
-      x.crowd.charAt(0).toUpperCase() +
-      x.crowd.slice(1) +
-      '</span>'
-    : '<span class="vpin-crowd">' + count + ' venues · zoom in</span>';
+  var cr = count
+    ? '<span class="vpin-crowd">' + count + ' venues · zoom in</span>'
+    : '<span class="vpin-crowd">' + pinCrowd(x, true) + '</span>';
   return (
     '<div class="vpin hue-' +
     x.hue +
@@ -120,7 +126,7 @@ export function MapScreen(p) {
           }
         },
         layers: [
-          { id: 'bg', type: 'background', paint: { 'background-color': '#0e0e10' } },
+          { id: 'bg', type: 'background', paint: { 'background-color': token('night-950') } },
           {
             id: 'osm',
             type: 'raster',
@@ -164,7 +170,7 @@ export function MapScreen(p) {
           () => {
             setRef.current({ mapSel: k });
           },
-          x.name + ', ' + x.crowd
+          x.name + ', ' + pinCrowd(x)
         ),
         anchor: 'bottom'
       }).setLngLat([x.lng, x.lat]);
@@ -346,7 +352,7 @@ export function MapScreen(p) {
         <div className="map-fail">
           {i3('discoball', 72)}
           <span className="title15">The map couldn’t load</span>
-          {meta('Check your connection. Venues are still in This week and Search.')}
+          {meta('Check your connection. Venues are still in This week and Search')}
         </div>
       ) : null}
       <div
@@ -370,7 +376,7 @@ export function MapScreen(p) {
         <div className="map-results g-glass" role="list" aria-label="Venues on the map">
           {areas.map((x) => (
             <button key={'a' + x[0]} type="button" role="listitem" className="map-res" onClick={() => showArea(x[1])}>
-              <span className="map-res-ic">{icon('map-pin', 18)}</span>
+              <span className="map-res-ic">{icon('map-pin', 20)}</span>
               <span className="col map-res-txt">
                 <span className="title15">{x[0]}</span>
                 {meta(x[1].length + ' venues · show them all')}
@@ -379,7 +385,7 @@ export function MapScreen(p) {
           ))}
           {hits.slice(0, 6).map((k) => (
             <button key={k} type="button" role="listitem" className="map-res" onClick={() => pick(k)}>
-              {i3(VENUES[k].ic, 36)}
+              {rowIcon('map-pin')}
               <span className="col map-res-txt">
                 <span className="title15">{VENUES[k].name}</span>
                 {meta(areaOf(k))}
@@ -404,7 +410,7 @@ export function MapScreen(p) {
         </div>
       ) : (
         <div className="map-chip" style={{ zIndex: 5 }}>
-          Crowd is sample data · pins are approximate
+          Bookings are sample data · pins are approximate
         </div>
       )}
       {!v ? (
@@ -416,10 +422,10 @@ export function MapScreen(p) {
             {svgIcon(['M5 12h14'], 20)}
           </button>
           <button type="button" aria-label="Show my location" onClick={locate}>
-            {icon('navigation', 18)}
+            {icon('navigation', 20)}
           </button>
           <button type="button" aria-label="Show all venues" onClick={() => zoom(0)}>
-            {icon('map', 18)}
+            {icon('map', 20)}
           </button>
         </div>
       ) : null}
@@ -431,11 +437,11 @@ export function MapScreen(p) {
             onClose={() => c.set({ mapSel: null })}
           >
             <div className="rowc" style={{ gap: '8px' }}>
-              <CrowdMeter level={v.crowd} />
+              <CrowdMeter booked={v.booked} cap={v.cap} level={v.crowd} />
               {sampleTag()}
             </div>
-            {note('Crowd is sample data.')}
-            {!evs.length ? meta('No nights listed here right now. See what’s on elsewhere this week.') : null}
+            {note('Bookings are sample data')}
+            {!evs.length ? meta('No nights listed here right now. See what’s on elsewhere this week') : null}
             {evs.map((x) => (
               <Tap
                 onClick={() => c.openEvent(x.id)}
@@ -452,21 +458,15 @@ export function MapScreen(p) {
                 {icon('chevron-right')}
               </Tap>
             ))}
-            {/* two equal buttons that always fit on one line */}
-            <div className="btn-pair">
-              <Button variant="subtle" icon="navigation" block onClick={() => Share.directions(v)}>
-                Directions
-              </Button>
-              {e ? (
-                <Button variant="primary" icon="ticket" block onClick={() => c.openEvent(e.id, 'list')}>
-                  {e.rsvp ? 'RSVP' : e.src === 'district' ? 'Get tickets' : 'Get on the list'}
-                </Button>
-              ) : (
-                <Button variant="primary" icon="arrow-right" block onClick={() => c.tab('tonight')}>
-                  What’s on
-                </Button>
-              )}
-            </div>
+            {/* violet when it books; white when there's nothing here to book */}
+            <ActionBar
+              icons={[{ icon: 'navigation', label: 'Get directions', onClick: () => Share.directions(v) }]}
+              main={
+                e
+                  ? { label: bookLabel(e), icon: 'ticket', variant: 'brand', onClick: () => c.openEvent(e.id, 'list') }
+                  : { label: 'See what’s on', icon: 'arrow-right', variant: 'primary', onClick: () => c.tab('tonight') }
+              }
+            />
           </Sheet>
         </div>
       ) : null}

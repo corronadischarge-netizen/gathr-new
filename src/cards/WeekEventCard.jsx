@@ -1,4 +1,4 @@
-import { priceTxt } from '../data/format';
+import { bookLabel, priceTxt } from '../data/format';
 import { VENUES } from '../data/listings';
 import { EventCard, Icon } from '../design-system';
 import { i3 } from '../ui/helpers';
@@ -8,27 +8,25 @@ export function WeekEventCard(p) {
   var c = p.ctx,
     e = p.e,
     v = VENUES[e.venue];
-  // the label on the card: Free (green ticket) and friends going (blue) stand out; age is quiet
+  // one badge at most: Free and friends going are glass labels on the photo; an age limit is red (red = limits)
   var badge = e.rsvp
     ? [
         <>
-          <Icon name="ticket" size={14} />
+          <Icon name="ticket" size={16} />
           Free
         </>,
-        'quiet',
-        'tag-free'
+        'glass'
       ]
     : e.nFriends >= 2
       ? [
           <>
-            <Icon name="users" size={14} />
+            <Icon name="users" size={16} />
             {e.nFriends + ' friends'}
           </>,
-          'quiet',
-          'tag-going'
+          'glass'
         ]
       : e.age
-        ? [e.age + '+', 'quiet']
+        ? [e.age + '+', 'limit']
         : null;
   return (
     <Tap
@@ -42,11 +40,10 @@ export function WeekEventCard(p) {
         image={e.img}
         badge={badge && badge[0]}
         badgeTone={badge && badge[1]}
-        badgeClass={badge && badge[2]}
         kicker={v.name + ' · ' + e.time}
         title={e.title}
         meta={e.genre + ' · ' + priceTxt(e)}
-        action={e.rsvp ? 'RSVP' : e.src === 'district' ? 'Get tickets' : 'Get on the list'}
+        action={bookLabel(e)}
         ctaSpan
       />
       <span className="card-sticker">{i3(v.ic, 52)}</span>

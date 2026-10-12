@@ -35,7 +35,6 @@ export function HostBar(p) {
     <>
       <div className="rowc between host-bar">
         <span className="host-pill">
-          <i aria-hidden />
           {'Hosting · ' + pr.name}
         </span>
         {/* switching back to going out lives on Profile, as the same card You uses to switch to hosting */}
@@ -72,7 +71,7 @@ export function HostBar(p) {
             </span>
           </button>
           <button type="button" className="host-notice-x" aria-label="Dismiss" onClick={() => read([top.id])}>
-            {icon('x', 18)}
+            {icon('x', 20)}
           </button>
         </div>
       ) : null}

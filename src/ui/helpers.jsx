@@ -1,14 +1,19 @@
 import { IMAGES_3D } from '../assets/images';
-import { FRIEND_SHAPE } from '../data/sample';
-import { Icon, ShapeAvatar } from '../design-system';
+import { Avatar, Icon } from '../design-system';
 
+/* gathr's own display headline: lowercase with the yellow full stop (none after a question mark) */
 export function stop(txt, cls) {
   return (
     <h1 className={'g-display disp' + (cls ? ' ' + cls : '')}>
       {txt}
-      <span className="stop">.</span>
+      {typeof txt === 'string' && /\?$/.test(txt) ? null : <span className="stop">.</span>}
     </h1>
   );
+}
+
+/* a display headline that is someone's name (an organiser, a plan, a person): their own spelling, no full stop */
+export function nameTitle(txt, cls) {
+  return <h1 className={'g-display disp' + (cls ? ' ' + cls : '')}>{txt}</h1>;
 }
 
 export function eyebrow(t, style) {
@@ -104,17 +109,26 @@ export function tile(name, hue, size) {
   );
 }
 
+/* the icon at the start of a list row: a Lucide icon on a grey circle (3D objects stay out of lists) */
+export function rowIcon(name) {
+  return (
+    <span className="row-ic" aria-hidden="true">
+      <Icon name={name} size={20} />
+    </span>
+  );
+}
+
 export function friendsTxt(n) {
   return <span className="friends-txt">{n === 1 ? '1 friend going' : n + ' friends going'}</span>;
 }
 
 export function note(t) {
-  return <p className="note">{t || 'Crowd and friends are sample data until the live feed exists.'}</p>;
+  return <p className="note">{t || 'Bookings and friends are sample data until the live feed exists'}</p>;
 }
 
+/* a person without a photo: their initials, centred */
 export function fav(name, size) {
-  var f = FRIEND_SHAPE[name] || ['circle', 'violet'];
-  return <ShapeAvatar key={name} shape={f[0]} hue={f[1]} name={name} size={size || 40} className="no-cap" />;
+  return <Avatar key={name} name={name} size={size || 40} />;
 }
 
 export function statusChip(t, tone) {

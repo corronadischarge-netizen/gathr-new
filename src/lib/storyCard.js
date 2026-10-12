@@ -1,5 +1,6 @@
 import { MO } from '../data/dates';
 import { REC, levelOf, nightsCount } from '../data/sample';
+import { token } from './utils';
 
 /* Wrapped as a real 1080 x 1920 story image, drawn on a canvas */
 export function storyCard(S) {
@@ -12,28 +13,28 @@ export function storyCard(S) {
       cv.height = H;
       var x = cv.getContext('2d');
       var g = x.createRadialGradient(W / 2, H * 1.05, 60, W / 2, H * 1.05, H * 0.95);
-      g.addColorStop(0, '#ff8fd0');
-      g.addColorStop(0.4, '#9b7bff');
-      g.addColorStop(0.75, '#531aff');
-      g.addColorStop(1, '#0a0a0a');
-      x.fillStyle = '#0a0a0a';
+      g.addColorStop(0, token('pink-300'));
+      g.addColorStop(0.4, token('violet-300'));
+      g.addColorStop(0.75, token('violet-500'));
+      g.addColorStop(1, token('night-950'));
+      x.fillStyle = token('night-950');
       x.fillRect(0, 0, W, H);
       x.fillStyle = g;
       x.fillRect(0, 0, W, H);
       var F = (w, sz) => w + ' ' + sz + 'px "Plus Jakarta Sans", "DM Sans", sans-serif';
-      x.fillStyle = '#f7f5f0';
+      x.fillStyle = token('night-50');
       x.textAlign = 'center';
       x.font = F(700, 64);
       x.fillText('gathr.', W / 2, 190);
       x.font = F(600, 52);
-      x.fillStyle = '#b5b1aa';
+      x.fillStyle = token('night-300');
       x.fillText(
         (S.me && S.me.name ? S.me.name.split(' ')[0].toLowerCase() + '’s ' : 'my ') +
           MO[new Date().getMonth()].toLowerCase(),
         W / 2,
         560
       );
-      x.fillStyle = '#f7f5f0';
+      x.fillStyle = token('night-50');
       x.font = F(700, 420);
       x.fillText(String(REC.length), W / 2, 960);
       x.font = F(600, 64);
@@ -48,14 +49,14 @@ export function storyCard(S) {
         var cx = i % 2 ? W * 0.72 : W * 0.28,
           cy = 1260 + Math.floor(i / 2) * 190;
         x.font = F(600, 40);
-        x.fillStyle = '#e6e2dc';
+        x.fillStyle = token('night-50');
         x.fillText(r[0], cx, cy);
         x.font = F(700, 64);
-        x.fillStyle = '#ffffff';
+        x.fillStyle = token('white');
         x.fillText(r[1], cx, cy + 76);
       });
       x.font = F(600, 40);
-      x.fillStyle = '#f7f5f0';
+      x.fillStyle = token('night-50');
       x.fillText('pune after dark', W / 2, 1800);
       cv.toBlob((b) => {
         b ? ok(b) : no(new Error('blob'));

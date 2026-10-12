@@ -132,7 +132,7 @@ export function Admin(p) {
         meta('Loading what’s waiting…')
       ) : !n ? (
         meta(
-          'Nothing to check. Nights from hosts who aren’t trusted yet, and anything flagged, show up here.'
+          'Nothing to check. Nights from hosts who aren’t trusted yet, and anything flagged, show up here'
         )
       ) : null}
       {w && w.nights.length ? (
@@ -311,7 +311,7 @@ export function Admin(p) {
       {w && w.organisers.length ? (
         <div className="col" style={{ gap: '12px' }}>
           <span className="g-section-title">{'Organisers to verify · ' + w.organisers.length}</span>
-          {note('Check their Instagram looks like the real account before you verify.')}
+          {note('Check their Instagram looks like the real account before you verify')}
           {w.organisers.map((o) => (
             <div key={o.id} className="g-card card col" style={{ gap: '10px', padding: '16px 18px' }}>
               <div className="col" style={{ gap: '2px' }}>
@@ -350,7 +350,7 @@ export function Admin(p) {
         <div className="col" style={{ gap: '12px' }}>
           <span className="g-section-title">{'Suggested kinds of night · ' + kinds.length}</span>
           {note(
-            'Marking one added doesn’t change the app by itself: add it to the list in the code, then mark it here.'
+            'Marking one added doesn’t change the app by itself: add it to the list in the code, then mark it here'
           )}
           {kinds.map((k) => (
             <div key={k.id} className="rowc list-row" style={{ gap: '8px' }}>
@@ -362,7 +362,7 @@ export function Admin(p) {
                 Decline
               </Button>
               <Button variant="subtle" size="sm" onClick={() => kindDone(k, true)}>
-                Added
+                Mark as added
               </Button>
             </div>
           ))}

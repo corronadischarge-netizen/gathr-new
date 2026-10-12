@@ -29,7 +29,7 @@ export function PassCard(p) {
       <div className="rowc" style={{ gap: '12px' }}>
         {thumb(e, 56)}
         <div className="col" style={{ gap: '4px' }}>
-          <span style={{ fontSize: '17px', lineHeight: '22px', fontWeight: 600 }}>{e.title}</span>
+          <span style={{ fontSize: '16px', lineHeight: '22px', fontWeight: 600 }}>{e.title}</span>
           {meta(
             e.time +
               (e.gates ? ' · gates ' + e.gates : '') +

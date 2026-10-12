@@ -21,14 +21,14 @@ export function Vibe(p) {
       <div className="rowc between">
         <IconButton icon="arrow-left" label="Back" variant="solid" onClick={c.back} />
         <Button variant="ghost" size="sm" onClick={c.back}>
-          Not now
+          Skip for now
         </Button>
       </div>
       <div>
         {eyebrow('Tune your week')}
         <h1 className="g-display disp">What are you into?</h1>
         <p className="body muted" style={{ marginTop: '10px' }}>
-          Pick as many as you like. Your week sorts itself around them.
+          Pick as many as you like. Your week sorts itself around them
         </p>
       </div>
       <div className="col" style={{ gap: '12px' }}>
@@ -49,7 +49,7 @@ export function Vibe(p) {
                 <span>{f[1]}</span>
                 {on ? (
                   <i className="vibe-check" aria-hidden>
-                    {svgIcon(['M5 12.5l4.5 4.5L19 7'], 14)}
+                    {svgIcon(['M5 12.5l4.5 4.5L19 7'], 16)}
                   </i>
                 ) : null}
               </button>

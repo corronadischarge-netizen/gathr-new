@@ -14,7 +14,7 @@ export function Media(p) {
     >
       {!p.image && p.neutral ? (
         <span className="g-media-icon" aria-hidden="true">
-          <Icon name="image" size={28} />
+          <Icon name="image" size={24} />
           {p.label ? <span className="g-media-label">{p.label}</span> : null}
         </span>
       ) : null}

@@ -176,7 +176,7 @@ export function OrgForm(p) {
         <input ref={fileRef} type="file" accept="image/*" style={{ display: 'none' }} onChange={pick} />
         <div className="col" style={{ gap: '6px', flex: 1 }}>
           <span className="title15">Poster · 4:5</span>
-          {meta('A clean photo or artwork works best. Put dates and prices in the form, not on the image.')}
+          {meta('A clean photo or artwork works best. Put dates and prices in the form, not on the image')}
         </div>
       </div>
       {F(
@@ -305,10 +305,10 @@ export function OrgForm(p) {
               />
             </div>,
             D.entry === 'paid'
-              ? meta('Guests pay on gathr. No fees are added on top of your price.')
-              : meta('Guests book free on gathr and pay you at the door.')
+              ? meta('Guests pay on gathr. No fees are added on top of your price')
+              : meta('Guests book free on gathr and pay you at the door')
           )
-        : meta('Guests RSVP on gathr and get a pass. You see every name.')}
+        : meta('Guests RSVP on gathr and get a pass. You see every name')}
       {F(
         'Capacity (optional)',
         'of-cap',
@@ -322,7 +322,7 @@ export function OrgForm(p) {
             onChange={(e) => upd({ capacity: e.target.value.replace(/\D/g, '').slice(0, 4) })}
           />
         </div>,
-        meta('We stop taking bookings when the night is full. Guest-list passes count too.')
+        meta('We stop taking bookings when the night is full. Guest-list passes count too')
       )}
       <div className="org-sec">
         <span className="ev-lbl">Who gets in</span>
@@ -372,10 +372,11 @@ export function OrgForm(p) {
           />
         </div>
       )}
-      {meta('Government ID is checked for everyone. That’s Pune law.')}
+      {meta('Government ID is checked for everyone. That’s Pune law')}
       <div className="bottom-stack" style={{ alignItems: 'stretch' }}>
         <Button
-          variant="brand"
+          variant="primary"
+          className="is-host"
           size="lg"
           block
           disabled={need.length > 0 || !!saving}

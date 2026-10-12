@@ -80,7 +80,6 @@
 .g-tabbar .g-tab { position: relative; z-index: 1; }
 .g-tabbar .g-tab.is-active { background: transparent; }
 .g-tab-ind { position: absolute; left: 0; top: 0; border-radius: var(--radius-full); background: var(--brand); pointer-events: none; transition: transform var(--motion-normal) var(--ease-standard); }
-.host-tabbar .g-tab-ind { background: var(--green-300); }
 
 /* ---------- sheets, poster, toasts ---------- */
 /* Sheets slide up in 300ms as the scrim fades in; closing, a frozen copy slides down in 200ms (useSheetExit),
@@ -104,8 +103,8 @@
 /* a changed verdict ("Who gets in") cross-fades to its new words and colour */
 .g-badge { transition: background-color var(--motion-normal) var(--ease-standard), color var(--motion-normal) var(--ease-standard); }
 .swap-in { animation: g-fade var(--motion-normal) var(--ease-standard); }
-.toast { animation: toast-in var(--motion-normal) var(--ease-enter); }
-@keyframes toast-in { from { opacity: 0; transform: translate(-50%, 12px); } to { opacity: 1; transform: translate(-50%, 0); } }
+.g-toast { animation: toast-in var(--motion-normal) var(--ease-enter); }
+@keyframes toast-in { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
 
 /* ---------- welcome: the night assembles (logo, posters, then what gathr tells you) ---------- */
 .w-in { animation: rise var(--motion-slower) var(--ease-enter) both; animation-delay: var(--d, 0ms); }
@@ -168,9 +167,6 @@
 .vote-lead-fly { position: absolute; margin: 0; }
 /* the home feed cross-fades to a new filter's nights */
 .feed-swap { animation: g-fade var(--motion-normal) var(--ease-standard); }
-/* a toast's action (Undo): compact, with a full 44px tap area */
-.toast-act { position: relative; margin-left: 10px; padding: 0 2px; border: 0; background: none; color: var(--ink); font: inherit; font-weight: 700; text-decoration: underline; cursor: pointer; }
-.toast-act::after { content: ''; position: absolute; top: -12px; bottom: -12px; left: -12px; right: -12px; }
 /* the pass count and total roll to their new number: up when it grows, down when it shrinks */
 .roll-up, .roll-down { display: inline-block; }
 .roll-up { animation: roll-up var(--motion-step) var(--ease-standard); }
@@ -219,7 +215,7 @@
   .ghost-fwd, .ghost-back { animation-name: fade-out !important; }
   .screen.under { transform: none; }
   .g-tab-ind { transition: none; }
-  .screen.nav-fwd, .screen.nav-back, .sheet-slot.rise, .toast, .w-in, .w-card, .w-tag, .w-3d, .w-fade, .fade-up,
+  .screen.nav-fwd, .screen.nav-back, .sheet-slot.rise, .g-toast, .w-in, .w-card, .w-tag, .w-3d, .w-fade, .fade-up,
   .mood, .vibe-tile, .celebrate .ok-tick, .celebrate .pass-card, .celebrate .pass-ic, .roll-up, .roll-down { animation-name: g-fade !important; }
   .sheet-leaving .sheet-slot, .sheet-slot.sheet-leaving { animation-name: fade-out !important; }
   .shake, .bell.is-new .g-ibtn svg, .bell-count { animation: none !important; }

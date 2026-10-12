@@ -29,7 +29,7 @@ export function HostGuests(p) {
         <div className="g-card card col empty-card">
           {i3('pass', 64)}
           <span className="title16">No one booked yet</span>
-          {meta('Guests show here once a night is live and people book.')}
+          {meta('Guests show here once a night is live and people book')}
         </div>
       )}
     </div>

@@ -5,7 +5,7 @@ import { EVENTS, upcoming } from '../data/listings';
 import { ST_LBL, nightStage, orgStats, orgToEvent, orgVenueIds, orgVenuesLabel, passCount } from '../data/organisers';
 import { Badge, Button } from '../design-system';
 import { OrgIntro } from './OrgIntro';
-import { eyebrow, i3, meta, note, statusChip, stop, thumb } from '../ui/helpers';
+import { eyebrow, i3, icon, meta, nameTitle, note, statusChip, thumb } from '../ui/helpers';
 import { Tap } from '../ui/Tap';
 
 export function OrgHome(p) {
@@ -45,7 +45,7 @@ export function OrgHome(p) {
           c={c}
           right={
             <Button variant="subtle" size="sm" onClick={() => c.go('orgsetup')}>
-              Profile
+              Edit profile
             </Button>
           }
         />
@@ -55,12 +55,12 @@ export function OrgHome(p) {
           (orgVenuesLabel(pr) ? orgVenuesLabel(pr) + ' · ' : '') +
             { venue: 'Venue', promoter: 'Promoter', collective: 'Collective' }[pr.type]
         )}
-        {stop(pr.name.toLowerCase())}
+        {nameTitle(pr.name)}
         <div className="rowc" style={{ gap: '8px' }}>
           {pr.status === 'verified' ? (
             <Badge tone="go">Verified</Badge>
           ) : (
-            <Badge tone="now">Verification pending</Badge>
+            <Badge tone="neutral">Verification pending</Badge>
           )}
           {pr.status === 'verified' ? null : meta('@' + pr.insta)}
         </div>
@@ -79,7 +79,8 @@ export function OrgHome(p) {
         ))}
       </div>
       <Button
-        variant="brand"
+        variant="primary"
+        className="is-host"
         size="lg"
         block
         icon="ticket"
@@ -106,7 +107,7 @@ export function OrgHome(p) {
                 style={{ gap: '12px', minHeight: '76px' }}
                 aria-label={x.e.title + ', ' + lb[0]}
               >
-                {x.e.img ? thumb(x.e, 56) : <span className="org-noposter">{i3('camera', 34)}</span>}
+                {x.e.img ? thumb(x.e, 56) : <span className="org-noposter">{icon('image', 24)}</span>}
                 <div className="col" style={{ gap: '3px', flexGrow: 1, minWidth: 0 }}>
                   <span className="title15">{x.e.title}</span>
                   {meta(
@@ -125,12 +126,12 @@ export function OrgHome(p) {
           <div className="g-card card col empty-card">
             {i3('spotlight', 64)}
             <span className="title16">No nights yet</span>
-            {meta('List your first night. It goes live once gathr checks it.')}
+            {meta('List your first night. It goes live once gathr checks it')}
           </div>
         )}
       </div>
       {listed.length
-        ? note('Nights marked “Listed” came from District or Sort My Scene. Their numbers are sample data.')
+        ? note('Nights marked “Listed” came from District or Sort My Scene. Their numbers are sample data')
         : null}
     </div>
   );

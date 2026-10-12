@@ -131,7 +131,7 @@ export function FriendsList(p) {
           Share your invite link
         </Button>
       </div>
-      {note('Friends are sample data.')}
+      {note('Friends are sample data')}
     </div>
   );
 }

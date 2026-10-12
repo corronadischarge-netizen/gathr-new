@@ -44,7 +44,7 @@ export function Areas(p) {
         {i3('sunglasses', 92, 'head-ic bob')}
         <h1 className="g-display disp">Where do you go out?</h1>
         <p className="body muted" style={{ marginTop: '10px' }}>
-          We show nights near these first.
+          We show nights near these first
         </p>
       </div>
       <button
@@ -53,7 +53,7 @@ export function Areas(p) {
         aria-pressed={!!S.loc}
         onClick={locate}
       >
-        <span className="loc-ic">{icon('navigation', 18)}</span>
+        <span className="loc-ic">{icon('navigation', 20)}</span>
         <span className="col" style={{ flexGrow: 1, textAlign: 'left' }}>
           <span className="title15">{S.loc ? 'Using your location' : 'Use my location'}</span>
           {meta(S.loc ? 'Distances show on every night' : 'For distances and "near me"')}

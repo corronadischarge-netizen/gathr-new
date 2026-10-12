@@ -40,7 +40,7 @@ export function Scanner(p) {
       }
     }
     if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-      setErr('This browser can’t open the camera. Type the code on the Door screen instead.');
+      setErr('This browser can’t open the camera. Type the code on the Door screen instead');
       return;
     }
     navigator.mediaDevices
@@ -95,8 +95,8 @@ export function Scanner(p) {
         (e) => {
           setErr(
             e && e.name === 'NotAllowedError'
-              ? 'Camera access is blocked. Allow the camera for this site in your browser settings, or type the code on the Door screen.'
-              : 'The camera couldn’t start. Type the code on the Door screen instead.'
+              ? 'Camera access is blocked. Allow the camera for this site in your browser settings, or type the code on the Door screen'
+              : 'The camera couldn’t start. Type the code on the Door screen instead'
           );
         }
       );
@@ -149,7 +149,7 @@ export function Scanner(p) {
           <ScanResult ctx={c} id={id} res={res} onDone={() => setRes(null)} />
         ) : (
           <p className="scan-hint" aria-live="polite">
-            Hold the pass inside the frame. It scans on its own.
+            Hold the pass inside the frame. It scans on its own
           </p>
         )}
       </div>

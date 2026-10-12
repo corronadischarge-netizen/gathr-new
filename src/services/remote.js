@@ -26,27 +26,27 @@ function ok(r) {
 /* database errors, said simply */
 export function sayError(e) {
   var m = (e && e.message) || '';
-  if (/Pick one of your venues/.test(m)) return 'Pick one of your venues for this night.';
+  if (/Pick one of your venues/.test(m)) return 'Pick one of your venues for this night';
   if (/main venue/.test(m)) return m;
-  if (/guestlist is full/.test(m)) return 'This night is full. There are no passes left.';
-  if (/The night is full/.test(m)) return 'This night is full. There are no passes left.';
-  if (/guest list is full|not on this guest list|plus-one a name/.test(m)) return m.replace(/\.?\s*$/, '.');
+  if (/guestlist is full/.test(m)) return 'This night is full. There are no passes left';
+  if (/The night is full/.test(m)) return 'This night is full. There are no passes left';
+  if (/guest list is full|not on this guest list|plus-one a name/.test(m)) return m.replace(/\.?\s*$/, '');
   if (e && e.code === '23505' && /guest_lists_one_invite/.test(m))
-    return 'You’ve already invited them to this night.';
-  if (e && e.code === '23505' && /phone/.test(m)) return 'That phone number is already on this guest list.';
-  if (e && e.code === '23505' && /guest_list/.test(m)) return 'That email is already on this guest list.';
-  if (/already have a list|That's you|waiting for its promoter/.test(m)) return m.replace(/\.?\s*$/, '.');
+    return 'You’ve already invited them to this night';
+  if (e && e.code === '23505' && /phone/.test(m)) return 'That phone number is already on this guest list';
+  if (e && e.code === '23505' && /guest_list/.test(m)) return 'That email is already on this guest list';
+  if (/already have a list|That's you|waiting for its promoter/.test(m)) return m.replace(/\.?\s*$/, '');
   if (/already accepted|already been used|night has ended|your own night|Add your name|A cap is between|Sign in first/.test(m))
-    return m.replace(/\.?\s*$/, '.');
+    return m.replace(/\.?\s*$/, '');
   if (/promoter_invite/.test(m) && /schema cache|does not exist/.test(m))
-    return 'Invite links need the latest gathr database update.';
+    return 'Invite links need the latest gathr database update';
   if (e && e.code === '23505' && /night_reports/.test(m))
-    return 'You’ve already reported this night. Thanks.';
+    return 'You’ve already reported this night. Thanks';
   if (/null value in column "email"|schema cache/.test(m))
-    return 'This needs the latest gathr database update. Add their email for now.';
-  if (/row-level security|permission/i.test(m)) return 'You don’t have permission to do that.';
-  if (/fetch|network|Failed to fetch/i.test(m)) return 'No connection. Check your internet and try again.';
-  return m || 'Something went wrong. Try again.';
+    return 'This needs the latest gathr database update. Add their email for now';
+  if (/row-level security|permission/i.test(m)) return 'You don’t have permission to do that';
+  if (/fetch|network|Failed to fetch/i.test(m)) return 'No connection. Check your internet and try again';
+  return m || 'Something went wrong. Try again';
 }
 
 /* ---------------------------------------------------------------- times (Pune is UTC+5:30 all year) */
@@ -207,7 +207,7 @@ export function pushProfile(pr) {
   return db()
     .then((cl) => {
       c = cl;
-      if (!me) throw new Error('Sign in again to save your profile.');
+      if (!me) throw new Error('Sign in again to save your profile');
       // venues they added on this phone go in first, so the organiser can point at them
       return Promise.all((pr.customVenues || []).map((nv) => ensureVenue(c, nv).then((id) => [nv.id, id])));
     })
@@ -273,8 +273,8 @@ export function pushNight(o, status, pr) {
   return db()
     .then((cl) => {
       c = cl;
-      if (!me) throw new Error('Sign in again to save this night.');
-      if (!pr.remoteId) throw new Error('Save your organiser profile first.');
+      if (!me) throw new Error('Sign in again to save this night');
+      if (!pr.remoteId) throw new Error('Save your organiser profile first');
       return o.poster && /^data:/.test(o.poster) ? uploadPoster(c, pr.remoteId, o.poster) : o.poster || null;
     })
     .then((poster) => {
@@ -403,7 +403,7 @@ export function setTrusted(orgId, yes) {
 /* A guest reports a night on gathr. */
 export function reportNight(eventId, reason, note) {
   return db().then((c) => {
-    if (!me) throw new Error('Sign in to report a night.');
+    if (!me) throw new Error('Sign in to report a night');
     return c
       .from('night_reports')
       .insert({ event_id: eventId, reason: reason, note: note || null })
@@ -824,7 +824,7 @@ export function cityCounts() {
 /* ---------------------------------------------------------------- "Suggest a new kind" of night (goes to gathr) */
 export function suggestKind(name, example) {
   return db().then((c) => {
-    if (!me) throw new Error('Sign in again to send this.');
+    if (!me) throw new Error('Sign in again to send this');
     return c
       .from('kind_suggestions')
       .insert({ name: name, example: (example || '').slice(0, 90) || null })

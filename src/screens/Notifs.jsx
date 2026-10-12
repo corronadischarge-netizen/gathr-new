@@ -1,16 +1,35 @@
 import { useEffect } from 'react';
+import { IMAGES_3D } from '../assets/images';
 import { EVENTS, VENUES } from '../data/listings';
-import { IconButton } from '../design-system';
+import { IconButton, Update, UpdateGroup } from '../design-system';
 import { poss } from '../lib/utils';
 import { openFrom } from '../services/push';
 import { markRead } from '../services/remote';
-import { icon, meta, note, tile } from '../ui/helpers';
-import { Tap } from '../ui/Tap';
+import { meta, note } from '../ui/helpers';
+
+/* "5m", "2h", "1d", "3w": how long ago, for the end of the meta line */
+function ago(iso) {
+  var m = Math.max(0, Math.round((Date.now() - new Date(iso).getTime()) / 60000));
+  return m < 60 ? Math.max(1, m) + 'm' : m < 1440 ? Math.round(m / 60) + 'h' : m < 10080 ? Math.round(m / 1440) + 'd' : Math.round(m / 10080) + 'w';
+}
+
+/* a night's 3D object (its venue's), for the lead */
+function nightObject(e) {
+  var v = e && VENUES[e.venue];
+  return v && IMAGES_3D[v.ic];
+}
+
+const noStop = (t) => (t || '').replace(/\.\s*$/, '');
+
+// the statuses of one night replace each other: only the newest shows
+const NIGHT_KINDS = ['night_submitted', 'night_review', 'night_live', 'night_back', 'night_rejected', 'night_reported'];
 
 export function Notifs(p) {
   var c = p.ctx,
     S = c.S,
-    items = [];
+    hidden = S.upHidden || [],
+    rows = [],
+    sample = false;
   // opening Updates reads your notifications
   useEffect(() => {
     var unread = (S.inbox || []).filter((n) => !n.read_at).map((n) => n.id);
@@ -25,118 +44,179 @@ export function Notifs(p) {
       )
       .catch(() => {});
   }, []);
-  // your nights and your organiser profile (guest lists show below, with whether you've taken your passes)
-  var LOOK = {
-    night_live: ['ticket', 'green'],
-    night_back: ['megaphone', 'yellow'],
-    verified: ['heart', 'violet'],
-    promoter_invite: ['wristband', 'green'],
-    night_submitted: ['ticket', 'blue'],
-    night_rejected: ['megaphone', 'red'],
-    night_review: ['megaphone', 'violet'],
-    night_reported: ['megaphone', 'red'],
-    promoter_joined: ['wristband', 'green']
-  };
-  (S.inbox || [])
-    .filter((n) => LOOK[n.kind])
-    .forEach((n) => {
-      items.push([
-        LOOK[n.kind],
-        n.title,
-        n.body,
-        () => {
-          openFrom(c, Object.assign({ kind: n.kind }, n.data));
-        }
-      ]);
+
+  function hide(key, t) {
+    c.set((o) => ({ upHidden: (o.upHidden || []).concat(key) }));
+    // declining is quiet: the other person isn't told, and there's an Undo
+    c.toast(t, {
+      label: 'Undo',
+      run: () => c.set((o) => ({ upHidden: (o.upHidden || []).filter((k) => k !== key), toast: null }))
     });
-  // guest lists you're on: tapping opens the night with "Guest list" already picked
+  }
+
+  /* ---- your account's notifications (nights you host, gathr checks, promoter invites) ---- */
+  var nightSeen = {};
+  (S.inbox || []).forEach((n) => {
+    var d = n.data || {},
+      open = () => openFrom(c, Object.assign({ kind: n.kind }, d)),
+      e = d.event_id && EVENTS[d.event_id],
+      when = n.created_at ? ago(n.created_at) : '',
+      key = 'n:' + n.id;
+    if (hidden.indexOf(key) >= 0) return;
+    if (NIGHT_KINDS.indexOf(n.kind) >= 0) {
+      if (nightSeen[d.event_id]) return;
+      nightSeen[d.event_id] = 1;
+    }
+    var base = { id: key, title: noStop(n.title), time: when, unread: !n.read_at, object: nightObject(e) };
+    var date = e ? e.date : '';
+    if (n.kind === 'night_back') rows.push(Object.assign(base, { kind: 'task', action: 'Fix', meta: 'Check the details', onAction: open }));
+    else if (n.kind === 'night_review') rows.push(Object.assign(base, { kind: 'task', action: 'Check', meta: date || 'Waiting for a check', onAction: open }));
+    else if (n.kind === 'night_reported') rows.push(Object.assign(base, { kind: 'task', action: 'Check', meta: 'Someone reported it', onAction: open }));
+    else if (n.kind === 'promoter_invite') {
+      var host = noStop(n.title).split(' wants you on ')[0] || 'The host';
+      rows.push(
+        Object.assign(base, {
+          kind: 'decide',
+          name: host,
+          object: null,
+          meta: (date ? date + ' · ' : '') + 'your own list',
+          onAccept: open,
+          onDecline: () => hide(key, 'Invite declined. ' + host + ' won’t be told')
+        })
+      );
+    } else if (n.kind === 'night_live') rows.push(Object.assign(base, { kind: 'info', meta: date, onOpen: open }));
+    else if (n.kind === 'night_submitted') rows.push(Object.assign(base, { kind: 'info', meta: 'Usually within a day', onOpen: open }));
+    else if (n.kind === 'night_rejected')
+      rows.push(Object.assign(base, { kind: 'info', object: null, icon: 'x', tone: 'limit', meta: date, onOpen: open }));
+    else if (n.kind === 'verified') rows.push(Object.assign(base, { kind: 'info', icon: 'shield-check', tone: 'go', onOpen: open }));
+    else if (n.kind === 'promoter_joined')
+      rows.push(Object.assign(base, { kind: 'info', object: null, icon: 'users', tone: 'go', meta: date, onOpen: open }));
+  });
+
+  /* ---- guest lists you're on: take your passes, or just news once you have ---- */
   (S.myGuestLists || []).forEach((g) => {
     var e = EVENTS[g.event];
     if (!e) return;
-    items.push([
-      ['wristband', 'green'],
-      'You’re on ' + poss(g.owner) + ' guest list',
-      e.title +
-        ' · ' +
-        e.date +
-        (VENUES[e.venue] ? ' at ' + VENUES[e.venue].name : '') +
-        ' · free entry' +
-        (g.plusOnes.length ? ' for you + ' + g.plusOnes.length : '') +
-        (g.bookingId ? ' · passes taken' : ''),
-      () => {
-        c.set({ bookMode: 'guest', bookList: g.listId });
-        c.openEvent(g.event, 'list');
-      }
-    ]);
+    var go = () => {
+      c.set({ bookMode: 'guest', bookList: g.listId });
+      c.openEvent(g.event, 'list');
+    };
+    var base = { id: 'gl:' + g.listId, title: 'You’re on ' + poss(g.owner) + ' guest list', object: nightObject(e) };
+    rows.push(
+      g.bookingId
+        ? Object.assign(base, { kind: 'info', meta: e.date + ' · passes taken', onOpen: go })
+        : Object.assign(base, { kind: 'task', action: 'Get passes', meta: e.date + ' · free entry', onAction: go })
+    );
   });
-  if (S.saved.twin)
-    items.push([
-      ['ticket', 'pink'],
-      'Twin Strings: tickets running low',
-      'You saved this · Fri 9 Oct at Epitome · ₹1,299',
-      () => {
-        c.openEvent('twin', 'list');
+
+  /* ---- sample updates (no live feed for these yet) ---- */
+  if (S.saved.twin) {
+    sample = true;
+    rows.push({
+      id: 's:twin',
+      kind: 'chance',
+      title: 'Twin Strings: few left',
+      meta: 'Fri 9 Oct · ₹1,299',
+      time: '5h',
+      action: 'Book',
+      object: nightObject(EVENTS.twin),
+      onAction: () => c.openEvent('twin', 'list')
+    });
+  }
+  if (!S.ishaan) {
+    sample = true;
+    rows.push({
+      id: 's:ishaan',
+      kind: 'decide',
+      title: 'Ishaan wants to be friends',
+      meta: 'Joined from your plan link',
+      time: '1d',
+      name: 'Ishaan',
+      onAccept: () => {
+        c.set({ ishaan: 'yes' });
+        c.toast('Ishaan is now your friend');
+      },
+      onDecline: () => {
+        c.set({ ishaan: 'no' });
+        c.toast('Request declined. Ishaan won’t be told', {
+          label: 'Undo',
+          run: () => c.set({ ishaan: null, toast: null })
+        });
       }
-    ]);
-  if (S.gp && S.gp.stage === 'voting')
-    items.push([
-      ['champagne', 'violet'],
-      'Zoya voted for Lavish Friday',
-      S.gp.name + ' · voting closes ' + S.gp.deadline,
-      () => {
-        c.go('group');
-      }
-    ]);
-  items.push([
-    ['sunglasses', 'blue'],
-    'Ishaan wants to be friends',
-    'He joined gathr from your plan link',
-    () => {
-      c.go('friendslist');
-    }
-  ]);
+    });
+  }
+  if (S.gp && S.gp.stage === 'voting') {
+    sample = true;
+    rows.push({
+      id: 's:vote',
+      kind: 'info',
+      title: 'Zoya voted for Lavish Friday',
+      meta: 'Voting closes ' + S.gp.deadline,
+      time: '1h',
+      name: 'Zoya',
+      onOpen: () => c.go('group')
+    });
+  }
   Object.keys(S.follow).forEach((f) => {
-    items.push([
-      ['headphones', 'yellow'],
-      f + ' announced a new night',
-      'You follow ' + f + ' · see it first',
-      () => {
-        c.openEvent('twin');
-      }
-    ]);
+    sample = true;
+    rows.push({
+      id: 's:follow:' + f,
+      kind: 'info',
+      title: f + ' announced a new night',
+      meta: EVENTS.twin.date,
+      time: '3h',
+      object: nightObject(EVENTS.twin),
+      onOpen: () => c.openEvent('twin')
+    });
   });
-  items.push([
-    ['camera', 'yellow'],
-    'Rate your last night',
-    'Your answer helps the next group decide',
-    () => {
-      c.go('recap');
-    }
-  ]);
+  sample = true;
+  rows.push({
+    id: 's:rate',
+    kind: 'info',
+    title: 'Rate your last night',
+    meta: 'Helps the next group decide',
+    time: '2d',
+    icon: 'star',
+    tone: 'brand',
+    onOpen: () => c.go('recap')
+  });
+
+  /* ---- Needs you: tasks, then chances, then people waiting on you; three answers on screen at most ---- */
+  var ORDER = { task: 0, chance: 1, decide: 2 };
+  var asks = rows.filter((r) => r.kind !== 'info').sort((a, b) => ORDER[a.kind] - ORDER[b.kind]);
+  var needs = asks.slice(0, 3);
+  // anything past three waits in Earlier as a plain row that opens it
+  var earlier = asks
+    .slice(3)
+    .map((r) =>
+      Object.assign({}, r, { kind: 'info', onOpen: r.onAction || r.onAccept })
+    )
+    .concat(rows.filter((r) => r.kind === 'info'));
+
   return (
-    <div className="full col pad-top" style={{ gap: '24px' }}>
+    <div className="full col pad-top updates">
       <div>
         <IconButton icon="arrow-left" label="Back" variant="solid" onClick={c.back} />
       </div>
-      <h1 className="g-display disp">Updates</h1>
-      <div className="col">
-        {items.map((it, i) => (
-          <Tap
-            onClick={it[3]}
-            key={it[1]}
-            className="tap rowc list-row fade-up"
-            style={{ gap: '14px', '--d': i * 60 + 'ms' }}
-          >
-            {tile(it[0][0], it[0][1], 48)}
-            <div className="col" style={{ gap: '2px', flexGrow: 1 }}>
-              <span className="title15">{it[1]}</span>
-              {meta(it[2])}
-            </div>
-            {icon('chevron-right')}
-          </Tap>
-        ))}
-      </div>
-      {note('Updates are sample data.')}
+      <h1 className="g-display disp updates-title">Updates</h1>
+      {needs.length ? (
+        <UpdateGroup title="Needs you" aside={String(needs.length)}>
+          {needs.map((r) => (
+            <Update {...r} key={r.id} />
+          ))}
+        </UpdateGroup>
+      ) : null}
+      {earlier.length ? (
+        <UpdateGroup title="Earlier">
+          {earlier.map((r) => (
+            <Update {...r} key={r.id} unread={undefined} />
+          ))}
+        </UpdateGroup>
+      ) : null}
+      {!needs.length && !earlier.length
+        ? meta('Nothing new. Book a night or start a plan and updates land here')
+        : null}
+      {sample ? note('Friend, vote, follow, rating and saved-night updates are sample data') : null}
     </div>
   );
 }

@@ -4,7 +4,7 @@ import { GroupPlanSummaryCard } from '../cards/GroupPlanSummaryCard';
 import { priceTxt } from '../data/format';
 import { EVENTS, VENUES } from '../data/listings';
 import { Button } from '../design-system';
-import { eyebrow, i3, icon, meta, sec, stop, thumb, tile } from '../ui/helpers';
+import { eyebrow, i3, icon, meta, rowIcon, sec, stop, thumb } from '../ui/helpers';
 import { Tap } from '../ui/Tap';
 
 export function Plans(p) {
@@ -35,7 +35,7 @@ export function Plans(p) {
             Start a plan{icon('chevron-right', 16)}
           </button>
         )}
-        {S.gp ? <GroupPlanSummaryCard ctx={c} /> : meta('No group plans yet.')}
+        {S.gp ? <GroupPlanSummaryCard ctx={c} /> : meta('No group plans yet')}
       </div>
       <div className="col" style={{ gap: '4px' }}>
         <span className="g-section-title">Saved</span>
@@ -68,12 +68,12 @@ export function Plans(p) {
                 </Tap>
               );
             })
-          : meta('Nothing saved yet. Tap the heart on a night to keep it here.')}
+          : meta('Nothing saved yet. Tap the heart on a night to keep it here')}
       </div>
       <div className="col" style={{ gap: '4px' }}>
         <span className="g-section-title">Past nights</span>
         <Tap onClick={() => c.go('recap')} className="tap rowc" style={{ gap: '12px', minHeight: '72px' }}>
-          {tile('memories', 'yellow', 64)}
+          {rowIcon('image')}
           <div className="col" style={{ gap: '2px', flexGrow: 1 }}>
             <span className="title16">Last Friday</span>
             {meta('Sample recap')}

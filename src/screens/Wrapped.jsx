@@ -16,7 +16,7 @@ export function Wrapped(p) {
         <span style={{ width: '48px' }} />
       </div>
       <WrappedCard ctx={c} />
-      {note('Sample data. Built from checked-in nights only.')}
+      {note('Sample data. Built from checked-in nights only')}
       <div className="bottom-stack" style={{ alignItems: 'stretch' }}>
         <Button
           variant="primary"

@@ -37,13 +37,13 @@ export function checkPass(S, id, raw) {
       return {
         tone: 'red',
         title: 'Not a gathr pass',
-        line: 'This QR code isn’t a gathr pass. Ask for the pass in the gathr app.'
+        line: 'This QR code isn’t a gathr pass. Ask for the pass in the gathr app'
       };
     if (pp.bad)
       return {
         tone: 'red',
         title: 'This pass has been changed',
-        line: 'The code doesn’t check out. Ask the guest to open the pass again in the app.'
+        line: 'The code doesn’t check out. Ask the guest to open the pass again in the app'
       };
     code = pp.code;
     passes = pp.passes;
@@ -54,7 +54,7 @@ export function checkPass(S, id, raw) {
     return {
       tone: 'red',
       title: 'Wrong night',
-      line: o ? 'This pass is for ' + o.title + ' on ' + o.date + '.' : 'This pass is for a different night.'
+      line: o ? 'This pass is for ' + o.title + ' on ' + o.date : 'This pass is for a different night'
     };
   }
   var g = st.guests.filter((x) => x.code === code)[0];
@@ -133,6 +133,6 @@ export function checkPass(S, id, raw) {
   return {
     tone: 'red',
     title: 'No booking with that code',
-    line: 'Check the code on the guest’s pass, or find them in Guests.'
+    line: 'Check the code on the guest’s pass, or find them in Guests'
   };
 }

@@ -1,7 +1,7 @@
 import { AuthForm } from '../components/AuthForm';
 import { OrgBack } from '../components/OrgBack';
 import { Button } from '../design-system';
-import { eyebrow, i3, stop, tile } from '../ui/helpers';
+import { eyebrow, i3, rowIcon, stop } from '../ui/helpers';
 
 /* 1 · why list on gathr, then sign in */
 export function OrgIntro(p) {
@@ -13,13 +13,13 @@ export function OrgIntro(p) {
   }
   var perks = [
     [
-      'pass',
+      'users',
       'Who’s coming, live',
-      'Who booked, how many passes, who turned up. Check people in at the door from your phone.'
+      'Who booked, how many passes, who turned up. Check people in at the door from your phone'
     ],
-    ['ticket', 'Free or paid, your call', 'Free RSVP, paid passes or pay at the door. No listing fee.'],
-    ['heart', 'Know who’s interested', 'Saves, views and your crowd’s age mix and sounds, before the night.'],
-    ['sunglasses', 'Fewer fights at the door', 'Your stag, age and dress rules show before anyone books.']
+    ['ticket', 'Free or paid, your call', 'Free RSVP, paid passes or pay at the door. No listing fee'],
+    ['heart', 'Know who’s interested', 'Saves, views and your crowd’s age mix and sounds, before the night'],
+    ['shield-check', 'Fewer fights at the door', 'Your stag, age and dress rules show before anyone books']
   ];
   return (
     <div className="full col pad-top" style={{ gap: '28px', paddingTop: '52px', paddingBottom: '32px' }}>
@@ -32,7 +32,7 @@ export function OrgIntro(p) {
       <div className="col" style={{ gap: '18px' }}>
         {perks.map((r) => (
           <div key={r[1]} className="rowc" style={{ gap: '14px', alignItems: 'flex-start' }}>
-            {tile(r[0], 'violet', 48)}
+            {rowIcon(r[0])}
             <div className="col" style={{ gap: '2px' }}>
               <span className="title15">{r[1]}</span>
               <span className="meta">{r[2]}</span>
@@ -52,7 +52,7 @@ export function OrgIntro(p) {
           </div>
         )}
         <p className="note" style={{ textAlign: 'center' }}>
-          Listing is free. gathr checks every organiser and every night before it goes live.
+          Listing is free. gathr checks every organiser and every night before it goes live
         </p>
       </div>
     </div>

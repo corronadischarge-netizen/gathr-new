@@ -8,7 +8,7 @@ export function EmptyPlanCard(p) {
     <div className="g-card card col rel empty-plan" style={{ gap: '12px' }}>
       {i3('champagne', 96, 'empty-ic')}
       <span className="title16">Nothing booked yet</span>
-      {meta('Book a night, or start a plan with your group.')}
+      {meta('Book a night, or start a plan with your group')}
       <div className="rowc" style={{ gap: '8px' }}>
         <Button variant="primary" size="sm" onClick={() => c.tab('tonight')}>
           See this week

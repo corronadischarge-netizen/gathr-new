@@ -25,8 +25,8 @@ export function Phone(p) {
         <h1 className="g-display disp">{login ? 'Welcome back' : 'Save your plans'}</h1>
         <p className="body muted" style={{ marginTop: '10px' }}>
           {login
-            ? 'Log in with Google or the email you booked with.'
-            : 'Sign in to keep your passes and plans on every phone. We never share your email.'}
+            ? 'Log in with Google or the email you booked with'
+            : 'Sign in to keep your passes and plans on every phone. We never share your email'}
         </p>
       </div>
       {S.signedIn ? (
@@ -37,7 +37,7 @@ export function Phone(p) {
       {!login && !S.signedIn ? (
         <div className="bottom-stack">
           <Button variant="ghost" onClick={() => c.tab('tonight')}>
-            Not now
+            Skip for now
           </Button>
         </div>
       ) : null}

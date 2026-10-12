@@ -66,7 +66,7 @@ export function KindPicker(p) {
               {sending ? 'Sending…' : 'Suggest it'}
             </Button>
           </div>
-          {note('Pick the closest kind above for now. If gathr adds yours, you can switch to it.')}
+          {note('Pick the closest kind above for now. If gathr adds yours, you can switch to it')}
         </div>
       ) : (
         <button
@@ -135,7 +135,7 @@ export function SoundPicker(p) {
         {like.length < 3 ? (
           <div className="col" style={{ gap: '4px' }}>
             <div className="field-row">
-              {icon('search', 18)}
+              {icon('search', 20)}
               <input
                 aria-label="Find an artist"
                 value={q}
@@ -223,7 +223,7 @@ export function SoundPicker(p) {
             </button>
           ))}
         </div>
-        {meta('Guests can filter by energy, so it helps the right crowd find you.')}
+        {meta('Guests can filter by energy, so it helps the right crowd find you')}
       </div>
     </>
   );

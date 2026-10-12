@@ -5,7 +5,7 @@ import { AREA_LIST } from '../data/options';
 import { REC, levelOf, nightsCount } from '../data/sample';
 import { pickName } from '../data/taxonomy';
 import { Button } from '../design-system';
-import { eyebrow, icon, meAvatar, meta, note, sec, statusChip, stop, tile } from '../ui/helpers';
+import { eyebrow, icon, meAvatar, meta, nameTitle, note, sec, rowIcon, statusChip, stop } from '../ui/helpers';
 import { Tap } from '../ui/Tap';
 
 /* You: status, perks, record, credit */
@@ -22,7 +22,7 @@ export function You(p) {
         .map(pickName)
         .join(', ') || 'Tune your week',
       () => c.go('vibe'),
-      ['discoball', 'violet']
+      'music-2'
     ],
     [
       'Where you go out',
@@ -30,20 +30,20 @@ export function You(p) {
         .filter((k) => AREA_LIST.indexOf(k) >= 0)
         .join(', ') || 'Pick areas or use your location',
       () => c.go('areas'),
-      ['sunglasses', 'pink']
+      'map-pin'
     ],
-    ['Age', S.age || 'Asked when a night needs it', () => c.go('editprofile'), ['pass', 'blue']],
+    ['Age', S.age || 'Asked when a night needs it', () => c.go('editprofile'), 'id-card'],
     [
       'Friends',
       (S.ishaan === 'yes' ? '5 friends' : '4 friends') + (!S.ishaan ? ' · 1 request' : ''),
       () => c.go('friendslist'),
-      ['heart', 'pink']
+      'users'
     ],
     [
       'Following',
       Object.keys(S.follow).join(', ') || 'No artists or venues yet',
       () => c.tab('search'),
-      ['headphones', 'yellow']
+      'star'
     ],
     [
       'Host a night',
@@ -54,7 +54,7 @@ export function You(p) {
         if (S.org && S.org.profile) c.toHost();
         else c.go('orgintro');
       },
-      ['spotlight', 'red']
+      'calendar-plus'
     ]
   ];
   // a host sent you a promoter invite as a code (the link opens it directly)
@@ -86,11 +86,11 @@ export function You(p) {
       <div className="rowc" style={{ gap: '16px' }}>
         <Tap onClick={() => c.go('editprofile')} className="tap me-head" aria-label="Edit profile photo">
           {meAvatar(S, 72)}
-          <span className="avatar-badge sm">{icon('image', 14)}</span>
+          <span className="avatar-badge sm">{icon('image', 16)}</span>
         </Tap>
         <div className="col" style={{ gap: '2px', flexGrow: 1, minWidth: 0 }}>
           {eyebrow((S.me.handle ? '@' + S.me.handle + ' · ' : '') + lv[0])}
-          {stop((S.me.name ? S.me.name.split(' ')[0] : 'you').toLowerCase(), 'sm')}
+          {S.me.name ? nameTitle(S.me.name.split(' ')[0], 'sm') : stop('you', 'sm')}
           {S.signedIn ? (
             meta(S.email || 'Signed in')
           ) : (
@@ -122,7 +122,7 @@ export function You(p) {
           var v = VENUES[r[0]];
           return (
             <div key={r[1] + r[2]} className="rowc list-row" style={{ gap: '14px' }}>
-              {tile(v.ic, 'violet', 44)}
+              {rowIcon('calendar-check')}
               <div className="col" style={{ gap: '2px', flexGrow: 1 }}>
                 <span className="title15">{r[1]}</span>
                 {meta(v.name + ' · ' + r[2] + ' · with ' + r[3])}
@@ -131,12 +131,12 @@ export function You(p) {
             </div>
           );
         })}
-        {note('Past nights are sample data.')}
+        {note('Past nights are sample data')}
       </div>
       <div className="col">
         {rows.map((r) => (
           <Tap onClick={r[2]} key={r[0]} className="tap rowc list-row" style={{ gap: '14px' }}>
-            {tile(r[3][0], r[3][1], 44)}
+            {rowIcon(r[3])}
             <div className="col" style={{ gap: '2px', flexGrow: 1 }}>
               <span className="title15">{r[0]}</span>
               {meta(r[1])}

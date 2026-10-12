@@ -65,7 +65,7 @@ export function Promoting(p) {
                   whenTxt(n.startsAt) +
                   '. Free entry' +
                   (g.plusOnes.length ? ' for you + ' + g.plusOnes.length : '') +
-                  '. Give your name at the door.'
+                  '. Give your name at the door'
               )
           });
         else c.toast(first + (g.email ? ' is on your list. They’ll see it in gathr' : ' is on your list'));
@@ -101,7 +101,7 @@ export function Promoting(p) {
       </div>
       {!nights.length
         ? meta(
-            'When a host invites you to promote a night, it shows here. They invite you by the email you sign in with.'
+            'When a host invites you to promote a night, it shows here. They invite you by the email you sign in with'
           )
         : null}
       {nights.map((n) => {
@@ -172,7 +172,7 @@ export function Promoting(p) {
           </section>
         );
       })}
-      {nights.length ? note('The host sets your cap. Each guest counts with their plus-ones.') : null}
+      {nights.length ? note('The host sets your cap. Each guest counts with their plus-ones') : null}
     </div>
   );
 }

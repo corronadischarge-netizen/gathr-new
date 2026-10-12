@@ -1,13 +1,13 @@
 import { APP_URL } from '../config';
 import { MO, WD } from '../data/dates';
 import { kindOf } from '../data/eventKind';
-import { blockedFor, rupees } from '../data/format';
+import { blockedFor, bookLabel, rupees } from '../data/format';
 import { stagTxt } from '../data/organisers';
 import { energyName, family, nightKind } from '../data/taxonomy';
 import { Badge, Button, IconButton } from '../design-system';
 import { shareToast } from '../lib/utils';
 import { Share } from '../services/share';
-import { fav, friendsTxt, i3, icon, note, tile } from '../ui/helpers';
+import { fav, friendsTxt, i3, icon, note, rowIcon } from '../ui/helpers';
 import { Tap } from '../ui/Tap';
 
 export function EventScreen(p) {
@@ -18,7 +18,7 @@ export function EventScreen(p) {
     saved = !!S.saved[e.id],
     blocked = blockedFor(e, S.age);
   var onThis = S.planned === e.id;
-  var cta = e.rsvp ? 'RSVP' : e.src === 'district' || (e.org && !e.door) ? 'Get tickets' : 'Get on the list';
+  var cta = bookLabel(e);
   var kind = e.org ? nightKind(e.kindKey).slice(1) : kindOf(e),
     fam = family(e.family),
     sounds = fam
@@ -35,7 +35,7 @@ export function EventScreen(p) {
   /* door check in one line, as plain words: what's certain, what's up to the door. No verdict badge: the door
      decides, and the Age box above already says when a night isn't for you. */
   var doorLine = blocked
-    ? 'This night is ' + e.age + '+. You’re ' + S.age + '.'
+    ? 'This night is ' + e.age + '+. You’re ' + S.age
     : e.org
       ? ['ID for everyone', stagTxt(e.stag)].concat(e.dress ? [e.dress.toLowerCase()] : []).join(' · ')
       : 'ID for everyone · stag entry is up to the door' + (e.dress ? ' · ' + e.dress.toLowerCase() : '');
@@ -57,7 +57,7 @@ export function EventScreen(p) {
           className="g-media ev-hero-img"
           aria-label="See the full poster"
           style={{
-            backgroundImage: 'linear-gradient(var(--poster-dim), var(--poster-dim)), url(' + e.img + ')'
+            backgroundImage: 'linear-gradient(color-mix(in srgb, var(--night-950) 28%, transparent), color-mix(in srgb, var(--night-950) 28%, transparent)), url(' + e.img + ')'
           }}
           onClick={() => c.set({ sheet: 'poster' })}
         >
@@ -183,7 +183,7 @@ export function EventScreen(p) {
         {/* 4 · door check and venue: two tappable rows, details one tap away */}
         <div className="ev-card col ev-rows">
           <button type="button" className="ev-row" onClick={() => c.set({ sheet: 'rules' })}>
-            <span className="ev-row-ic">{i3('pass', 40)}</span>
+            {rowIcon('id-card')}
             <span className="col" style={{ gap: '4px', flexGrow: 1, minWidth: 0, textAlign: 'left' }}>
               <span className="title15">Who gets in</span>
               <span className={'meta' + (blocked ? ' err-txt' : '')}>{doorLine}</span>
@@ -198,7 +198,7 @@ export function EventScreen(p) {
               style={{ flexGrow: 1 }}
               aria-label={v.name + ', ' + v.area + '. Open venue'}
             >
-              {tile(v.ic, v.hue, 40)}
+              {rowIcon('map-pin')}
               <span className="col" style={{ gap: '2px', flexGrow: 1, minWidth: 0 }}>
                 <span className="title15">{v.name}</span>
                 <span className="meta">{v.area.split(',')[0] + ' · closes 1:30 am'}</span>
@@ -212,13 +212,13 @@ export function EventScreen(p) {
             />
           </div>
         </div>
-        {note('Friends are sample data. Tap the poster to see it in full.')}
+        {note('Friends are sample data. Tap the poster to see it in full')}
       </div>
       {/* 5 · the decision: price on the left, one action on the right */}
       <div className="bottom ev-bar">
         {onThis ? (
           <Button variant="primary" size="lg" block icon="ticket" onClick={() => c.go('pass')}>
-            You're in · show pass
+            Show my pass
           </Button>
         ) : (
           <div className="rowc" style={{ gap: '14px' }}>

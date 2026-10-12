@@ -91,7 +91,7 @@ export function ReviewPanel(p) {
     <nav className="jump" aria-label="Jump to a screen">
       <Wordmark size={26} />
       <p className="meta" style={{ margin: '12px 0 16px' }}>
-        Tap through the phone, or jump to any screen.
+        Tap through the phone, or jump to any screen
       </p>
       {list.map((it) => {
         var active = c.S.sheet

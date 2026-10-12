@@ -55,7 +55,7 @@ export function FriendsSheet(p) {
       >
         How friends work{icon('chevron-right', 16)}
       </button>
-      {note('Friends are sample data.')}
+      {note('Friends are sample data')}
     </Sheet>
   );
 }

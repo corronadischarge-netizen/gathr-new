@@ -42,3 +42,10 @@ export function shareToast(r, what) {
 export function poss(name) {
   return name + (/s$/i.test(name) ? '’' : '’s');
 }
+
+/* A gathr token's value (e.g. token('brand') -> '#531aff'), for places that can't read CSS variables:
+   canvas drawing, the map style and the payment sheet */
+export function token(name) {
+  var v = getComputedStyle(document.documentElement).getPropertyValue('--' + name).trim();
+  return /^var\(--([\w-]+)\)$/.test(v) ? token(v.slice(6, -1)) : v;
+}

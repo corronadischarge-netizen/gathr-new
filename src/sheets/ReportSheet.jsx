@@ -67,7 +67,7 @@ export function ReportSheet(p) {
           onChange={(ev) => setText(ev.target.value)}
         />
       </div>
-      {note('Only gathr sees reports. The host isn’t told who sent one.')}
+      {note('Only gathr sees reports. The host isn’t told who sent one')}
       <Button variant="primary" size="lg" block disabled={!why || busy} onClick={send}>
         {busy ? 'Sending…' : 'Send report'}
       </Button>

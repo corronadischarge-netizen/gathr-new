@@ -1,5 +1,7 @@
 /* Real data: Pune listings pulled from District and Sort My Scene on 29 Sep 2026, plus ten more from District on 4 Oct 2026.
-   Crowd levels, friends and group votes are SAMPLE data: no live crowd feed exists yet. */
+   Bookings (booked so far against a cap), friends and group votes are SAMPLE data: no live booking feed exists yet. */
+import { crowdLevel } from '../design-system/utils';
+
 const SMS = 'https://assets.sortmyscene.com/img/event-hero/';
 
 const DIS = 'https://cdn.district.in/assets/events/publisher/event_cover_image_horizontal/';
@@ -10,7 +12,8 @@ export const VENUES = {
     id: 'kukoo',
     name: 'Kukoo',
     area: 'The Mills, Sangamwadi',
-    crowd: 'buzzing',
+    booked: 330, cap: 480,
+    saved: 1240, lastHour: 38, vibe: 'High energy',
     lat: 18.5362,
     lng: 73.8764,
     ic: 'discoball',
@@ -21,7 +24,8 @@ export const VENUES = {
     id: 'plunge',
     name: 'Plunge',
     area: 'Koregaon Park',
-    crowd: 'warming',
+    booked: 96, cap: 220,
+    saved: 410, lastHour: 9, vibe: 'Laid back',
     lat: 18.5388,
     lng: 73.8934,
     ic: 'cocktail',
@@ -31,7 +35,8 @@ export const VENUES = {
     id: 'fml',
     name: 'FML',
     area: 'Kalyani Nagar',
-    crowd: 'quiet',
+    booked: 22, cap: 300,
+    saved: 380, lastHour: 2, vibe: 'Underground',
     lat: 18.5475,
     lng: 73.9025,
     ic: 'headphones',
@@ -41,7 +46,8 @@ export const VENUES = {
     id: 'opus',
     name: 'Opus Club & Lounge',
     area: 'Baner',
-    crowd: 'packed',
+    booked: 412, cap: 480,
+    saved: 1610, lastHour: 44, vibe: 'Dressy, loud',
     lat: 18.5635,
     lng: 73.778,
     ic: 'champagne',
@@ -51,7 +57,8 @@ export const VENUES = {
     id: 'ozone',
     name: 'Ozone',
     area: 'Sinhgad Road',
-    crowd: 'buzzing',
+    booked: 260, cap: 400,
+    saved: 720, lastHour: 21, vibe: 'Rowdy',
     lat: 18.48,
     lng: 73.825,
     ic: 'mic',
@@ -61,7 +68,8 @@ export const VENUES = {
     id: 'kopa',
     name: 'KOPA Mall',
     area: 'Koregaon Park',
-    crowd: 'quiet',
+    booked: 140, cap: 1200,
+    saved: 530, lastHour: 6, vibe: 'Easygoing',
     lat: 18.5352,
     lng: 73.8988,
     ic: 'speaker',
@@ -71,7 +79,8 @@ export const VENUES = {
     id: 'epitome',
     name: 'Epitome',
     area: 'The Mills, Sangamwadi',
-    crowd: 'warming',
+    booked: 120, cap: 350,
+    saved: 460, lastHour: 11, vibe: 'Warm, chatty',
     lat: 18.5346,
     lng: 73.8779,
     ic: 'vinyl',
@@ -82,7 +91,8 @@ export const VENUES = {
     id: 'palacio',
     name: 'The Game Palacio',
     area: 'The Mills, Sangamwadi',
-    crowd: 'full',
+    booked: 600, cap: 600,
+    saved: 1890, lastHour: 0, vibe: 'Big night out',
     lat: 18.5356,
     lng: 73.8796,
     ic: 'spotlight',
@@ -93,7 +103,8 @@ export const VENUES = {
     id: 'antisocial',
     name: 'Anti Social',
     area: 'Shivaji Nagar',
-    crowd: 'quiet',
+    booked: 45, cap: 250,
+    saved: 290, lastHour: 3, vibe: 'Gritty',
     lat: 18.5306,
     lng: 73.8478,
     ic: 'sunglasses',
@@ -104,7 +115,8 @@ export const VENUES = {
     id: 'shisha',
     name: 'Shisha Jazz Cafe',
     area: 'The Mills, Bund Garden Road',
-    crowd: 'warming',
+    booked: 70, cap: 150,
+    saved: 240, lastHour: 7, vibe: 'Mellow',
     lat: 18.5338,
     lng: 73.8706,
     ic: 'cd',
@@ -115,7 +127,8 @@ export const VENUES = {
     id: 'sinonna',
     name: 'Si Nonna’s',
     area: 'FC Road',
-    crowd: 'buzzing',
+    booked: 110, cap: 160,
+    saved: 350, lastHour: 12, vibe: 'Lively',
     lat: 18.526,
     lng: 73.8419,
     ic: 'megaphone',
@@ -125,7 +138,8 @@ export const VENUES = {
     id: 'fcsocial',
     name: 'FC Road Social',
     area: 'FC Road, Shivaji Nagar',
-    crowd: 'warming',
+    booked: 150, cap: 400,
+    saved: 610, lastHour: 14, vibe: 'Casual',
     lat: 18.5291,
     lng: 73.8437,
     ic: 'mic',
@@ -135,7 +149,8 @@ export const VENUES = {
     id: 'dimora',
     name: 'Di Mora',
     area: 'The Mills, Bund Garden Road',
-    crowd: 'packed',
+    booked: 270, cap: 300,
+    saved: 880, lastHour: 26, vibe: 'Glam',
     lat: 18.534,
     lng: 73.8712,
     ic: 'champagne',
@@ -146,7 +161,8 @@ export const VENUES = {
     id: 'cobbler',
     name: 'Cobbler & Crew',
     area: 'Kalyani Nagar',
-    crowd: 'quiet',
+    booked: 64, // walk-in: no cap
+    saved: 190, lastHour: 8, vibe: 'Cosy',
     lat: 18.5495,
     lng: 73.9027,
     ic: 'cocktail',
@@ -156,7 +172,8 @@ export const VENUES = {
     id: 'themills',
     name: 'The Mills',
     area: 'Sangamwadi',
-    crowd: 'buzzing',
+    booked: 900, cap: 1400,
+    saved: 3100, lastHour: 72, vibe: 'Festival',
     lat: 18.5313,
     lng: 73.8709,
     ic: 'spotlight',
@@ -167,7 +184,8 @@ export const VENUES = {
     id: 'kurryleaf',
     name: 'Kurry Leaf',
     area: 'Erandwane',
-    crowd: 'warming',
+    booked: 60, cap: 200,
+    saved: 210, lastHour: 5, vibe: 'Friendly',
     lat: 18.5036,
     lng: 73.8356,
     ic: 'memories',
@@ -177,13 +195,19 @@ export const VENUES = {
     id: 'mahalaxmi',
     name: 'Mahalaxmi Lawns',
     area: 'Karve Nagar',
-    crowd: 'full',
+    booked: 2500, cap: 2500,
+    saved: 6400, lastHour: 0, vibe: 'Festive',
     lat: 18.4872,
     lng: 73.8261,
     ic: 'discoball',
     hue: 'red'
   }
 };
+
+/* Booked so far: the level comes from booked against the cap (none for walk-in venues) */
+Object.values(VENUES).forEach((v) => {
+  v.crowd = crowdLevel(v.booked, v.cap);
+});
 
 export const EVENTS = {
   illegal: {

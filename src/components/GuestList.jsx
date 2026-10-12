@@ -152,8 +152,8 @@ export function GuestList(p) {
           <span className="title15">No one on the list yet</span>
           {meta(
             p.live
-              ? 'Share your link on Instagram and WhatsApp. Bookings show here as they come in.'
-              : 'Once the night is live, bookings show here.'
+              ? 'Share your link on Instagram and WhatsApp. Bookings show here as they come in'
+              : 'Once the night is live, bookings show here'
           )}
         </div>
       )}

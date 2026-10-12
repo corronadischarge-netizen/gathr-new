@@ -85,7 +85,7 @@ export function VenueDash(p) {
         ))}
       </div>
       {note(
-        'Every number here is sample data for pitching. Promoted content is always labelled and never overrides who gets in.'
+        'Every number here is sample data for pitching. Promoted content is always labelled and never overrides who gets in'
       )}
       <Button
         variant="primary"

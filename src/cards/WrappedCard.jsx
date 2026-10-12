@@ -8,7 +8,7 @@ export function WrappedCard(p) {
   return (
     <div className="wrap-card">
       {i3('discoball', 96, 'wc-ic1 bob')}
-      {i3('vinyl', 80, 'wc-ic2 bob', { animationDelay: '-1.5s' })}
+      {i3('vinyl', 80, 'wc-ic2')}
       <span className="wc-kick">
         {(S.me.name ? S.me.name.split(' ')[0].toLowerCase() + '’s ' : 'your ') +
           MO[new Date().getMonth()].toLowerCase()}

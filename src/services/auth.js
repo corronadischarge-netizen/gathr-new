@@ -8,11 +8,11 @@ export const Auth = (() => {
   var sb = supabase;
   function friendly(err) {
     var m = (err && (err.message || err.error_description)) || '';
-    if (/rate|too many|seconds/i.test(m)) return 'Too many codes asked for. Wait a minute, then try again.';
+    if (/rate|too many|seconds/i.test(m)) return 'Too many codes asked for. Wait a minute, then try again';
     if (/expired|invalid|token/i.test(m))
-      return 'That code doesn’t match or has expired. Check it, or send a new one.';
-    if (/network|fetch|load/i.test(m)) return 'No connection. Check your internet and try again.';
-    return m || 'Something went wrong. Try again.';
+      return 'That code doesn’t match or has expired. Check it, or send a new one';
+    if (/network|fetch|load/i.test(m)) return 'No connection. Check your internet and try again';
+    return m || 'Something went wrong. Try again';
   }
   function userOf(u) {
     if (!u) return null;
@@ -58,11 +58,11 @@ export const Auth = (() => {
     },
     verify: (email, code) => {
       if (!live) {
-        if (!demo || demo.email !== email) return Promise.reject(new Error('Send a code first.'));
-        if (Date.now() > demo.exp) return Promise.reject(new Error('That code has expired. Send a new one.'));
-        if (++demo.tries > 5) return Promise.reject(new Error('Too many tries. Send a new code.'));
+        if (!demo || demo.email !== email) return Promise.reject(new Error('Send a code first'));
+        if (Date.now() > demo.exp) return Promise.reject(new Error('That code has expired. Send a new one'));
+        if (++demo.tries > 5) return Promise.reject(new Error('Too many tries. Send a new code'));
         if (code !== demo.code)
-          return Promise.reject(new Error('That code doesn’t match. Check it and try again.'));
+          return Promise.reject(new Error('That code doesn’t match. Check it and try again'));
         demo = null;
         return Promise.resolve({ id: 'demo', email: email, name: '', photo: null });
       }
@@ -81,7 +81,7 @@ export const Auth = (() => {
     google: () => {
       if (!live)
         return Promise.reject(
-          new Error('Google sign-in switches on once Supabase is connected. Use your email for now.')
+          new Error('Google sign-in switches on once Supabase is connected. Use your email for now')
         );
       return sb()
         .then((c) => c.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: APP_URL } }))

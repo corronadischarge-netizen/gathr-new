@@ -67,7 +67,7 @@ export function Group(p) {
           <span className="g-section-title">The group</span>
           {meta(booked ? 'Everyone has a pass' : voted + ' of ' + all.length + ' voted')}
         </div>
-        {meta('Everyone here joined from your invite link.')}
+        {meta('Everyone here joined from your invite link')}
         <div className="crew">
           {all.map((n) => (
             <div key={n} className="crew-item">
@@ -99,10 +99,10 @@ export function Group(p) {
             S.vote
               ? 'You voted. Close the vote now or wait for ' +
                   gp.deadline +
-                  '. You book once, and everyone gets a pass.'
-              : 'Tap a night to vote. Friends and votes are sample data.'
+                  '. You book once, and everyone gets a pass'
+              : 'Tap a night to vote. Friends and votes are sample data'
           )
-        : note('Friends are sample data.')}
+        : note('Friends are sample data')}
       {!booked ? (
         <div className="bottom-stack" style={{ alignItems: 'stretch' }}>
           <Button

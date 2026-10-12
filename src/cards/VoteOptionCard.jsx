@@ -38,7 +38,7 @@ export function VoteOptionCard(p) {
         <i style={{ width: (names.length / p.groupSize) * 100 + '%' }} />
       </div>
       <div className="rowc between">
-        <CrowdMeter level={v.crowd} compact />
+        <CrowdMeter booked={v.booked} cap={v.cap} level={v.crowd} compact />
         {names.length ? (
           <span key={names.join()} className="votes fade-up">
             {names.join(', ')}

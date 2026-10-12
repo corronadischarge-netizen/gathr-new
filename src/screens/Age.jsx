@@ -13,7 +13,7 @@ export function Age(p) {
         {i3('pass', 88, 'head-ic bob')}
         <h1 className="g-display disp">How old are you?</h1>
         <p className="body muted" style={{ marginTop: '10px' }}>
-          Every door in Pune checks ID, so we only show nights that will let you in.
+          Every door in Pune checks ID, so we only show nights that will let you in
         </p>
       </div>
       <div className="col age-list" style={{ gap: '8px' }} role="radiogroup" aria-label="Age">

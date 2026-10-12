@@ -3,7 +3,7 @@ import { HostBar } from '../components/HostBar';
 import { orgVenuesLabel } from '../data/organisers';
 import { Badge } from '../design-system';
 import { OrgIntro } from './OrgIntro';
-import { eyebrow, icon, meta, stop } from '../ui/helpers';
+import { eyebrow, icon, meta, nameTitle } from '../ui/helpers';
 
 /* Profile: who you host as, and the way back to going out */
 export function HostProfile(p) {
@@ -20,12 +20,12 @@ export function HostProfile(p) {
           { venue: 'Venue', promoter: 'Promoter', collective: 'Collective' }[pr.type] +
             (where ? ' · ' + where : '')
         )}
-        {stop(pr.name.toLowerCase())}
+        {nameTitle(pr.name)}
         <div className="rowc" style={{ gap: '8px' }}>
           {pr.status === 'verified' ? (
             <Badge tone="go">Verified</Badge>
           ) : (
-            <Badge tone="now">Verification pending</Badge>
+            <Badge tone="neutral">Verification pending</Badge>
           )}
           {meta('@' + pr.insta)}
         </div>
@@ -66,7 +66,7 @@ export function HostProfile(p) {
       <div className="ev-card col" style={{ gap: '6px' }}>
         <span className="title15">Door staff</span>
         {meta(
-          'Invite bouncers to scan passes from their own phones, with no access to money or editing. Turns on once door check-ins sync online.'
+          'Invite bouncers to scan passes from their own phones, with no access to money or editing. Turns on once door check-ins sync online'
         )}
       </div>
     </div>

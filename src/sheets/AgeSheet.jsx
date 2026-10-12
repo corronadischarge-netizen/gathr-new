@@ -18,8 +18,8 @@ export function AgeSheet(p) {
       title={blocked ? 'This night is 21+' : 'How old are you?'}
       subtitle={
         blocked
-          ? 'Pune doors check ID, so we’ll only show you nights that let you in.'
-          : e.title + ' is ' + e.age + '+. Every Pune door checks ID. We ask once and remember.'
+          ? 'Pune doors check ID, so we’ll only show you nights that let you in'
+          : e.title + ' is ' + e.age + '+. Every Pune door checks ID. We ask once and remember'
       }
       onClose={close}
     >
@@ -72,7 +72,7 @@ export function AgeSheet(p) {
           </Button>
         </div>
       ) : null}
-      {note('We never show your age to venues or friends.')}
+      {note('We never show your age to venues or friends')}
     </Sheet>
   );
 }

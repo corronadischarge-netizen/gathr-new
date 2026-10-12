@@ -44,7 +44,7 @@ export function BookSheet(p) {
   const [party, setParty] = useState({ couples: 1, stags: 0, girls: 0 });
   var partyErr =
     e.stag === 'groups' && party.stags > 0 && !party.couples && !party.girls
-      ? 'This night is couples and mixed groups only. Add a couple or a girl.'
+      ? 'This night is couples and mixed groups only. Add a couple or a girl'
       : null;
   /* Guest list: free entry for people the host or a promoter added by name. No requests: you pick whose
      list you're on, and you're either on it (free passes for you and your named plus-ones) or told to ask. */
@@ -151,7 +151,7 @@ export function BookSheet(p) {
           err:
             sayError(err) +
             (payId && !/^demo_/.test(payId)
-              ? ' Your payment reference is ' + payId + '; we’ll refund it.'
+              ? ' Your payment reference is ' + payId + '; we’ll refund it'
               : '')
         });
         c.set({ busy: null });
@@ -177,7 +177,7 @@ export function BookSheet(p) {
         finish(r.id);
       },
       (err) => {
-        pay.send('FAIL', { err: err.message || 'The payment didn’t go through. You haven’t been charged.' });
+        pay.send('FAIL', { err: err.message || 'The payment didn’t go through. You haven’t been charged' });
         c.set({ busy: null });
         haptic.error();
       }
@@ -223,7 +223,7 @@ export function BookSheet(p) {
           {!S.signedIn ? (
             <div className="col" style={{ gap: '8px' }}>
               <span className="title15">Sign in to check the list</span>
-              {meta('Use the email the host or promoter added you with.')}
+              {meta('Use the email the host or promoter added you with')}
               <AuthForm
                 ctx={c}
                 id="gl"
@@ -233,7 +233,7 @@ export function BookSheet(p) {
               />
             </div>
           ) : !chosen ? (
-            meta('Pick whose list you’re on.')
+            meta('Pick whose list you’re on')
           ) : entry ? (
             <div className="g-card card col" style={{ gap: '6px', padding: '16px 18px' }}>
               <span className="title16">{'You’re on ' + poss(chosenList.owner) + ' list'}</span>

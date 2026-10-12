@@ -19,12 +19,24 @@ export function textOn(hue) {
   return DARK_ON[hue] ? 'var(--night-900)' : 'var(--white)';
 }
 
+/* Booked so far: bookings on gathr against a cap verified by gathr. About people, never the vibe */
 export const CROWD = {
-  quiet: { n: 1, label: 'Quiet', line: 'Easy to get a table' },
-  warming: { n: 2, label: 'Warming up', line: 'Filling up nicely' },
-  buzzing: { n: 3, label: 'Buzzing', line: 'Good energy, short wait' },
-  packed: { n: 4, label: 'Packed', line: 'Shoulder to shoulder' },
-  full: { n: 5, label: 'At capacity', line: 'Door is holding' }
+  quiet: { n: 1, label: 'Early', line: 'Few booked yet. Plenty of room' },
+  warming: { n: 2, label: 'Filling up', line: 'Easy to get in' },
+  buzzing: { n: 3, label: 'Buzzing', line: 'Good crowd. Short wait at the door' },
+  packed: { n: 4, label: 'Packed', line: 'Peak night. Expect a queue' },
+  full: { n: 5, label: 'Full', line: 'Sold out. Only list and pass holders get in' }
 };
 
 export const LEVELS = ['quiet', 'warming', 'buzzing', 'packed', 'full'];
+
+/* the level from the share of the cap booked; null when there's no cap (walk-in venues) */
+export function crowdLevel(booked, cap) {
+  if (!cap) return null;
+  var r = (booked || 0) / cap;
+  return r >= 1 ? 'full' : r >= 0.85 ? 'packed' : r >= 0.6 ? 'buzzing' : r >= 0.25 ? 'warming' : 'quiet';
+}
+
+export function fmtNum(n) {
+  return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+}

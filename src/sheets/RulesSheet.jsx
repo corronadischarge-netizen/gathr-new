@@ -1,4 +1,4 @@
-import { blockedFor, priceTxt, srcName } from '../data/format';
+import { blockedFor, bookLabel, priceTxt, srcName } from '../data/format';
 import { stagTxt } from '../data/organisers';
 import { Badge, Button, Sheet } from '../design-system';
 import { Share } from '../services/share';
@@ -16,7 +16,7 @@ export function RulesSheet(p) {
       'user',
       'Age',
       e.allAges
-        ? 'Open to all ages.'
+        ? 'Open to all ages'
         : e.age
           ? e.age + '+ to enter.' + (e.age >= 21 ? ' Spirits 25+ by law.' : '')
           : null
@@ -29,8 +29,8 @@ export function RulesSheet(p) {
       'clock',
       'Hours',
       e.end
-        ? e.time + ' till ' + e.end + '. Pune bars close at 1:30 am.'
-        : 'Starts ' + e.time + '. Pune bars close at 1:30 am.'
+        ? e.time + ' till ' + e.end + '. Pune bars close at 1:30 am'
+        : 'Starts ' + e.time + '. Pune bars close at 1:30 am'
     ]
   ];
   if (e.noReentry) rows.push(['x', 'Re-entry', 'Not allowed once you exit']);
@@ -73,7 +73,7 @@ export function RulesSheet(p) {
       </div>
       {!blocked ? (
         <Button variant="primary" size="lg" block onClick={() => c.book()}>
-          {e.rsvp ? 'RSVP' : e.src === 'district' ? 'Get tickets' : 'Get on the list'}
+          {bookLabel(e)}
         </Button>
       ) : null}
       <Button

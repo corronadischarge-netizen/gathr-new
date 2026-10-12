@@ -9,7 +9,7 @@ export function TuneWeekCard(p) {
       {i3('headphones', 52)}
       <div className="col" style={{ gap: '2px', flexGrow: 1 }}>
         <span className="title15">Tune your week</span>
-        {meta('Pick your sounds. 20 seconds.')}
+        {meta('Pick your sounds. 20 seconds')}
       </div>
       {icon('chevron-right')}
     </Tap>

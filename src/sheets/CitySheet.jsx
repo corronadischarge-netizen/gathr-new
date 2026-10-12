@@ -33,19 +33,19 @@ export function CitySheet(p) {
     <Sheet title="Your city" subtitle="gathr is in Pune for now" onClose={() => c.set({ sheet: null })}>
       <div className="col">
         <div className="rowc list-row city-row" style={{ gap: '12px' }}>
-          <span className="city-ic on">{icon('map-pin', 18)}</span>
+          <span className="city-ic on">{icon('map-pin', 20)}</span>
           <span className="title15" style={{ flexGrow: 1 }}>
             Pune
           </span>
           <span className="city-tick" aria-label="Your city">
-            {svgIcon(['M5 12.5l4.5 4.5L19 7'], 18)}
+            {svgIcon(['M5 12.5l4.5 4.5L19 7'], 20)}
           </span>
         </div>
         {NEXT_CITIES.map((x) => {
           var done = asked.indexOf(x[0]) >= 0;
           return (
             <div key={x[0]} className="rowc list-row city-row" style={{ gap: '12px' }}>
-              <span className="city-ic">{icon('map-pin', 18)}</span>
+              <span className="city-ic">{icon('map-pin', 20)}</span>
               <div className="col" style={{ gap: '2px', flexGrow: 1, minWidth: 0 }}>
                 <span className="title15">{x[1]}</span>
                 {meta('Coming soon')}
@@ -56,14 +56,14 @@ export function CitySheet(p) {
                 disabled={done}
                 onClick={() => tell(x[0], x[1])}
               >
-                {done ? svgIcon(['M5 12.5l4.5 4.5L19 7'], 14) : null}
+                {done ? svgIcon(['M5 12.5l4.5 4.5L19 7'], 16) : null}
                 {done ? 'We’ll tell you' : 'Tell me when'}
               </button>
             </div>
           );
         })}
       </div>
-      {note('We only use this to tell you when gathr opens there.')}
+      {note('We only use this to tell you when gathr opens there')}
     </Sheet>
   );
 }

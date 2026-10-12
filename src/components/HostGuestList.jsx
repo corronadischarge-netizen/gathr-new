@@ -48,8 +48,8 @@ export function HostGuestList(p) {
         </h2>
         {meta(
           remoteOn
-            ? 'Guest lists are for nights you list on gathr. This one is listed from another site.'
-            : 'Guest lists work once gathr is online and you’re signed in.'
+            ? 'Guest lists are for nights you list on gathr. This one is listed from another site'
+            : 'Guest lists work once gathr is online and you’re signed in'
         )}
       </section>
     );
@@ -77,7 +77,7 @@ export function HostGuestList(p) {
                   e.time +
                   '. Free entry' +
                   (g.plusOnes.length ? ' for you + ' + g.plusOnes.length : '') +
-                  '. Give your name at the door.'
+                  '. Give your name at the door'
               )
           });
         else c.toast(first + (g.email ? ' is on your list. They’ll see it in gathr' : ' is on your list'));
@@ -195,7 +195,7 @@ export function HostGuestList(p) {
         </div>
         {!people ? meta('Loading your guest list…') : null}
         {people && !mine.length && !adding
-          ? meta('Free entry for people you invite: by email, phone, or just their name.')
+          ? meta('Free entry for people you invite: by email, phone, or just their name')
           : null}
         {mine.length ? <div className="col">{mine.map((x) => row(x, true))}</div> : null}
         {adding ? (
@@ -213,9 +213,9 @@ export function HostGuestList(p) {
           </h2>
           {promos.length ? meta(promos.length + (promos.length === 1 ? ' list' : ' lists')) : null}
         </div>
-        {lists === false ? meta('Promoter invites need the latest gathr database update.') : null}
+        {lists === false ? meta('Promoter invites need the latest gathr database update') : null}
         {lists && !promos.length && !inviting
-          ? meta('Send a promoter an invite on WhatsApp or anywhere. They add their own people; you see who came.')
+          ? meta('Send a promoter an invite on WhatsApp or anywhere. They add their own people; you see who came')
           : null}
         {promos.map((l) => {
           var more = open === l.listId,
@@ -296,7 +296,7 @@ export function HostGuestList(p) {
               />
             </div>
             {note(
-              'You’ll send it on WhatsApp or anywhere. The first person to accept gets the list. Each guest counts with their plus-ones.'
+              'You’ll send it on WhatsApp or anywhere. The first person to accept gets the list. Each guest counts with their plus-ones'
             )}
             <div className="btn-pair">
               <Button variant="subtle" block onClick={() => setInviting(null)}>

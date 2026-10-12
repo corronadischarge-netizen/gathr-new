@@ -17,7 +17,7 @@ export const Sms = (() => {
   return {
     on: !!on,
     send: (phone10) => {
-      if (!on) return Promise.reject(new Error('SMS codes are switched off.'));
+      if (!on) return Promise.reject(new Error('SMS codes are switched off'));
       return fb()
         .then((auth) => {
           var holder =
@@ -31,7 +31,7 @@ export const Sms = (() => {
         });
     },
     verify: (code) => {
-      if (!conf) return Promise.reject(new Error('Send a code first.'));
+      if (!conf) return Promise.reject(new Error('Send a code first'));
       return conf.confirm(code).then(() => {
         conf = null;
         return true;
