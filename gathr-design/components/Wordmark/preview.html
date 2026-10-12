@@ -1,0 +1,12 @@
+<!-- @dsCard group="Brand" height=150 -->
+<!doctype html>
+<html>
+<head><meta charset="utf-8"><title>Wordmark — preview</title></head>
+<body>
+<div id="root"></div>
+<script>
+  var G = window.Gathr, h = React.createElement;
+  ReactDOM.createRoot(document.getElementById('root')).render(h('div',{className:'g-stage',style:{gap:'40px'}},h(G.Wordmark,{size:72}),h(G.Wordmark,{size:36}),h(G.Wordmark,{size:20}),h('span',{style:{backgroundColor:'var(--yellow-300)',padding:'18px 26px',borderRadius:'var(--radius-lg)',display:'inline-flex'}},h(G.Wordmark,{size:40,tone:'dark'})),h('span',{style:{position:'relative',overflow:'hidden',padding:'18px 26px',borderRadius:'var(--radius-lg)',display:'inline-flex'}},h('div',{className:'g-media g-media-empty',style:{position:'absolute',inset:0}}),h(G.Wordmark,{size:40,tone:'light',style:{position:'relative'}}))));
+</script>
+</body>
+</html>

@@ -1,0 +1,12 @@
+<!-- @dsCard group="Data" height=300 -->
+<!doctype html>
+<html>
+<head><meta charset="utf-8"><title>DotGrid — preview</title></head>
+<body>
+<div id="root"></div>
+<script>
+  var G = window.Gathr, h = React.createElement;
+  ReactDOM.createRoot(document.getElementById('root')).render(h('div',{className:'g-stage',style:{gap:'48px'}},h(G.DotGrid,{value:85,label:'of your nights ended after 1 am',hue:'blue'}),h(G.DotGrid,{value:40,label:'of friends went to F Bar this month',hue:'pink'})));
+</script>
+</body>
+</html>

@@ -1,0 +1,321 @@
+/* gathr: generated from tokens.json (release 21, 12 Oct 2026). Do not edit by hand. */
+:root, [data-theme="night"] {
+  --yellow-100: #fdffdb; /* APP. Yellow = energy right now: live, and a buzzing room. Tint: text on transparent live badges; soft ground behind ink in day and print. */
+  --yellow-300: #fbff87; /* APP. Yellow = energy right now: live badges, the live dot, the logo full stop, the buzzing crowd level. Nothing else in the app is yellow (focus is white). Text on it is night-900 (16:1). Never as text in day (1.1:1). */
+  --yellow-500: #faff5c; /* EXPRESSION. Poster and social fields, the deep end of the yellow shine. Not for app UI. */
+  --red-100: #ffd9cf; /* APP. Limits. Tint: text on transparent limit badges; soft ground in day and print. */
+  --red-300: #f0483d; /* APP. Limits: sold out, at capacity, 21+, errors, the packed crowd levels. Text on it is night-900. */
+  --red-500: #e62f1f; /* EXPRESSION. Poster and social fields, the deep end of the red shine. Not for app UI. */
+  --pink-100: #ffd9ee; /* EXPRESSION. Pink tint (print grounds, the light end of the pink shine). Never in app UI. */
+  --pink-300: #f2409b; /* EXPRESSION. Vibe tags, The mirror pillar, poster accents, blooms. Night-900 text on it (4.9:1). Never in app UI. */
+  --pink-500: #e0157f; /* EXPRESSION. Poster and social fields, blooms, the deep end of the pink shine. Never in app UI. */
+  --violet-100: #ede6ff; /* APP. gathr's choice: selected, the one booking button, gathr pick. Tint: text on transparent brand badges; soft selected ground in day. */
+  --violet-300: #8b5cff; /* APP. Violet as text in night, and the light end of the violet shine. */
+  --violet-500: #531aff; /* APP. THE brand fill: selected chips and tiles, the tab pill, the one booking button per screen, gathr pick. White text on it. */
+  --green-100: #d2f5de; /* APP. Booked. Tint: text on transparent go badges; soft ground in day and print. */
+  --green-300: #3ecf7e; /* APP. Booked / on the list, and the warming-up crowd level (green reads as good in both). Night-900 text on it. */
+  --green-500: #16b860; /* EXPRESSION. Poster fields, the deep end of the green shine. Not for app UI. */
+  --blue-100: #cde7fa; /* EXPRESSION. Blue tint (print grounds). Never in app UI. */
+  --blue-300: #2e8fe0; /* EXPRESSION. Blooms (comedown), recap art, the light end of the blue shine. Never in app UI. */
+  --blue-500: #0b6fc4; /* EXPRESSION. Blooms and recap fields; white text on it (5.1:1). Never in app UI. */
+  --night-950: #0a0a0a; /* Neutral (from the onboarding screen). The night bg: near-black, neutral. Aurora glows and glass sit on it. */
+  --night-900: #1c1c1c; /* Neutral (from the palette sheet card). Night surface; also THE dark ink on every -300 fill and on day grounds. */
+  --night-800: #262524; /* Neutral (added). Raised surfaces in night: sheets, menus, pressed rows. */
+  --night-700: #363430; /* Neutral (added). Hairlines in night. */
+  --night-600: #6b6761; /* Neutral (added). Strong borders (inputs) in night — 3.0:1 on surface; faint text in day (5.1–5.6:1). Never for text: lines and disabled marks only (3:1 on bg). */
+  --night-500: #9d9992; /* ink-faint in night. Lightened so it reads at 4.5:1+ on bg, surface and surface-raised (5.4:1 on the darkest raised surface). */
+  --night-300: #b5b1aa; /* Neutral (added). Muted text in night (8–8.8:1). */
+  --night-50: #f7f5f0; /* Neutral (added). Warm white — primary text in night (15.6:1 on surface). */
+  --paper: #f5f4f0; /* Neutral (added). Day bg: web pages in light mode, print stock simulation. */
+  --white: #ffffff; /* Neutral. Day surface; label colour on violet-500 and blue-500 fills. */
+  --bg: var(--night-950); /* Page / app background. */
+  --surface: var(--night-900); /* Cards, list rows, tab bar. */
+  --surface-raised: var(--night-800); /* Sheets, menus, anything above a card. Day relies on shadow-float. */
+  --line: var(--night-700); /* Hairline dividers and card edges (decorative, not meaningful). */
+  --line-strong: var(--night-600); /* Input and secondary-button borders: 3:1+ on surface and bg in both themes. */
+  --ink: var(--night-50); /* Primary text on bg, surface, surface-raised and glass (14:1+). Also the PRIMARY button fill (white pill in night, as on the onboarding "Next"). */
+  --ink-muted: var(--night-300); /* Secondary text: metadata, supporting lines — on bg, surface, surface-raised (5:1+). */
+  --ink-faint: var(--night-500); /* Tertiary text (timestamps, counters) on bg and surface only; night 4.5:1 fails on surface-raised — use ink-muted there. */
+  --on-fill: var(--night-900); /* Text/icons on every -300 fill (yellow, green, blue, pink, red) in both themes. */
+  --brand: var(--violet-500); /* The Gathr light (violet-500): brand buttons ("Get on the list"), selected chips, the active tab disc, the selected map pin. Max one brand-filled button per screen. */
+  --on-brand: var(--white); /* Text and icons on brand (7.1:1). */
+  --on-ink: var(--night-950); /* Label on the primary (ink-filled) button: black on the white pill in night, white on the dark pill in day (18:1). */
+  --brand-text: var(--violet-100); /* Brand-coloured text and links. Violet-100 in night (14:1 on surface); violet-300 failed on cards (4.1:1). Use rarely: most links are ink. */
+  --brand-soft: #531aff33; /* Selected row / hovered chip ground; text on it is ink. */
+  --now: var(--yellow-300); /* APP. Energy right now: LIVE badges and the live dot. Shares yellow-300 with the full stop and the buzzing crowd level; nothing else in the app is yellow. */
+  --go: var(--green-300); /* Booked, confirmed, entry open, and host mode. A signal, never decoration. */
+  --limit: var(--red-300); /* At capacity, sold out, age limits, errors. A signal, never decoration. */
+  --limit-text: var(--red-300); /* Error and sold-out words. Day theme uses ink + the red fill/icon, because red on light fails 4.5:1. */
+  --go-text: var(--green-300); /* Success words. Day theme uses ink + the green fill/icon (green on light is 2.4:1). */
+  --focus: var(--night-50); /* APP. Keyboard focus ring: warm white in night, near-black in day. Never yellow, so focus is never mistaken for live. */
+  --glass-fill: #ffffff14; /* Frosted glass over bg or aurora: floating tab bar, top bar, round icon buttons. Pair with blur-lg. Text on it: ink, ink-muted. */
+  --glass-fill-strong: #1c1c1cb8; /* Heavier glass for sheets over the map and dialogs, where long text sits. Pair with blur-lg. */
+  --glass-scrim: #0a0a0a99; /* Dark glass OVER PHOTOS, both themes: tags, save button, crowd pill on a venue photo. 60% keeps white text at 5.2:1 even over a white photo. Only white (night-50) text on it, 13px semibold+. */
+  --glass-tonal: #ffffff38; /* Tonal glass ON COLOUR FILLS (a -300 or violet card): the "Play"-style button. Text keeps the fill's own text colour (on-fill or on-brand; 4.9:1+). */
+  --glass-edge: #ffffff1f; /* 1px inner edge on every glass surface — the highlight that makes glass read as glass. Decorative. */
+  --depth-light: #ffffff12; /* The top-lit highlight every solid surface carries (a radial glow from the top-left) so no fill is ever flat. */
+  --depth-shade: #00000073; /* The matching shade at the bottom-right of every solid surface. Together with depth-light and grain it gives fills their depth. */
+  --logo-dot: var(--yellow-300); /* The full stop after the r in the wordmark: yellow on dark grounds, violet on light grounds (yellow on paper is 1.1:1). */
+  --crowd-quiet: var(--night-500); /* Early (under 25% of the verified cap booked): grey. About bookings, never the vibe. */
+  --crowd-warming: var(--green-300); /* Filling up (25–59% booked): green, easy to get in. */
+  --crowd-buzzing: var(--yellow-300); /* Buzzing (60–84% booked): yellow, energy right now. */
+  --crowd-packed: var(--yellow-300); /* Packed (85–99% booked): yellow. The high point of the night, not a warning. */
+  --crowd-full: var(--red-300); /* Full (sold out): red, the only real limit. Only list and pass holders get in. */
+  --shadow-card: inset 0 1px 0 #ffffff0f; /* Solid cards at rest. */
+  --shadow-glass: inset 0 1px 0 #ffffff26, inset 0 0 0 1px #ffffff14, 0 12px 32px #00000080; /* Every glass surface: the top highlight, the hairline edge and a soft drop. */
+  --shadow-float: 0 12px 32px #000000b3; /* Solid floating layers: menus, toasts. */
+  --focus-ring: 0 0 0 2px #0a0a0a, 0 0 0 4px #f7f5f0; /* Keyboard focus: 2px ground gap, then 2px solid focus colour. */
+}
+[data-theme="day"] {
+  --bg: var(--paper);
+  --surface: var(--white);
+  --surface-raised: var(--white);
+  --line: #e3e1db;
+  --line-strong: var(--night-500);
+  --ink: var(--night-900);
+  --ink-muted: var(--night-600);
+  --ink-faint: var(--night-600);
+  --on-ink: var(--white);
+  --brand-text: var(--violet-500);
+  --brand-soft: var(--violet-100);
+  --limit-text: var(--night-900);
+  --go-text: var(--night-900);
+  --focus: var(--night-950);
+  --glass-fill: #ffffffb3;
+  --glass-fill-strong: #ffffffd9;
+  --glass-edge: #ffffff99;
+  --depth-light: #ffffffb3;
+  --depth-shade: #1c1c1c14;
+  --logo-dot: var(--violet-500);
+  --shadow-card: 0 1px 2px #1c1c1c14, 0 2px 8px #1c1c1c0f;
+  --shadow-glass: inset 0 1px 0 #ffffffcc, inset 0 0 0 1px #ffffff99, 0 12px 32px #1c1c1c1f;
+  --shadow-float: 0 12px 32px #1c1c1c29;
+  --focus-ring: 0 0 0 2px #f5f4f0, 0 0 0 4px #0a0a0a;
+}
+:root {
+  --space-1: 4px; /* Icon-to-label, dot-to-word. */
+  --space-2: 8px; /* Between chips; inside badges. */
+  --space-3: 12px; /* Inside a group (8–14px): lines in a card, list row padding. */
+  --space-4: 16px; /* App side gutter; card padding. */
+  --space-5: 20px; /* Sheet padding. */
+  --space-6: 24px; /* Between cards / groups. */
+  --space-8: 32px; /* Between sections: 32px minimum. */
+  --space-11: 44px; /* Between sections: 44px maximum on feeds. */
+  --space-12: 48px; /* Web section inner spacing. */
+  --space-16: 64px; /* Social/print safe margin at 1080px; web section breaks. */
+  --space-24: 96px; /* Landing page section breaks on desktop. */
+  --radius-xs: 6px; /* Crowd-meter segments, tiny tags. */
+  --radius-sm: 10px; /* Inputs inside sheets, small thumbnails. */
+  --radius-md: 16px; /* Row thumbnails, collage photos (with a 3px white edge), search field. */
+  --radius-lg: 24px; /* Venue and event cards, rank cards. */
+  --radius-xl: 32px; /* Feature cards, sheets (top corners), social story frames, phone-shaped canvases. */
+  --radius-full: 9999px; /* Buttons, chips, badges, tab bar, vibe tags, icon buttons, avatars. */
+  --tap-min: 44px; /* Minimum hit area for anything tappable. */
+  --button-md: 44px; /* Default button height. */
+  --icon-sm: 16px; /* Icons inside body-sm lines and badges. */
+  --icon-md: 20px; /* Icons in buttons and rows. */
+  --icon-lg: 24px; /* Tab bar and header icons. */
+  --stroke-icon: 1.75px; /* Lucide stroke width at every size. */
+  --tabbar-h: 68px; /* Floating glass tab bar height (it floats space-4 above the safe area). */
+  --icon-button: 48px; /* Round icon buttons (search, save, back) — solid or glass. */
+  --cta-h: 60px; /* Full-width bottom CTA pill on onboarding and detail screens. */
+  --bp-phone: 390px; /* App design width; web base. */
+  --bp-tablet: 768px; /* Web: two-column venue grid. */
+  --bp-desktop: 1200px; /* Web: max content width 1200, three-column grid. */
+  --blur-sm: 12px; /* Glass chips and tags over photos. */
+  --blur-lg: 28px; /* Tab bar, top bar, sheets, icon buttons. */
+  --blur-bloom: 60px; /* Soft edge of CSS bloom layers. */
+  --opacity-disabled: 0.4; /* Disabled controls. */
+  --opacity-ghost-numeral: 0.35; /* The giant tinted numeral behind a RankCard's content. */
+  --opacity-grain: 0.22; /* The grain film over blooms and solid fills. */
+  --dur-fast: 120ms; /* Presses. */
+  --dur-base: 200ms; /* Chips, tabs. */
+  --dur-slow: 320ms; /* Sheets, cards entering. */
+  --dur-screen: 360ms; /* Screens slide in on forward and back; tabs cross-fade. */
+  --bob: 3200ms; /* 3D stickers bob gently (±4px). The only looping motion; decorative. */
+  --font-display: "Plus Jakarta Sans", "DM Sans", system-ui, sans-serif;
+  --font-sans: "DM Sans", system-ui, "Segoe UI", sans-serif;
+  --text-poster: 700 144px/0.95 var(--font-display); /* Posters and social covers on a 1080 canvas. */
+  --text-hero: 700 64px/1 var(--font-display); /* Web hero, social headlines, venue hero name. */
+  --text-display: 700 32px/1.08 var(--font-display); /* The one screen headline ("this week in pune."). Plus Jakarta Sans 700. One per screen, and the only text above 22px in the app. */
+  --text-title: 600 20px/1.2 var(--font-display); /* Sheet titles; the one name on a big media card (VenueCard, FeatureCard). */
+  --text-section: 600 16px/1.3 var(--font-display); /* Page-level headings ("Near you", "Listed nights"), Plus Jakarta Sans 600, sentence case. */
+  --text-numeral: 300 96px/0.9 var(--font-sans); /* Rank numbers, big stats, countdowns. Light weight so size does the shouting. */
+  --text-eyebrow: 500 13px/18px var(--font-sans); /* Small context line directly above a screen or section headline, in ink-muted. It complements the headline and never competes: at most a third of its size. */
+  --text-accent: 300 16px/28px var(--font-sans); /* Expression zone only (onboarding, social, posters): the light lead-in above a big headline. No italics anywhere. In the app use eyebrow instead. */
+  --text-lead: 300 20px/28px var(--font-sans); /* Intro lines under a display headline; landing paragraphs. */
+  --text-headline: 600 15px/20px var(--font-sans); /* Names of things (friends, nights, venues, settings rows, update titles) and every heading inside a card. DM Sans 600. Organiser event names keep their own spelling, with no gathr full stop. */
+  --text-body: 400 15px/22px var(--font-sans); /* Default app text. */
+  --text-body-light: 300 15px/20px var(--font-sans); /* Single-line tips beside an icon, e.g. VenueHero "Before you go". DM Sans 300. */
+  --text-body-sm: 400 13px/18px var(--font-sans); /* Meta: times, areas, prices and counts in ink-muted; tabular figures. */
+  --text-label: 600 16px/20px var(--font-sans); /* Buttons 16px 600, starting with a verb; chips, small buttons and nav links 15px; tags, map pins and captions 13px. */
+  --text-caps: 600 11px/14px var(--font-sans); /* Labels: 11px 600, all caps, +4% tracking. Badges, day tags. */
+}
+.poster {
+  font-family: var(--font-display);
+  font-size: 144px;
+  line-height: 0.95;
+  font-weight: 700;
+  letter-spacing: -0.04em;
+}
+.hero {
+  font-family: var(--font-display);
+  font-size: 64px;
+  line-height: 1;
+  font-weight: 700;
+  letter-spacing: -0.04em;
+}
+.display {
+  font-family: var(--font-display);
+  font-size: 32px;
+  line-height: 1.08;
+  font-weight: 700;
+  letter-spacing: -0.04em;
+}
+.title {
+  font-family: var(--font-display);
+  font-size: 20px;
+  line-height: 1.2;
+  font-weight: 600;
+  letter-spacing: -0.04em;
+}
+.section {
+  font-family: var(--font-display);
+  font-size: 16px;
+  line-height: 1.3;
+  font-weight: 600;
+  letter-spacing: -0.03em;
+}
+.numeral {
+  font-family: var(--font-sans);
+  font-size: 96px;
+  line-height: 0.9;
+  font-weight: 300;
+  letter-spacing: -0.02em;
+}
+.eyebrow {
+  font-family: var(--font-sans);
+  font-size: 13px;
+  line-height: 18px;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+}
+.accent {
+  font-family: var(--font-sans);
+  font-size: 16px;
+  line-height: 28px;
+  font-weight: 300;
+  letter-spacing: -0.03em;
+}
+.lead {
+  font-family: var(--font-sans);
+  font-size: 20px;
+  line-height: 28px;
+  font-weight: 300;
+  letter-spacing: -0.02em;
+}
+.headline {
+  font-family: var(--font-sans);
+  font-size: 15px;
+  line-height: 20px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+.body {
+  font-family: var(--font-sans);
+  font-size: 15px;
+  line-height: 22px;
+  font-weight: 400;
+  letter-spacing: -0.02em;
+}
+.body-light {
+  font-family: var(--font-sans);
+  font-size: 15px;
+  line-height: 20px;
+  font-weight: 300;
+  letter-spacing: -0.02em;
+}
+.body-sm {
+  font-family: var(--font-sans);
+  font-size: 13px;
+  line-height: 18px;
+  font-weight: 400;
+  letter-spacing: -0.02em;
+}
+.label {
+  font-family: var(--font-sans);
+  font-size: 16px;
+  line-height: 20px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+.caps {
+  font-family: var(--font-sans);
+  font-size: 11px;
+  line-height: 14px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+}
+@font-face {
+  font-family: "Plus Jakarta Sans";
+  src: url("fonts/plus-jakarta-sans-latin-600-normal.woff2") format("woff2");
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Plus Jakarta Sans";
+  src: url("fonts/plus-jakarta-sans-latin-700-normal.woff2") format("woff2");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "DM Sans";
+  src: url("fonts/dm-sans-latin-300-normal.woff2") format("woff2");
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "DM Sans";
+  src: url("fonts/dm-sans-latin-400-normal.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "DM Sans";
+  src: url("fonts/dm-sans-latin-500-normal.woff2") format("woff2");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "DM Sans";
+  src: url("fonts/dm-sans-latin-600-normal.woff2") format("woff2");
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "DM Sans";
+  src: url("fonts/dm-sans-latin-700-normal.woff2") format("woff2");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "DM Sans";
+  src: url("fonts/dm-sans-latin-300-italic.woff2") format("woff2");
+  font-weight: 300;
+  font-style: italic;
+  font-display: swap;
+}
+@font-face {
+  font-family: "DM Sans";
+  src: url("fonts/dm-sans-latin-400-italic.woff2") format("woff2");
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+}

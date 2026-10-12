@@ -1,0 +1,23 @@
+<!-- @dsCard group="Screens" height=560 page -->
+<!doctype html>
+<html>
+<head><meta charset="utf-8"><title>ImageSpec — preview</title></head>
+<body>
+<div id="root"></div>
+<script>
+  var G = window.Gathr, h = React.createElement;
+  ReactDOM.createRoot(document.getElementById('root')).render(h('div',{className:'g-stage g-night',style:{gap:'40px',alignItems:'flex-start',padding:'24px',borderRadius:'var(--radius-lg)'}},
+ h('div',{style:{position:'relative',width:'288px',height:'360px',borderRadius:'24px',overflow:'hidden',background:'var(--night-800)',boxShadow:'inset 0 0 0 1px #ffffff1f',flex:'none'}},
+  h('div',{style:{position:'absolute',left:0,right:0,top:0,height:'56px',background:'repeating-linear-gradient(135deg,#fbff8714 0 8px,transparent 8px 16px)',borderBottom:'1px dashed #fbff8766'}},h('span',{style:{position:'absolute',left:'12px',top:'18px',fontSize:'11px',color:'var(--yellow-300)',fontWeight:600}},'Badge zone: keep it calm')),
+  h('div',{style:{position:'absolute',left:'40px',right:'40px',top:'72px',height:'96px',border:'1.5px dashed #f7f5f099',borderRadius:'12px',display:'grid',placeItems:'center'}},h('span',{style:{fontSize:'12px',color:'var(--night-50)',fontWeight:600}},'Subject / focal point')),
+  h('div',{style:{position:'absolute',left:0,right:0,bottom:0,height:'60%',background:'linear-gradient(180deg,transparent,#0a0a0ad9 55%,var(--night-950))'}}),
+  h('div',{style:{position:'absolute',left:0,right:0,bottom:0,height:'40%',borderTop:'1px dashed #f2409b99',padding:'12px',boxSizing:'border-box',display:'flex',flexDirection:'column',justifyContent:'flex-end',gap:'6px'}},
+   h('span',{style:{fontSize:'11px',color:'var(--ink)',fontWeight:600}},'Fade zone: gathr type + CTA go here'),
+   h('span',{style:{fontSize:'11px',color:'var(--night-300)'}},'No faces, logos, text or QR codes'))),
+ h('div',{style:{display:'flex',flexDirection:'column',gap:'14px',maxWidth:'420px'}},
+  h('span',{className:'g-eyebrow'},'For organisers'),
+  h('h3',{className:'g-display',style:{margin:0,fontSize:'24px',fontWeight:700}},'event image spec',h('span',{style:{color:'var(--yellow-300)'}},'.')),
+  ['4:5 portrait, at least 1080 × 1350 px, JPG or PNG under 2 MB.','Put the subject in the upper half. The bottom 40% sits under gathr’s fade, title and button.','Use your own art: flyer visuals, artist press shots or venue photos. Keep your colours and style.','No text, logos, prices or QR codes in the image. The title and details come from your event listing.','Text-heavy flyers still go on the event page, shown uncropped as the Poster.','gathr adds the same touch to everyone: crop, grain, fade into black and rounded corners.'].map(function(t,i){return h('div',{key:i,style:{display:'flex',gap:'10px',fontSize:'14px',lineHeight:'20px',color:'var(--ink)'}},h('span',{style:{color:'var(--yellow-300)',fontWeight:700}},'•'),h('span',null,t))}))));
+</script>
+</body>
+</html>

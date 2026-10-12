@@ -1,0 +1,12 @@
+<!-- @dsCard group="Data" height=260 -->
+<!doctype html>
+<html>
+<head><meta charset="utf-8"><title>StatBubbles — preview</title></head>
+<body>
+<div id="root"></div>
+<script>
+  var G = window.Gathr, h = React.createElement;
+  ReactDOM.createRoot(document.getElementById('root')).render(h('div',{className:'g-stage'},h(G.StatBubbles,{size:200,items:[{value:12,display:'12',label:'nights out',hue:'violet'},{value:5,display:'5',label:'new venues',hue:'pink'},{value:3,display:'3',label:'sunrises',hue:'yellow'}]})));
+</script>
+</body>
+</html>

@@ -1,0 +1,656 @@
+{
+  "v": 3,
+  "assetGroups": {
+    "Gradients": {
+      "files": {
+        "gradient-comedown.jpg": {
+          "blob": "e077a645c5818d10a21349b2e9594fcb",
+          "name": "gradient-comedown.jpg",
+          "size": 333924,
+          "type": "image/jpeg"
+        },
+        "gradient-peak.jpg": {
+          "blob": "664dbfc59fc9c85dec9a1f91cae3daed",
+          "name": "gradient-peak.jpg",
+          "size": 349606,
+          "type": "image/jpeg"
+        },
+        "gradient-sundowner.jpg": {
+          "blob": "4b3bcd0f40caa44a18a919eb1f1dafa9",
+          "name": "gradient-sundowner.jpg",
+          "size": 334054,
+          "type": "image/jpeg"
+        },
+        "gradient-uv.jpg": {
+          "blob": "ca577597acfe77961ea0b6b80f0d4e6e",
+          "name": "gradient-uv.jpg",
+          "size": 344023,
+          "type": "image/jpeg"
+        },
+        "heat-bloom-study.jpg": {
+          "blob": "bb5e946193b529a2edcba56e5225e949",
+          "name": "heat-bloom-study.jpg",
+          "size": 973077,
+          "type": "image/jpeg"
+        }
+      },
+      "name": "Gradients",
+      "order": [
+        "gradient-peak.jpg",
+        "gradient-uv.jpg",
+        "gradient-sundowner.jpg",
+        "gradient-comedown.jpg",
+        "heat-bloom-study.jpg"
+      ],
+      "tile": "l"
+    },
+    "Logos": {
+      "files": {
+        "gathr-wordmark-dark.svg": {
+          "blob": "e07ffb5fbdbb50f1ee02e0beb3e1bc2e",
+          "name": "gathr-wordmark-dark.svg",
+          "size": 2283,
+          "type": "image/svg+xml"
+        },
+        "gathr-wordmark-light.svg": {
+          "blob": "17728f51b84a9afd382b16da6625316d",
+          "name": "gathr-wordmark-light.svg",
+          "size": 2283,
+          "type": "image/svg+xml"
+        },
+        "gathr-wordmark-mono-white.svg": {
+          "blob": "3da3903ecc011669492e6ca6008603aa",
+          "name": "gathr-wordmark-mono-white.svg",
+          "size": 2283,
+          "type": "image/svg+xml"
+        }
+      },
+      "name": "Logos",
+      "order": [
+        "gathr-wordmark-light.svg",
+        "gathr-wordmark-dark.svg",
+        "gathr-wordmark-mono-white.svg"
+      ],
+      "tile": "l"
+    },
+    "Stickers": {
+      "files": {
+        "disco-ball.png": {
+          "blob": "26d9e4af5331412ddf848bf06d9e252c",
+          "name": "disco-ball.png",
+          "size": 92781,
+          "type": "image/png"
+        },
+        "headphones.png": {
+          "blob": "d4fec04ba11bdaf2f545e198a1695846",
+          "name": "headphones.png",
+          "size": 86591,
+          "type": "image/png"
+        },
+        "cocktail.png": {
+          "blob": "76d93b85ec03a19643fd28ac826ce18e",
+          "name": "cocktail.png",
+          "size": 66309,
+          "type": "image/png"
+        },
+        "champagne.png": {
+          "blob": "c86baeebf8e809754f3cf48a42ee5479",
+          "name": "champagne.png",
+          "size": 50484,
+          "type": "image/png"
+        },
+        "vinyl.png": {
+          "blob": "1fc1232ce07e6d2db40ff736d1abb0e0",
+          "name": "vinyl.png",
+          "size": 93902,
+          "type": "image/png"
+        },
+        "ticket.png": {
+          "blob": "912bc88376587c26f91ede067b5c320e",
+          "name": "ticket.png",
+          "size": 63368,
+          "type": "image/png"
+        },
+        "wristband.png": {
+          "blob": "fd2b7f86e9dfa198ebd6144221a86d0f",
+          "name": "wristband.png",
+          "size": 80013,
+          "type": "image/png"
+        },
+        "camera.png": {
+          "blob": "c325d705ef7e5536161a6af8ff83d8b7",
+          "name": "camera.png",
+          "size": 84123,
+          "type": "image/png"
+        },
+        "sunglasses.png": {
+          "blob": "09c4bc0e05cc308616bf4035a98ceff4",
+          "name": "sunglasses.png",
+          "size": 51605,
+          "type": "image/png"
+        },
+        "mic.png": {
+          "blob": "75ae476a2bb44bc7b8e25bccb0b72424",
+          "name": "mic.png",
+          "size": 65807,
+          "type": "image/png"
+        },
+        "speaker.png": {
+          "blob": "b0942b132dfa79d7a4c693e32cdd9939",
+          "name": "speaker.png",
+          "size": 107770,
+          "type": "image/png"
+        },
+        "shaker.png": {
+          "blob": "5693641258ae2fcf5bbd5c540cc01002",
+          "name": "shaker.png",
+          "size": 65976,
+          "type": "image/png"
+        },
+        "lighter.png": {
+          "blob": "cd3bd736e19a735782faf3475a5963ec",
+          "name": "lighter.png",
+          "size": 75036,
+          "type": "image/png"
+        },
+        "phone.png": {
+          "blob": "32824d00335d9b15e28ec3652d73f5dd",
+          "name": "phone.png",
+          "size": 81106,
+          "type": "image/png"
+        },
+        "lanyard-pass.png": {
+          "blob": "a4053598390d61de4e6354043163e89e",
+          "name": "lanyard-pass.png",
+          "size": 73003,
+          "type": "image/png"
+        },
+        "spotlight.png": {
+          "blob": "58aeed273ef37f00e4348e06e0401655",
+          "name": "spotlight.png",
+          "size": 93082,
+          "type": "image/png"
+        },
+        "after-hours.png": {
+          "blob": "387e585bb5df96b55435c32e15e1ae52",
+          "name": "after-hours.png",
+          "size": 45462,
+          "type": "image/png"
+        },
+        "ask-later-8-ball.png": {
+          "blob": "591d628344c1e86b138729efd03f253b",
+          "name": "ask-later-8-ball.png",
+          "size": 30637,
+          "type": "image/png"
+        },
+        "balloon-dog.png": {
+          "blob": "85bd814fabdec10c6e7485078e8a7e20",
+          "name": "balloon-dog.png",
+          "size": 51953,
+          "type": "image/png"
+        },
+        "boombox.png": {
+          "blob": "0b8f502a7ddd5d93701e5b89a4060199",
+          "name": "boombox.png",
+          "size": 58054,
+          "type": "image/png"
+        },
+        "bucket-hat.png": {
+          "blob": "0ff818cf2c9ed03ed79e052088c181d5",
+          "name": "bucket-hat.png",
+          "size": 45959,
+          "type": "image/png"
+        },
+        "camcorder.png": {
+          "blob": "a6ee00515974f98ed359e58ed6f4c353",
+          "name": "camcorder.png",
+          "size": 52907,
+          "type": "image/png"
+        },
+        "cash-stack.png": {
+          "blob": "079843b96ee15e3c41ff7f8f936d3e92",
+          "name": "cash-stack.png",
+          "size": 47564,
+          "type": "image/png"
+        },
+        "cassette.png": {
+          "blob": "a05236f7faf69d21e6def8447f727b9c",
+          "name": "cassette.png",
+          "size": 71127,
+          "type": "image/png"
+        },
+        "chill-bottle.png": {
+          "blob": "8c8edeffab51308d07cb9971d291c464",
+          "name": "chill-bottle.png",
+          "size": 43464,
+          "type": "image/png"
+        },
+        "club-member-keytag.png": {
+          "blob": "95f35a682cd0bb1d07f3270d489f32e4",
+          "name": "club-member-keytag.png",
+          "size": 46586,
+          "type": "image/png"
+        },
+        "club-neon-sign.png": {
+          "blob": "f57f854ad630a62982115dd41bcf4030",
+          "name": "club-neon-sign.png",
+          "size": 35709,
+          "type": "image/png"
+        },
+        "club-ticket.png": {
+          "blob": "ca766a6d7472d43dea52eff683343f1e",
+          "name": "club-ticket.png",
+          "size": 48385,
+          "type": "image/png"
+        },
+        "dance-repeat-can.png": {
+          "blob": "175e3d3fda306d4def1e5f6b4ba2f744",
+          "name": "dance-repeat-can.png",
+          "size": 38080,
+          "type": "image/png"
+        },
+        "disco-keychain.png": {
+          "blob": "8b1e4ccb6df5d3f377de6e013e9dd6ab",
+          "name": "disco-keychain.png",
+          "size": 58023,
+          "type": "image/png"
+        },
+        "donut-box.png": {
+          "blob": "fc05ab90f5ac36e54d8f787f45622bcf",
+          "name": "donut-box.png",
+          "size": 44932,
+          "type": "image/png"
+        },
+        "energy-can.png": {
+          "blob": "29e6a83ae984067e31fff69440a87ec2",
+          "name": "energy-can.png",
+          "size": 47480,
+          "type": "image/png"
+        },
+        "foil-bag.png": {
+          "blob": "b09491eebe8d52f97a95b9f4c5225e79",
+          "name": "foil-bag.png",
+          "size": 56194,
+          "type": "image/png"
+        },
+        "good-vibes-matches.png": {
+          "blob": "5daaceb6a0dc752987ad2f4fea187b05",
+          "name": "good-vibes-matches.png",
+          "size": 52144,
+          "type": "image/png"
+        },
+        "green-bottle.png": {
+          "blob": "cf3bdfa73cfb584654775ec9b994dd31",
+          "name": "green-bottle.png",
+          "size": 44039,
+          "type": "image/png"
+        },
+        "heart-lollipop.png": {
+          "blob": "828ac5e4d62d986e2503cae6de27e895",
+          "name": "heart-lollipop.png",
+          "size": 40616,
+          "type": "image/png"
+        },
+        "ice-bucket.png": {
+          "blob": "057e34a2ac33de96cd9cf2d1ce3cd772",
+          "name": "ice-bucket.png",
+          "size": 51994,
+          "type": "image/png"
+        },
+        "instant-camera.png": {
+          "blob": "b34edacfc2ac56012cc5e18639d01c32",
+          "name": "instant-camera.png",
+          "size": 52597,
+          "type": "image/png"
+        },
+        "late-night-fries.png": {
+          "blob": "4bb382184e54fc26c32179d149d7211a",
+          "name": "late-night-fries.png",
+          "size": 52768,
+          "type": "image/png"
+        },
+        "late-night-noodles.png": {
+          "blob": "e0fba8f3a91f87e75d70568bbeb80213",
+          "name": "late-night-noodles.png",
+          "size": 57140,
+          "type": "image/png"
+        },
+        "megaphone.png": {
+          "blob": "6c933b79af0f890eea710d34e0f6f5fd",
+          "name": "megaphone.png",
+          "size": 44784,
+          "type": "image/png"
+        },
+        "memories-camera.png": {
+          "blob": "dde50bf120545286e7cdbad7114cd244",
+          "name": "memories-camera.png",
+          "size": 61083,
+          "type": "image/png"
+        },
+        "neon-lighter.png": {
+          "blob": "a3ab204e81da05c8e448e11011c765b0",
+          "name": "neon-lighter.png",
+          "size": 42192,
+          "type": "image/png"
+        },
+        "night-mix-cds.png": {
+          "blob": "41d463f996a19b2c492d34515a68f6a7",
+          "name": "night-mix-cds.png",
+          "size": 64294,
+          "type": "image/png"
+        },
+        "night-shots-camera.png": {
+          "blob": "8f1523e741c0dfd9fc049da7015c5f99",
+          "name": "night-shots-camera.png",
+          "size": 44190,
+          "type": "image/png"
+        },
+        "perfume.png": {
+          "blob": "da2a1dc98f107da3556b42bc22febc9f",
+          "name": "perfume.png",
+          "size": 34067,
+          "type": "image/png"
+        },
+        "pink-sunglasses.png": {
+          "blob": "5de2e96d19c15c8341cefc76a6955cbc",
+          "name": "pink-sunglasses.png",
+          "size": 49025,
+          "type": "image/png"
+        },
+        "pizza-after-party.png": {
+          "blob": "f8276ca63e39b81a6e2fc5285bc59d99",
+          "name": "pizza-after-party.png",
+          "size": 66249,
+          "type": "image/png"
+        },
+        "play-later-console.png": {
+          "blob": "56aef1ef2c5ac56d0389a2dd790a923b",
+          "name": "play-later-console.png",
+          "size": 50970,
+          "type": "image/png"
+        },
+        "purple-box.png": {
+          "blob": "3cc369da6f7b9e69267ffe539c46a8f8",
+          "name": "purple-box.png",
+          "size": 50065,
+          "type": "image/png"
+        },
+        "red-cup.png": {
+          "blob": "5c4dce930ab2bfcbce5f9817960c46de",
+          "name": "red-cup.png",
+          "size": 52370,
+          "type": "image/png"
+        },
+        "same-people-tote.png": {
+          "blob": "a2cdb5aa60315b38d8cae7d1216420d1",
+          "name": "same-people-tote.png",
+          "size": 54086,
+          "type": "image/png"
+        },
+        "see-you-tonight-pager.png": {
+          "blob": "cadf1bfd18b4ef86463bd0ce6d662c58",
+          "name": "see-you-tonight-pager.png",
+          "size": 47275,
+          "type": "image/png"
+        },
+        "stay-hydrated.png": {
+          "blob": "d6dfe59cc34842739784aea6bf3ace6e",
+          "name": "stay-hydrated.png",
+          "size": 50779,
+          "type": "image/png"
+        },
+        "taxi.png": {
+          "blob": "fc30e97e4b684f58be97984ec8e9e109",
+          "name": "taxi.png",
+          "size": 45450,
+          "type": "image/png"
+        },
+        "traffic-cone.png": {
+          "blob": "d22b3f85ba89bc32f255e32d4da057a4",
+          "name": "traffic-cone.png",
+          "size": 41988,
+          "type": "image/png"
+        },
+        "vibe-chips.png": {
+          "blob": "70c39547bd2e2f2a81f9828d3b86c50f",
+          "name": "vibe-chips.png",
+          "size": 55223,
+          "type": "image/png"
+        },
+        "vinyl-sleeve.png": {
+          "blob": "4a10f57f7e856690ffd2bec791037d44",
+          "name": "vinyl-sleeve.png",
+          "size": 59738,
+          "type": "image/png"
+        },
+        "vip-heart-keychain.png": {
+          "blob": "3b45dab33286910425e38147bed2cee9",
+          "name": "vip-heart-keychain.png",
+          "size": 49589,
+          "type": "image/png"
+        },
+        "vip-tape.png": {
+          "blob": "2d6eb025f52b02b62c73f7f1eaa387e9",
+          "name": "vip-tape.png",
+          "size": 38225,
+          "type": "image/png"
+        }
+      },
+      "name": "Stickers",
+      "order": [
+        "disco-ball.png",
+        "headphones.png",
+        "cocktail.png",
+        "champagne.png",
+        "vinyl.png",
+        "ticket.png",
+        "wristband.png",
+        "camera.png",
+        "sunglasses.png",
+        "mic.png",
+        "speaker.png",
+        "shaker.png",
+        "lighter.png",
+        "phone.png",
+        "lanyard-pass.png",
+        "spotlight.png",
+        "after-hours.png",
+        "ask-later-8-ball.png",
+        "balloon-dog.png",
+        "boombox.png",
+        "bucket-hat.png",
+        "camcorder.png",
+        "cash-stack.png",
+        "cassette.png",
+        "chill-bottle.png",
+        "club-member-keytag.png",
+        "club-neon-sign.png",
+        "club-ticket.png",
+        "dance-repeat-can.png",
+        "disco-keychain.png",
+        "donut-box.png",
+        "energy-can.png",
+        "foil-bag.png",
+        "good-vibes-matches.png",
+        "green-bottle.png",
+        "heart-lollipop.png",
+        "ice-bucket.png",
+        "instant-camera.png",
+        "late-night-fries.png",
+        "late-night-noodles.png",
+        "megaphone.png",
+        "memories-camera.png",
+        "neon-lighter.png",
+        "night-mix-cds.png",
+        "night-shots-camera.png",
+        "perfume.png",
+        "pink-sunglasses.png",
+        "pizza-after-party.png",
+        "play-later-console.png",
+        "purple-box.png",
+        "red-cup.png",
+        "same-people-tote.png",
+        "see-you-tonight-pager.png",
+        "stay-hydrated.png",
+        "taxi.png",
+        "traffic-cone.png",
+        "vibe-chips.png",
+        "vinyl-sleeve.png",
+        "vip-heart-keychain.png",
+        "vip-tape.png"
+      ],
+      "tile": "s"
+    },
+    "Photography": {
+      "files": {
+        "flash-trio.jpg": {
+          "blob": "1e415979acbb78ce608ebbeeb2f10619",
+          "name": "flash-trio.jpg",
+          "size": 134572,
+          "type": "image/jpeg"
+        },
+        "cheers-flash.jpg": {
+          "blob": "fcd60be7af52f6de78a6661571c63b08",
+          "name": "cheers-flash.jpg",
+          "size": 134628,
+          "type": "image/jpeg"
+        },
+        "film-booth.jpg": {
+          "blob": "96a1cf601c8526fa40f9d5af0ecfe577",
+          "name": "film-booth.jpg",
+          "size": 93524,
+          "type": "image/jpeg"
+        },
+        "martini-selfie.jpg": {
+          "blob": "c1c9c3b76ec2690e3e0a26224eb520a4",
+          "name": "martini-selfie.jpg",
+          "size": 115269,
+          "type": "image/jpeg"
+        },
+        "gallery-crowd.jpg": {
+          "blob": "666d52621a86504ae8dbeb78f6350f2b",
+          "name": "gallery-crowd.jpg",
+          "size": 72744,
+          "type": "image/jpeg"
+        },
+        "bar-pour.jpg": {
+          "blob": "538179c53168c648f91c952493f81a60",
+          "name": "bar-pour.jpg",
+          "size": 41431,
+          "type": "image/jpeg"
+        },
+        "face-anya.jpg": {
+          "blob": "b378412482016c49b3fb07d9fd456ec0",
+          "name": "face-anya.jpg",
+          "size": 7801,
+          "type": "image/jpeg"
+        },
+        "face-dev.jpg": {
+          "blob": "58523bb8679b04ce67aaa8c36f7446b7",
+          "name": "face-dev.jpg",
+          "size": 5962,
+          "type": "image/jpeg"
+        },
+        "face-ira.jpg": {
+          "blob": "158da3b0ffdddfa5cbf7b693f3cce5af",
+          "name": "face-ira.jpg",
+          "size": 9173,
+          "type": "image/jpeg"
+        },
+        "face-kabir.jpg": {
+          "blob": "94ccb7f2a24f96637426d4fb4867bf14",
+          "name": "face-kabir.jpg",
+          "size": 6031,
+          "type": "image/jpeg"
+        },
+        "face-meera.jpg": {
+          "blob": "136b78c4648803d03776971cfc45752a",
+          "name": "face-meera.jpg",
+          "size": 8744,
+          "type": "image/jpeg"
+        },
+        "face-riya.jpg": {
+          "blob": "4870c37295e71b0d3907e8272d6f43cd",
+          "name": "face-riya.jpg",
+          "size": 6125,
+          "type": "image/jpeg"
+        },
+        "face-tara.jpg": {
+          "blob": "ade2a8543d350fc8f6c86cdc4582ce79",
+          "name": "face-tara.jpg",
+          "size": 8564,
+          "type": "image/jpeg"
+        },
+        "face-zoya.jpg": {
+          "blob": "f8f01281f798f5e14bd32630984bb523",
+          "name": "face-zoya.jpg",
+          "size": 9602,
+          "type": "image/jpeg"
+        }
+      },
+      "name": "Photography",
+      "order": [
+        "flash-trio.jpg",
+        "cheers-flash.jpg",
+        "film-booth.jpg",
+        "martini-selfie.jpg",
+        "gallery-crowd.jpg",
+        "bar-pour.jpg",
+        "face-anya.jpg",
+        "face-dev.jpg",
+        "face-ira.jpg",
+        "face-kabir.jpg",
+        "face-meera.jpg",
+        "face-riya.jpg",
+        "face-tara.jpg",
+        "face-zoya.jpg"
+      ],
+      "tile": "m"
+    }
+  },
+  "blobs": {},
+  "createdOnFiles": {
+    "at": "2026-09-28T09:09:35Z",
+    "v": 1
+  },
+  "docs": {
+    "readme": "project/README.md",
+    "sections": [
+      "project/guides/01-colour-type.md",
+      "project/guides/02-surfaces.md",
+      "project/guides/03-imagery.md",
+      "project/guides/04-voice.md",
+      "project/guides/05-app.md",
+      "project/guides/06-brand-moments.md",
+      "project/guides/07-checklist.md"
+    ]
+  },
+  "groups": [
+    "Logos",
+    "Stickers",
+    "Photography",
+    "Gradients"
+  ],
+  "lastChange": {
+    "at": "2026-10-10T10:00:00Z",
+    "by": "Shubh",
+    "via": "Claude (Cowork)",
+    "note": "v18 Booked so far. CrowdMeter levels come from bookings against a cap verified by gathr (Early <25%, Filling up 25–59, Buzzing 60–84, Packed 85–99, Full). Packed is yellow, only Full is red. New widget: 60-dot grid + \"412 of 480 spots booked\", count hidden under 50, no-cap fallback. VenueHero rebuilt as one card (booked so far + facts + trust line) with Get passes. New FactList and TonightSoFar. Guides 01, 04, 05, 07 and the README updated."
+  },
+  "layout": "files",
+  "libraries": [
+    {
+      "global": "React",
+      "name": "react",
+      "version": "18"
+    },
+    {
+      "global": "ReactDOM",
+      "name": "react-dom",
+      "version": "18"
+    }
+  ],
+  "namespace": "Gathr",
+  "sections": {},
+  "title": "gathr"
+}

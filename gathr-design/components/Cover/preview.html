@@ -1,0 +1,44 @@
+<!-- @dsCard height=288 -->
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>gathr</title>
+<style>
+  html, body { margin:0; height:100%; }
+  body { background:var(--night-950); color:var(--night-50); font-family:var(--font-sans); overflow:hidden; }
+  /* black first: the wordmark is the hero, decorated with gathr's own 3D objects; a marquee runs along the bottom */
+  .cover { position:relative; width:960px; height:288px; overflow:hidden; background:var(--night-950); }
+  .meta { position:absolute; top:20px; left:32px; right:32px; display:flex; justify-content:space-between; font-size:12px; line-height:16px; color:var(--night-300); }
+  .stage { position:absolute; left:0; right:0; top:0; height:236px; }
+  .mark { position:absolute; left:50%; top:52px; transform:translateX(-50%); z-index:2; }
+  .mark .g-logo { display:block; }
+  .st { position:absolute; object-fit:contain; filter:drop-shadow(0 14px 18px #000000cc); }
+  .back { z-index:1; } .front { z-index:3; }
+  .marquee { position:absolute; left:0; right:0; bottom:0; height:52px; border-top:1px solid #ffffff1f; display:flex; align-items:center; gap:22px; padding-left:24px; white-space:nowrap; font-family:var(--font-display); font-weight:600; font-size:18px; letter-spacing:-0.02em; color:var(--night-50); }
+  .marquee i { width:16px; height:2px; border-radius:1px; background:var(--night-500); display:inline-block; flex:none; }
+  .marquee .mute { color:var(--night-300); font-family:var(--font-sans); font-weight:500; font-size:14px; letter-spacing:0; }
+</style>
+</head>
+<body>
+<div class="cover">
+  <div class="meta"><span>Design system</span><span>Pune</span></div>
+  <div class="stage" aria-hidden="true">
+    <img class="st back" src="/_blob/1fc1232ce07e6d2db40ff736d1abb0e0" alt="" style="left:592px;top:58px;width:112px;height:112px;transform:rotate(-14deg)">
+    <img class="st back" src="/_blob/912bc88376587c26f91ede067b5c320e" alt="" style="left:262px;top:118px;width:104px;height:104px;transform:rotate(-24deg)">
+    <img class="st front" src="/_blob/26d9e4af5331412ddf848bf06d9e252c" alt="" style="left:296px;top:22px;width:72px;height:72px;transform:rotate(-8deg)">
+    <img class="st front" src="/_blob/d4fec04ba11bdaf2f545e198a1695846" alt="" style="left:480px;top:8px;width:78px;height:78px;transform:rotate(12deg)">
+    <img class="st front" src="/_blob/828ac5e4d62d986e2503cae6de27e895" alt="" style="left:676px;top:156px;width:60px;height:60px;transform:rotate(18deg)">
+  </div>
+  <div class="mark" id="logo"></div>
+  <div class="marquee" aria-hidden="true">
+    <span>going out is an art form</span><i></i><span class="mute">Pune</span><i></i><span>gathr.</span><i></i><span>most people are doing it wrong</span><i></i><span class="mute">Tonight</span><i></i><span>going out is an art form</span><i></i><span class="mute">Pune</span>
+  </div>
+</div>
+<script>
+  // the real wordmark from the bundle, never retyped
+  var G = window.Gathr, h = React.createElement;
+  ReactDOM.createRoot(document.getElementById('logo')).render(h(G.Wordmark, { size: 140, tone: 'light' }));
+</script>
+</body>
+</html>

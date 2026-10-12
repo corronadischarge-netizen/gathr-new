@@ -1,0 +1,12 @@
+<!-- @dsCard group="Gradient" height=260 -->
+<!doctype html>
+<html>
+<head><meta charset="utf-8"><title>Bloom — preview</title></head>
+<body>
+<div id="root"></div>
+<script>
+  var G = window.Gathr, h = React.createElement;
+  ReactDOM.createRoot(document.getElementById('root')).render(h('div',{style:{display:'grid',gridTemplateColumns:'repeat(4,1fr)',gap:'12px',padding:'16px'}},['peak','uv','sundowner','comedown'].map(function(r){return h('div',{key:r,className:'g-night',style:{position:'relative',height:'220px',borderRadius:'var(--radius-lg)',overflow:'hidden'}},h(G.Bloom,{recipe:r}),h('div',{className:'g-display',style:{position:'relative',padding:'16px',fontWeight:700,fontSize:'24px',color:'var(--night-50)'}},r,h('span',{style:{color:'var(--yellow-300)'}},'.')))})));
+</script>
+</body>
+</html>

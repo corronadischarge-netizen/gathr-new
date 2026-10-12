@@ -1,0 +1,12 @@
+<!-- @dsCard group="Status" height=72 -->
+<!doctype html>
+<html>
+<head><meta charset="utf-8"><title>ProgressBar — preview</title></head>
+<body>
+<div id="root"></div>
+<script>
+  var G = window.Gathr, h = React.createElement;
+  ReactDOM.createRoot(document.getElementById('root')).render(h('div',{className:'g-stack'},h(G.ProgressBar,{step:1,total:4}),h(G.ProgressBar,{step:3,total:4})));
+</script>
+</body>
+</html>
