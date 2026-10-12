@@ -632,10 +632,10 @@
     "Gradients"
   ],
   "lastChange": {
-    "at": "2026-10-10T10:00:00Z",
+    "at": "2026-10-12T14:00:00Z",
     "by": "Shubh",
     "via": "Claude (Cowork)",
-    "note": "v18 Booked so far. CrowdMeter levels come from bookings against a cap verified by gathr (Early <25%, Filling up 25–59, Buzzing 60–84, Packed 85–99, Full). Packed is yellow, only Full is red. New widget: 60-dot grid + \"412 of 480 spots booked\", count hidden under 50, no-cap fallback. VenueHero rebuilt as one card (booked so far + facts + trust line) with Get passes. New FactList and TonightSoFar. Guides 01, 04, 05, 07 and the README updated."
+    "note": "Release 23, from the Seeker app. Host mode: selected tab pill and main buttons (List a night, Submit for review) named. Selections and buttons are flat (chips, tab pill, tiles, pins, rings, brand button, Update Accept); shine is expression only and documented as a recipe of palette tokens. Screen glow (.g-page-depth) listed with the functional fades. Bell's new dot is a second functional dot. Update: name (initials lead) and onOpen (tappable info rows). Toast is the app's only toast: docked 32px up or 12px above the tab bar, 2.4 s or 5 s with an action; new Toast README and preview."
   },
   "layout": "files",
   "libraries": [

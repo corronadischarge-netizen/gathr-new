@@ -1,6 +1,6 @@
 # Button
 
-Flat pill buttons: no sheen, gradient or glow. Labels are 16px 600 (13px on `sm`) and start with a verb.
+Flat pill buttons: no sheen, gradient or glow. The brand button is flat violet (flat yellow-300 with night-900 text in host mode). Labels are 16px 600 (15px on `sm`) and start with a verb.
 
 **Provide:** `variant`, `size` (`sm` 36px, `md` 48px or `lg` 60px), optional `icon` and `iconRight`, `block` for full width, and a verb-first label.
 

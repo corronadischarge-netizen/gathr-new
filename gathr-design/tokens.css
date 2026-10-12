@@ -1,29 +1,29 @@
-/* gathr: generated from tokens.json (release 21, 12 Oct 2026). Do not edit by hand. */
+/* gathr — generated from tokens.json */
 :root, [data-theme="night"] {
-  --yellow-100: #fdffdb; /* APP. Yellow = energy right now: live, and a buzzing room. Tint: text on transparent live badges; soft ground behind ink in day and print. */
-  --yellow-300: #fbff87; /* APP. Yellow = energy right now: live badges, the live dot, the logo full stop, the buzzing crowd level. Nothing else in the app is yellow (focus is white). Text on it is night-900 (16:1). Never as text in day (1.1:1). */
-  --yellow-500: #faff5c; /* EXPRESSION. Poster and social fields, the deep end of the yellow shine. Not for app UI. */
-  --red-100: #ffd9cf; /* APP. Limits. Tint: text on transparent limit badges; soft ground in day and print. */
-  --red-300: #f0483d; /* APP. Limits: sold out, at capacity, 21+, errors, the packed crowd levels. Text on it is night-900. */
-  --red-500: #e62f1f; /* EXPRESSION. Poster and social fields, the deep end of the red shine. Not for app UI. */
-  --pink-100: #ffd9ee; /* EXPRESSION. Pink tint (print grounds, the light end of the pink shine). Never in app UI. */
-  --pink-300: #f2409b; /* EXPRESSION. Vibe tags, The mirror pillar, poster accents, blooms. Night-900 text on it (4.9:1). Never in app UI. */
-  --pink-500: #e0157f; /* EXPRESSION. Poster and social fields, blooms, the deep end of the pink shine. Never in app UI. */
-  --violet-100: #ede6ff; /* APP. gathr's choice: selected, the one booking button, gathr pick. Tint: text on transparent brand badges; soft selected ground in day. */
-  --violet-300: #8b5cff; /* APP. Violet as text in night, and the light end of the violet shine. */
-  --violet-500: #531aff; /* APP. THE brand fill: selected chips and tiles, the tab pill, the one booking button per screen, gathr pick. White text on it. */
-  --green-100: #d2f5de; /* APP. Booked. Tint: text on transparent go badges; soft ground in day and print. */
-  --green-300: #3ecf7e; /* APP. Booked / on the list, and the warming-up crowd level (green reads as good in both). Night-900 text on it. */
-  --green-500: #16b860; /* EXPRESSION. Poster fields, the deep end of the green shine. Not for app UI. */
-  --blue-100: #cde7fa; /* EXPRESSION. Blue tint (print grounds). Never in app UI. */
-  --blue-300: #2e8fe0; /* EXPRESSION. Blooms (comedown), recap art, the light end of the blue shine. Never in app UI. */
-  --blue-500: #0b6fc4; /* EXPRESSION. Blooms and recap fields; white text on it (5.1:1). Never in app UI. */
+  --yellow-100: #fdffdb; /* The door, sodium glow — NOW — live, tonight, new, featured. Night focus ring. Tint. Soft ground behind ink in the day theme and on print. */
+  --yellow-300: #fbff87; /* The door, sodium glow — NOW — live, tonight, new, featured. Night focus ring. Glow. THE yellow fill: badges, live dots, the night focus ring. Text on it is night-900 (16:1). Never as text in the day theme (1.1:1). */
+  --yellow-500: #faff5c; /* The door, sodium glow — NOW — live, tonight, new, featured. Night focus ring. Core. Poster and social fields only; ink night-900 on it (15.8:1). Too close to yellow-300 to pair in UI. */
+  --red-100: #ffd9cf; /* The rope, laser sweep — LIMITS — at capacity, sold out, errors, destructive actions. Tint. Soft ground behind ink in the day theme and on print. */
+  --red-300: #f0483d; /* The rope, laser sweep — LIMITS — at capacity, sold out, errors, destructive actions. Glow. THE red fill: "At capacity", "Sold out", errors. Text on it is night-900 (4.6:1). As text: on bg/surface in night only (4.6–5.3:1). */
+  --red-500: #e62f1f; /* The rope, laser sweep — LIMITS — at capacity, sold out, errors, destructive actions. Core. Poster and social fields only. White on it is 4.4:1 and night-900 3.9:1, so text on red-500 must be 24px+ or bold 19px+. */
+  --pink-100: #ffd9ee; /* The wash on skin, fabric — PEOPLE — friends going, saves, likes, social proof. Tint. Soft ground behind ink in the day theme and on print. */
+  --pink-300: #f2409b; /* The wash on skin, fabric — PEOPLE — friends going, saves, likes, social proof. Glow. THE pink fill: friends going, saves. Night-900 text on it (4.9:1). As text: on bg/surface in night (4.9–5.5:1). */
+  --pink-500: #e0157f; /* The wash on skin, fabric — PEOPLE — friends going, saves, likes, social proof. Core. People text in the day theme on white only (4.6:1). Poster fields with white type 24px+. */
+  --violet-100: #ede6ff; /* The UV tube itself — BRAND + ACTION — the Gathr light. Primary buttons, selection, links. Tint. Soft ground for selected rows in the day theme; text on violet-500 fills in big type (5.9:1 on it). */
+  --violet-300: #8b5cff; /* The UV tube itself — BRAND + ACTION — the Gathr light. Primary buttons, selection, links. Glow. Violet as TEXT in the night theme — on bg only (4.7:1). On surface (4.1:1) use it only at 18px semibold+. Never put dark text on it (4.1:1). */
+  --violet-500: #531aff; /* The UV tube itself — BRAND + ACTION — the Gathr light. Primary buttons, selection, links. Core. THE brand fill: primary buttons, selected chips, the wordmark block. White text on it (7.1:1). Its edge against night bg is only 2.7:1, so a violet-500 control always carries a white label or icon. */
+  --green-100: #d2f5de; /* The beam, exit glow — GO — entry open, confirmed, on the list, success. Tint. Soft ground behind ink in the day theme and on print. */
+  --green-300: #3ecf7e; /* The beam, exit glow — GO — entry open, confirmed, on the list, success. Glow. THE green fill: "Entry open", "You're on the list". Night-900 text on it (8.5:1). As text in night only. */
+  --green-500: #16b860; /* The beam, exit glow — GO — entry open, confirmed, on the list, success. Core. Poster fields; night-900 text on it (6.5:1). Never as text on light grounds (2.6:1). */
+  --blue-100: #cde7fa; /* The walk home, comedown — AFTER — directions, rides home, info, after-hours, calm. Tint. Soft ground behind ink in the day theme and on print. */
+  --blue-300: #2e8fe0; /* The walk home, comedown — AFTER — directions, rides home, info, after-hours, calm. Glow. THE blue fill: directions, rides, info. Night-900 text on it (5:1). As text: on bg/surface in night (5–5.7:1). */
+  --blue-500: #0b6fc4; /* The walk home, comedown — AFTER — directions, rides home, info, after-hours, calm. Core. Blue text in the day theme (5.1:1 on white, 4.7:1 on paper). White text on it for buttons (5.1:1). */
   --night-950: #0a0a0a; /* Neutral (from the onboarding screen). The night bg: near-black, neutral. Aurora glows and glass sit on it. */
   --night-900: #1c1c1c; /* Neutral (from the palette sheet card). Night surface; also THE dark ink on every -300 fill and on day grounds. */
   --night-800: #262524; /* Neutral (added). Raised surfaces in night: sheets, menus, pressed rows. */
   --night-700: #363430; /* Neutral (added). Hairlines in night. */
-  --night-600: #6b6761; /* Neutral (added). Strong borders (inputs) in night — 3.0:1 on surface; faint text in day (5.1–5.6:1). Never for text: lines and disabled marks only (3:1 on bg). */
-  --night-500: #9d9992; /* ink-faint in night. Lightened so it reads at 4.5:1+ on bg, surface and surface-raised (5.4:1 on the darkest raised surface). */
+  --night-600: #6b6761; /* Neutral (added). Strong borders (inputs) in night — 3.0:1 on surface; faint text in day (5.1–5.6:1). */
+  --night-500: #8e8a83; /* Neutral (added). Faint text in night on bg/surface (5–5.5:1); strong borders in day (3.4:1 on white). */
   --night-300: #b5b1aa; /* Neutral (added). Muted text in night (8–8.8:1). */
   --night-50: #f7f5f0; /* Neutral (added). Warm white — primary text in night (15.6:1 on surface). */
   --paper: #f5f4f0; /* Neutral (added). Day bg: web pages in light mode, print stock simulation. */
@@ -40,14 +40,18 @@
   --brand: var(--violet-500); /* The Gathr light (violet-500): brand buttons ("Get on the list"), selected chips, the active tab disc, the selected map pin. Max one brand-filled button per screen. */
   --on-brand: var(--white); /* Text and icons on brand (7.1:1). */
   --on-ink: var(--night-950); /* Label on the primary (ink-filled) button: black on the white pill in night, white on the dark pill in day (18:1). */
-  --brand-text: var(--violet-100); /* Brand-coloured text and links. Violet-100 in night (14:1 on surface); violet-300 failed on cards (4.1:1). Use rarely: most links are ink. */
+  --brand-text: var(--violet-300); /* Links, selected tab label, "See all". Night: on bg, or 18px semibold+ on surface. */
   --brand-soft: #531aff33; /* Selected row / hovered chip ground; text on it is ink. */
-  --now: var(--yellow-300); /* APP. Energy right now: LIVE badges and the live dot. Shares yellow-300 with the full stop and the buzzing crowd level; nothing else in the app is yellow. */
-  --go: var(--green-300); /* Booked, confirmed, entry open, and host mode. A signal, never decoration. */
-  --limit: var(--red-300); /* At capacity, sold out, age limits, errors. A signal, never decoration. */
+  --now: var(--yellow-300); /* Fill for LIVE / TONIGHT / NEW badges and live dots. Text on it: on-fill. */
+  --go: var(--green-300); /* Fill for entry-open / confirmed / success. Text on it: on-fill. */
+  --people: var(--pink-300); /* Fill for friends-going, saves, likes. Text on it: on-fill. */
+  --limit: var(--red-300); /* Fill for at capacity / sold out / errors. Text on it: on-fill. */
+  --after: var(--blue-300); /* Fill for directions / rides / info / after-hours. Text on it: on-fill. */
+  --people-text: var(--pink-300); /* Pink words ("4 friends going"). Day: on surface (white) only. */
+  --after-text: var(--blue-300); /* Blue words (directions, "12 min walk"). */
   --limit-text: var(--red-300); /* Error and sold-out words. Day theme uses ink + the red fill/icon, because red on light fails 4.5:1. */
   --go-text: var(--green-300); /* Success words. Day theme uses ink + the green fill/icon (green on light is 2.4:1). */
-  --focus: var(--night-50); /* APP. Keyboard focus ring: warm white in night, near-black in day. Never yellow, so focus is never mistaken for live. */
+  --focus: var(--yellow-300); /* Keyboard focus ring colour: 3:1+ on every ground in its theme. */
   --glass-fill: #ffffff14; /* Frosted glass over bg or aurora: floating tab bar, top bar, round icon buttons. Pair with blur-lg. Text on it: ink, ink-muted. */
   --glass-fill-strong: #1c1c1cb8; /* Heavier glass for sheets over the map and dialogs, where long text sits. Pair with blur-lg. */
   --glass-scrim: #0a0a0a99; /* Dark glass OVER PHOTOS, both themes: tags, save button, crowd pill on a venue photo. 60% keeps white text at 5.2:1 even over a white photo. Only white (night-50) text on it, 13px semibold+. */
@@ -56,15 +60,15 @@
   --depth-light: #ffffff12; /* The top-lit highlight every solid surface carries (a radial glow from the top-left) so no fill is ever flat. */
   --depth-shade: #00000073; /* The matching shade at the bottom-right of every solid surface. Together with depth-light and grain it gives fills their depth. */
   --logo-dot: var(--yellow-300); /* The full stop after the r in the wordmark: yellow on dark grounds, violet on light grounds (yellow on paper is 1.1:1). */
-  --crowd-quiet: var(--night-500); /* Early (under 25% of the verified cap booked): grey. About bookings, never the vibe. */
-  --crowd-warming: var(--green-300); /* Filling up (25–59% booked): green, easy to get in. */
-  --crowd-buzzing: var(--yellow-300); /* Buzzing (60–84% booked): yellow, energy right now. */
-  --crowd-packed: var(--yellow-300); /* Packed (85–99% booked): yellow. The high point of the night, not a warning. */
-  --crowd-full: var(--red-300); /* Full (sold out): red, the only real limit. Only list and pass holders get in. */
+  --crowd-quiet: var(--blue-300); /* Crowd scale step: Quiet — "Easy to get a table". Only inside CrowdMeter / MapPin / heat map, always with its word, always on a dark (night-900) track — in both themes. */
+  --crowd-warming: var(--green-300); /* Crowd scale step: Warming up — "Filling up nicely". Only inside CrowdMeter / MapPin / heat map, always with its word, always on a dark (night-900) track — in both themes. */
+  --crowd-buzzing: var(--yellow-300); /* Crowd scale step: Buzzing — "Good energy, short wait". Only inside CrowdMeter / MapPin / heat map, always with its word, always on a dark (night-900) track — in both themes. */
+  --crowd-packed: var(--pink-300); /* Crowd scale step: Packed — "Shoulder to shoulder". Only inside CrowdMeter / MapPin / heat map, always with its word, always on a dark (night-900) track — in both themes. */
+  --crowd-full: var(--red-300); /* Crowd scale step: At capacity — "Door is holding". Only inside CrowdMeter / MapPin / heat map, always with its word, always on a dark (night-900) track — in both themes. */
   --shadow-card: inset 0 1px 0 #ffffff0f; /* Solid cards at rest. */
   --shadow-glass: inset 0 1px 0 #ffffff26, inset 0 0 0 1px #ffffff14, 0 12px 32px #00000080; /* Every glass surface: the top highlight, the hairline edge and a soft drop. */
   --shadow-float: 0 12px 32px #000000b3; /* Solid floating layers: menus, toasts. */
-  --focus-ring: 0 0 0 2px #0a0a0a, 0 0 0 4px #f7f5f0; /* Keyboard focus: 2px ground gap, then 2px solid focus colour. */
+  --focus-ring: 0 0 0 2px #0a0a0a, 0 0 0 4px #fbff87; /* Keyboard focus: 2px ground gap, then 2px solid focus colour. */
 }
 [data-theme="day"] {
   --bg: var(--paper);
@@ -75,22 +79,37 @@
   --ink: var(--night-900);
   --ink-muted: var(--night-600);
   --ink-faint: var(--night-600);
+  --on-fill: var(--night-900);
+  --brand: var(--violet-500);
+  --on-brand: var(--white);
   --on-ink: var(--white);
   --brand-text: var(--violet-500);
   --brand-soft: var(--violet-100);
+  --now: var(--yellow-300);
+  --go: var(--green-300);
+  --people: var(--pink-300);
+  --limit: var(--red-300);
+  --after: var(--blue-300);
+  --people-text: var(--pink-500);
+  --after-text: var(--blue-500);
   --limit-text: var(--night-900);
   --go-text: var(--night-900);
-  --focus: var(--night-950);
+  --focus: var(--violet-500);
   --glass-fill: #ffffffb3;
   --glass-fill-strong: #ffffffd9;
   --glass-edge: #ffffff99;
   --depth-light: #ffffffb3;
   --depth-shade: #1c1c1c14;
   --logo-dot: var(--violet-500);
+  --crowd-quiet: var(--blue-300);
+  --crowd-warming: var(--green-300);
+  --crowd-buzzing: var(--yellow-300);
+  --crowd-packed: var(--pink-300);
+  --crowd-full: var(--red-300);
   --shadow-card: 0 1px 2px #1c1c1c14, 0 2px 8px #1c1c1c0f;
   --shadow-glass: inset 0 1px 0 #ffffffcc, inset 0 0 0 1px #ffffff99, 0 12px 32px #1c1c1c1f;
   --shadow-float: 0 12px 32px #1c1c1c29;
-  --focus-ring: 0 0 0 2px #f5f4f0, 0 0 0 4px #0a0a0a;
+  --focus-ring: 0 0 0 2px #f5f4f0, 0 0 0 4px #531aff;
 }
 :root {
   --space-1: 4px; /* Icon-to-label, dot-to-word. */
@@ -138,18 +157,17 @@
   --text-poster: 700 144px/0.95 var(--font-display); /* Posters and social covers on a 1080 canvas. */
   --text-hero: 700 64px/1 var(--font-display); /* Web hero, social headlines, venue hero name. */
   --text-display: 700 32px/1.08 var(--font-display); /* The one screen headline ("this week in pune."). Plus Jakarta Sans 700. One per screen, and the only text above 22px in the app. */
-  --text-title: 600 20px/1.2 var(--font-display); /* Sheet titles; the one name on a big media card (VenueCard, FeatureCard). */
-  --text-section: 600 16px/1.3 var(--font-display); /* Page-level headings ("Near you", "Listed nights"), Plus Jakarta Sans 600, sentence case. */
+  --text-title: 600 20px/1.2 var(--font-display); /* Sheet titles, venue name on detail, the feature card title. */
+  --text-section: 600 16px/1.3 var(--font-display); /* Feed section headers ("Near you"), Plus Jakarta Sans 600, sentence case, with a subtle "See all" pill. */
   --text-numeral: 300 96px/0.9 var(--font-sans); /* Rank numbers, big stats, countdowns. Light weight so size does the shouting. */
   --text-eyebrow: 500 13px/18px var(--font-sans); /* Small context line directly above a screen or section headline, in ink-muted. It complements the headline and never competes: at most a third of its size. */
-  --text-accent: 300 16px/28px var(--font-sans); /* Expression zone only (onboarding, social, posters): the light lead-in above a big headline. No italics anywhere. In the app use eyebrow instead. */
+  --text-accent: italic 300 16px/28px var(--font-sans); /* Expression zone only (onboarding, social, posters): the light italic lead-in above a big headline. In the app use eyebrow instead. */
   --text-lead: 300 20px/28px var(--font-sans); /* Intro lines under a display headline; landing paragraphs. */
-  --text-headline: 600 15px/20px var(--font-sans); /* Names of things (friends, nights, venues, settings rows, update titles) and every heading inside a card. DM Sans 600. Organiser event names keep their own spelling, with no gathr full stop. */
+  --text-headline: 600 16px/22px var(--font-sans); /* Item titles: card and row names, 15–16px DM Sans 600. Organiser event names are written as the organiser wrote them, with no gathr full stop. */
   --text-body: 400 15px/22px var(--font-sans); /* Default app text. */
-  --text-body-light: 300 15px/20px var(--font-sans); /* Single-line tips beside an icon, e.g. VenueHero "Before you go". DM Sans 300. */
   --text-body-sm: 400 13px/18px var(--font-sans); /* Meta: times, areas, prices and counts in ink-muted; tabular figures. */
-  --text-label: 600 16px/20px var(--font-sans); /* Buttons 16px 600, starting with a verb; chips, small buttons and nav links 15px; tags, map pins and captions 13px. */
-  --text-caps: 600 11px/14px var(--font-sans); /* Labels: 11px 600, all caps, +4% tracking. Badges, day tags. */
+  --text-label: 600 16px/20px var(--font-sans); /* Buttons: 16px 600, starting with a verb. Small buttons use 13px 600. */
+  --text-caps: 700 11px/14px var(--font-sans); /* Labels: 11px 700, all caps, +4% tracking. Badges, day tags, the "sample data" note. */
 }
 .poster {
   font-family: var(--font-display);
@@ -206,6 +224,7 @@
   line-height: 28px;
   font-weight: 300;
   letter-spacing: -0.03em;
+  font-style: italic;
 }
 .lead {
   font-family: var(--font-sans);
@@ -216,8 +235,8 @@
 }
 .headline {
   font-family: var(--font-sans);
-  font-size: 15px;
-  line-height: 20px;
+  font-size: 16px;
+  line-height: 22px;
   font-weight: 600;
   letter-spacing: -0.02em;
 }
@@ -226,13 +245,6 @@
   font-size: 15px;
   line-height: 22px;
   font-weight: 400;
-  letter-spacing: -0.02em;
-}
-.body-light {
-  font-family: var(--font-sans);
-  font-size: 15px;
-  line-height: 20px;
-  font-weight: 300;
   letter-spacing: -0.02em;
 }
 .body-sm {
@@ -253,7 +265,7 @@
   font-family: var(--font-sans);
   font-size: 11px;
   line-height: 14px;
-  font-weight: 600;
+  font-weight: 700;
   letter-spacing: 0.04em;
 }
 @font-face {

@@ -964,3 +964,53 @@ body { margin: 0; font-family: var(--font-sans); background: var(--bg); color: v
 .g-actionbar { display: flex; align-items: center; gap: 12px; }
 .g-actionbar .g-ibtn { width: 52px; height: 52px; flex: none; }
 .g-actionbar-main { flex: 1; min-width: 0; }
+
+/* r22 — Host mode. Wrap host screens in .g-host.
+   Every selection (tabs, chips, toggles, tick boxes, picked rows) and the host's main (brand) buttons
+   swap violet for yellow-300 with night-900 text. Status colours are unchanged: green in, red no entry,
+   the scanner's amber check. The second yellow exception, alongside the door scanner. */
+.g-host {
+  --brand: var(--yellow-300);
+  --on-brand: var(--night-900);
+  --brand-soft: #fbff8729;
+  --brand-text: var(--yellow-300);
+  --glow-brand: 0 0 24px #fbff8740;
+}
+.g-host .g-btn-brand, .g-host .g-tab.is-active { animation-name: g-glow-host; }
+@keyframes g-glow-host { 0%, 100% { box-shadow: var(--glow-brand); } 50% { box-shadow: 0 0 36px #fbff8766; } }
+.g-host .g-pin.is-selected .g-pin-text span { color: var(--yellow-100); }
+.g-host .g-mood.is-selected .g-mood-kicker { color: var(--night-900); }
+.g-host .g-tab-ind::before { box-shadow: var(--shine-edge), 0 8px 22px #fbff8740; }
+.g-host .g-up-round.is-yes { background-color: var(--yellow-300); color: var(--night-900); }
+.g-host .g-badge-brand { --bf: var(--yellow-300); --bs: var(--shine-yellow); --bt: var(--night-900); --bh: var(--yellow-100); }
+/* Toggles, tick boxes and picked rows in host screens: on = yellow-300, mark night-900 */
+.g-host [aria-checked="true"], .g-host input[type="checkbox"]:checked, .g-host input[type="radio"]:checked { accent-color: var(--yellow-300); }
+.g-host .is-picked { background-color: var(--brand-soft); box-shadow: inset 0 0 0 1px var(--yellow-300); }
+
+/* r23 — Selected states are flat. Selections (chip, tab and its sliding pill, mood tile, map pin, rings) and
+   buttons (brand, Update's Accept) are one flat fill with no shine, no edge highlight and no glow.
+   The shine (--shine-*) is for expression fills only: VibeTag, PillChain, StatBubbles, PillPattern, social slides. */
+.g-chip.is-selected, .g-btn-brand, .g-tab.is-active, .g-mood.is-selected, .g-pin.is-selected .g-pin-tile { background-image: none; box-shadow: none; animation: none; }
+.g-pin.is-selected .g-pin-head { box-shadow: none; }
+.g-ring-brand { background: var(--brand); }
+.g-ring-go { background: var(--green-300); }
+.g-tab-ind::before { background: var(--brand); box-shadow: none; }
+.g-up-round.is-yes { background-color: var(--brand); background-image: none; box-shadow: none; color: var(--on-brand); }
+.g-host .g-btn-brand, .g-host .g-tab.is-active { animation: none; }
+.g-host .g-tab-ind::before { box-shadow: none; }
+
+/* r23 — Update: initials lead, tappable info rows */
+.g-up-lead.is-initials { background: var(--surface-raised, var(--night-800)); color: var(--ink, var(--night-50)); font-weight: 600; font-size: 18px; line-height: 1; }
+.g-up.is-info .g-up-lead.is-initials { font-size: 14px; }
+.g-up-item { display: block; }
+.g-up.is-link { width: 100%; border: 0; background: none; font: inherit; color: inherit; text-align: left; cursor: pointer; }
+.g-up.is-link:hover { background: color-mix(in srgb, var(--ink, var(--night-50)) 4%, transparent); }
+.g-up.is-link:focus-visible { outline: 2px solid transparent; box-shadow: var(--focus-ring); }
+.g-up.is-link .g-up-title, .g-up.is-link .g-up-meta { display: block; }
+
+/* r23 — Toast placement: the app's only toast. 32px up, or 12px above the floating tab bar
+   (tab bar: 68px tall, 16px above the safe area) */
+.g-toast-dock { position: fixed; left: 16px; right: 16px; bottom: calc(32px + env(safe-area-inset-bottom, 0px)); max-width: 358px; margin: 0 auto; z-index: 50; }
+.g-toast-dock.is-above-tabbar { bottom: calc(16px + 68px + 12px + env(safe-area-inset-bottom, 0px)); }
+@media (prefers-reduced-motion: no-preference) { .g-toast-dock { animation: g-toast-in var(--dur-fast, 200ms) ease-out; } }
+@keyframes g-toast-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }

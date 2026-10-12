@@ -9,16 +9,18 @@
 | Colour | Token | Only for |
 |---|---|---|
 | Violet | `brand` | **gathr's choice**: selected chip, tile, active tab, map pin, gathr pick, and the one booking button |
-| Yellow | `now` | **energy right now**: live, the live dot, the Buzzing and Packed levels, and the logo's full stop. Nothing else is yellow; keyboard focus is white ; one exception: the host's door scanner keeps an amber (yellow) "check" state next to green (in) and red (no entry) |
-| Green | `go` | **booked**, on the list, entry open, host mode; also the Filling up level (green reads as good in both) |
+| Yellow | `now` | **energy right now**: live, the live dot, the Buzzing and Packed levels, and the logo's full stop. Nothing else is yellow; keyboard focus is white. Two exceptions, both host-only: the door scanner keeps an amber (yellow) "check" state next to green (in) and red (no entry), and **host mode** draws every selection and the main buttons in yellow-300 (see below) |
+| Green | `go` | **booked**, on the list, entry open; also the Filling up level (green reads as good in both) |
 | Red | `limit` | **limits**: sold out, at capacity, age, errors, and the Full level |
 
 Everything else is black and greys (`bg`, `surface`, `surface-raised`, `line`, `ink`, `ink-muted`, `ink-faint`). The 3D objects bring the rest of the colour. Pink and blue live outside the app only (social, posters, recaps, blooms).
 
 **App or expression.** Every colour token is tagged in tokens.json. **App:** yellow-100/300, red-100/300, green-100/300, violet-100/300/500 and the greys. **Expression only:** yellow-500, red-500, green-500, all of pink and all of blue (posters, social, blooms, and the ends of the shine). If a UI needs an expression token, the design is wrong, not the rule.
 
+- **Host mode:** on host screens (wrap them in `.g-host`), yellow-300 with night-900 text replaces violet for every selection (the selected tab and its sliding pill, chips, toggles, tick boxes, picked rows) and the host's main buttons ("List a night", "Submit for review"). It tells a host at a glance which side of gathr they're on. Status colours don't change: green in, red no entry, the scanner's amber check. Violet never appears in host mode.
 - **Buttons:** the white pill (`ink` on `on-ink`) is the main action on any screen. The violet `brand` button is kept for the one booking action, once per screen. Never colour a button with a venue hue.
-- **Shine:** colour fills get a subtle same-hue gloss built **only** from the hue's own -100/-300/-500 steps (the deepest violet and blue are mixed with night-950). No hex outside the palette (`--shine-violet` … `--shine-red`): vibe tags, pill chains, stat bubbles, social fields, and selected states (not status badges, which stay flat) (selected chip and tile, brand button, active tab, selected pin, rings).
+- **Selections and buttons are flat:** one flat fill, no shine, no edge highlight, no glow. That covers the selected chip, tile and pin, the selected tab and its sliding pill, rings, the brand button and Update's Accept.
+- **Shine is expression only:** a same-hue gloss built **only** from the hue's own -100/-300/-500 steps (the deepest violet and blue are mixed with night-950), for vibe tags, pill chains, stat bubbles, the pill pattern and social fields. It isn't a colour token: `--shine-<hue>` in bundle.css is a recipe made only of palette tokens plus a white highlight, so "no colour value outside tokens.json" still holds.
 - **Status badges:** flat, the one exception to the shine. Solid badges are one flat fill of the hue's fill step (night-950 text on yellow, green and red; white on violet). Transparent badges are a flat 20% wash of the hue with a 1px hue edge and the -100 step as text. Neutral badges are flat night-800 with a night-700 edge. The colours are still only the four above, plus grey.
 - **Booked so far:** grey Early → green Filling up → yellow Buzzing → **yellow Packed** → red Full. Packed is the high point, so it's yellow (energy right now); red is only for Full, the one real limit. Always with its word, and counts as people ("412 of 480"), never a percentage.
 

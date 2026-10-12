@@ -1,4 +1,4 @@
-<!-- @dsCard group="Content" height=880 subtitle="Updates: Needs you (task, chance, decide) then Earlier, one line each. After Decline, a quiet toast with Undo" -->
+<!-- @dsCard group="Content" height=880 subtitle="Updates: Needs you (task, chance, decide) then Earlier, one line each; Earlier rows open what they're about, and a person with no photo shows initials. After Decline, a quiet toast with Undo" -->
 <!doctype html>
 <html>
 <head><meta charset="utf-8"><title>Update — preview</title>
@@ -16,7 +16,8 @@
   h(G.Update,{kind:'chance',object:B['ticket'],title:'Twin Strings: few left',meta:'Fri 9 Oct \u00b7 \u20b91,299',time:'5h',action:'Book'}),
   after?null:h(G.Update,{kind:'decide',image:B['face-kabir'],title:'Ishaan wants to be friends',meta:'2 friends in common',time:'1d'})),
  h(G.UpdateGroup,{title:'Earlier'},
-  h(G.Update,{object:B['mic'],title:'Sati Savitri is live',meta:'Tue 6 Oct',time:'1d'}),
+  h(G.Update,{name:'Meera Joshi',title:'Meera accepted your request',meta:'You\u2019re now friends',time:'1d',onOpen:function(){}}),
+  h(G.Update,{object:B['mic'],title:'Sati Savitri is live',meta:'Tue 6 Oct',time:'1d',onOpen:function(){}}),
   h(G.Update,{object:B['mic'],title:'Sati Savitri, Fri 9 Oct is in review',meta:'Usually within a day',time:'2d'}),
   h(G.Update,{icon:'shield-check',tone:'go',title:'You\u2019re verified on gathr',time:'3d'})),
  null)};return h('div',{className:'g-stage',style:{justifyContent:'center',gap:'24px',flexWrap:'nowrap',padding:'24px 16px',alignItems:'flex-start'}},scr(false),h('div',{style:{position:'relative'}},scr(true),h('div',{style:{position:'absolute',left:'16px',right:'16px',bottom:'32px'}},h(G.Toast,{action:'Undo'},'Request declined. Ishaan won\u2019t be told')))) })());

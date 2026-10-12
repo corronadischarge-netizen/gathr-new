@@ -37,7 +37,7 @@ Detail screens swap the tab bar for one full-width button: white for the main ac
 | Notifications | `UpdateGroup` + `Update` (task, chance, decide, info) + `Toast` for undo |
 | A place on the map | `MapPin` with its object sticker |
 | Status | `Badge` (now, go, limit, brand, neutral) |
-| Main action | `Button primary` (white pill); the booking action is `Button brand` (violet), once per screen |
+| Main action | `Button primary` (white pill); the booking action is `Button brand` (violet), once per screen. In host mode `Button brand` turns yellow-300 |
 
 ## Flow
 
@@ -45,6 +45,14 @@ Detail screens swap the tab bar for one full-width button: white for the main ac
 - Every screen has a way forward and back. Pop-ups never cover buttons. Empty states say how to start.
 - Hit areas 44px+. Icon-only buttons have labels.
 - **Icons:** Lucide only (lucide.dev), outline at 1.75 stroke, sized 16, 20 or 24px. Filled versions (built from the same Lucide shapes) mean "on": active tab, saved, liked, booked, selected. If the bundle doesn't have one, add it by its Lucide name; never draw or mix sets. 3D stickers are for expression, not UI.
+
+## Host mode
+
+Hosts run the door and their nights from the same app, so their screens look different at a glance.
+
+- Wrap every host screen in `.g-host`. Selections (the selected tab and its sliding pill, chips, toggles, tick boxes, picked rows with `.is-picked`) and the host's main buttons (`Button brand`: "List a night", "Submit for review") become yellow-300 with night-900 text, flat like every selection.
+- Status stays as it is: green in, red no entry, the scanner's amber check.
+- Never mix: no violet on a host screen, no host yellow on a guest screen.
 
 ## Updates
 
@@ -55,4 +63,14 @@ Notifications are for a quick glance and a strong action.
 - **What leads the row:** a night's 3D object, a person's photo, or gathr's icon tinted by meaning.
 - **One row per night:** the latest status replaces the earlier ones.
 - **Declining is quiet**, with an Undo toast for 5 seconds.
+- **No photo, initials:** pass `name` and, with no `image`, the lead shows the person's initials. Never a silhouette.
+- **Earlier rows open what they're about:** give an `info` row `onOpen` and the whole row becomes a button (Enter and Space work); the chevron says it goes somewhere.
+
+## Toast
+
+`Toast` is the app's only toast: every short message ("Removed from Plans", "Logged out") and every Undo.
+
+- **Where:** near the bottom, 32px up; 12px above the tab bar when there is one (`docked`, `aboveTabBar`). Never at the top, never over a button.
+- **How long:** 2.4 seconds, or 5 seconds when it has an action (`onClose` fires when the time is up).
+- **What:** one short line, no full stop, at most one action ("Undo"). One toast at a time; a new one replaces the old.
 - **Breathable:** row padding 16, lead → text 16, rows 8 apart, groups 32 apart, page title → first group 24.

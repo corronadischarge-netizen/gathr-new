@@ -29,18 +29,18 @@ Glass floats **over** photos and content; it is never the content.
 
 | Kind | What | Where |
 |---|---|---|
-| **Shine** | the finish on colour fills, from the hue's own steps (`--shine-<hue>`) | chips, vibe tags, pill chains, the tab pill, tickets. Never on status badges |
+| **Shine** | the finish on colour fills, from the hue's own steps (`--shine-<hue>`) | expression fills only: vibe tags, pill chains, stat bubbles, the pill pattern, social fields. Never on selections, buttons or status badges, which are flat |
 | **Echo** | the brand pattern (`EchoPattern`) | brand surfaces: end slides, share cards, merch, splash |
 | **Bloom** | heat rising from the bottom (`Bloom`) | occasions only, below |
 
 ### The bloom is for occasions
 
-Off by default. **Functional fades are allowed everywhere** and don't count as a bloom: the fade to black under a photo, behind the tab bar, and behind pinned bottom buttons. Anything else is a bloom, only for launches, gathr-hosted nights, big city nights (NYE, Holi, Diwali, festival weekends), recaps and the first onboarding screen. One per screen.
+Off by default. **Functional fades are allowed everywhere** and don't count as a bloom: the fade to black under a photo, behind the tab bar, and behind pinned bottom buttons, plus the **screen glow**, the faint radial light at the top of each screen's background (`.g-page-depth`). Anything else is a bloom, only for launches, gathr-hosted nights, big city nights (NYE, Holi, Diwali, festival weekends), recaps and the first onboarding screen. One per screen.
 
 - **Shape:** irregular, rising from the bottom, up to half the frame. Never a circle, never a dot beside it, never animated.
 - Recipes: `peak`, `uv`, `sundowner`, `comedown` (`Bloom`, assets/Gradients).
 
 ## Depth and motion
 
-- Big surfaces carry a faint light top-left and grain. **Colour fills (selected chips, the brand button, vibe tags, pill chains) carry the hue's shine. Status badges and grey surfaces stay flat. Nothing glows.**
+- Big surfaces carry a faint light top-left and grain. **Expression fills (vibe tags, pill chains, stat bubbles) carry the hue's shine. Selections, buttons, status badges and grey surfaces stay flat. Nothing glows** (the screen glow is light on the background, not on an element).
 - Every animation explains a change: screens slide, selections settle, a booking draws a tick. Nothing pulses. **One sticker per screen may bob** (`bob`, or the selected MoodTile); every other sticker is still. Reduced motion stops all of it.

@@ -37,7 +37,7 @@ Every component answers one of four questions before you leave the house. If a p
 
 ## Logo
 
-**gathr.** (option J76): Plus Jakarta Sans Bold, lowercase, outlined, tracked −6%, with **one** circle after the r. It's the only decorative dot: no round bullets or dot separators (the marquee uses a short dash). The one functional dot is the live dot inside a badge, and the typed middle dot (·) in meta lines is punctuation.
+**gathr.** (option J76): Plus Jakarta Sans Bold, lowercase, outlined, tracked −6%, with **one** circle after the r. It's the only decorative dot: no round bullets or dot separators (the marquee uses a short dash). There are two functional dots: the live dot inside a badge and the bell's "something new" dot. The the typed middle dot (·) in meta lines is punctuation.
 
 - The dot is yellow-300 on dark, violet-500 on light (`logo-dot`). Its diameter is 1.25 × the stem.
 - Clear space = the x-height. Minimum 16px on screen, 5 mm in print.

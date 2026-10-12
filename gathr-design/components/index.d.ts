@@ -106,14 +106,16 @@ export interface TicketProps {
 }
 export declare function Ticket(props: TicketProps): React.ReactElement;
 
-export interface UpdateProps { kind?: 'task' | 'chance' | 'decide' | 'info'; title: string; /** one line, ~32 characters max; the time is appended */ meta?: string; time?: string; /** task/chance button label, e.g. "Fix", "Book" */ action?: string; /** a night's 3D object */ object?: string; /** a person's photo */ image?: string; /** gathr's own updates */ icon?: IconName; tone?: 'go' | 'limit' | 'brand' | 'wait'; unread?: boolean; acceptLabel?: string; declineLabel?: string; onAction?: () => void; onAccept?: () => void; onDecline?: () => void; className?: string }
+export interface UpdateProps { kind?: 'task' | 'chance' | 'decide' | 'info'; title: string; /** one line, ~32 characters max; the time is appended */ meta?: string; time?: string; /** task/chance button label, e.g. "Fix", "Book" */ action?: string; /** a night's 3D object */ object?: string; /** a person's photo */ image?: string; /** the person's name: with no image, the lead shows their initials */ name?: string; /** gathr's own updates */ icon?: IconName; tone?: 'go' | 'limit' | 'brand' | 'wait'; unread?: boolean; acceptLabel?: string; declineLabel?: string; onAction?: () => void; onAccept?: () => void; onDecline?: () => void; /** info rows only: makes the whole row a button that opens what it's about (keyboard: Enter, Space) */ onOpen?: () => void; className?: string }
 export declare function Update(props: UpdateProps): React.ReactElement;
-export interface UpdateLeadProps { object?: string; image?: string; icon?: IconName; tone?: 'go' | 'limit' | 'brand' | 'wait' }
+export interface UpdateLeadProps { object?: string; image?: string; /** with no image, shows the person's initials */ name?: string; icon?: IconName; tone?: 'go' | 'limit' | 'brand' | 'wait' }
 export declare function UpdateLead(props: UpdateLeadProps): React.ReactElement;
 export interface UpdateGroupProps { title: string; aside?: string; children?: React.ReactNode; className?: string }
 export declare function UpdateGroup(props: UpdateGroupProps): React.ReactElement;
-export interface ToastProps { children?: React.ReactNode; action?: string; onAction?: () => void; className?: string }
+/** The app's only toast: every short message and Undo. */
+export interface ToastProps { children?: React.ReactNode; action?: string; onAction?: () => void; /** fixed near the bottom, 32px up */ docked?: boolean; /** with docked: 12px above the tab bar */ aboveTabBar?: boolean; /** ms; defaults to 2400, or 5000 with an action */ duration?: number; /** called when the time is up */ onClose?: () => void; className?: string }
 export declare function Toast(props: ToastProps): React.ReactElement;
+export declare namespace Toast { const duration: { plain: number; action: number }; }
 
 export interface ActionBarProps { /** up to two; each needs a label */ icons?: { icon: IconName; label: string; onClick?: () => void }[]; main: { label: string; icon?: IconName; variant?: 'brand' | 'primary'; disabled?: boolean; onClick?: () => void }; className?: string }
 export declare function ActionBar(props: ActionBarProps): React.ReactElement;

@@ -1,0 +1,21 @@
+<!-- @dsCard group="Content" height=420 subtitle="The app's only toast: short messages and Undo. 32px up, or 12px above the tab bar; 2.4 s, or 5 s with an action" -->
+<!doctype html>
+<html>
+<head><meta charset="utf-8"><title>Toast — preview</title>
+<style>body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font-sans)}</style></head>
+<body>
+<div id="root"></div>
+<script>
+  var G = window.Gathr, h = React.createElement;
+  function scr(label, tab, toast){return h('div',{style:{display:'flex',flexDirection:'column',gap:'8px',alignItems:'center'}},
+    h('div',{className:'g-night',style:{position:'relative',width:'300px',height:'340px',borderRadius:'32px',overflow:'hidden',background:'var(--night-950)',boxShadow:'0 0 0 1px #ffffff14'}},
+      tab?h('div',{style:{position:'absolute',left:'16px',right:'16px',bottom:'16px',height:'68px',borderRadius:'999px',background:'var(--night-800)',boxShadow:'inset 0 0 0 1px #ffffff14'}}):null,
+      h('div',{style:{position:'absolute',left:'16px',right:'16px',bottom:tab?'96px':'32px'}},toast)),
+    h('span',{style:{fontSize:'13px',color:'var(--night-300)'}},label));}
+  ReactDOM.createRoot(document.getElementById('root')).render(h('div',{className:'g-stage',style:{display:'flex',gap:'24px',padding:'24px 16px',justifyContent:'center',flexWrap:'wrap'}},
+    scr('No tab bar · 32px up · 2.4 s',false,h(G.Toast,null,'Logged out')),
+    scr('Above the tab bar · 12px · 2.4 s',true,h(G.Toast,null,'Removed from Plans')),
+    scr('With an action · 5 s',true,h(G.Toast,{action:'Undo'},'Request declined. Ishaan won’t be told'))));
+</script>
+</body>
+</html>

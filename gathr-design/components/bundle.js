@@ -624,17 +624,21 @@
 
   /* ---------- v20 · Updates: quick glance, strong actions ---------- */
   /* lead: a night's 3D object (object), a person's photo (image), or gathr's tinted icon (icon + tone: go | limit | brand | wait) */
+  /* a person with no photo (name, no image) gets centred initials, never a silhouette */
   function UpdateLead(p) {
     if (p.image) return h('span', { className: 'g-up-lead is-person' }, h('img', { src: p.image, alt: '' }));
     if (p.object) return h('span', { className: 'g-up-lead is-night' }, h('img', { src: p.object, alt: '' }));
+    if (p.name) return h('span', { className: 'g-up-lead is-person is-initials', 'aria-hidden': 'true' }, initials(p.name));
     return h('span', { className: cx('g-up-lead', 'is-gathr', 'is-' + (p.tone || 'wait')) }, h(Icon, { name: p.icon || 'bell', size: 20 }));
   }
   /* Update: kind = task (one primary button) | chance (one violet button) | decide (Decline + Accept) | info (one line, no button) */
   function Update(p) {
     var kind = p.kind || 'info';
     var meta = [p.meta, p.time].filter(Boolean).join(' \u00b7 ');
-    var lead = h(UpdateLead, { object: p.object, image: p.image, icon: p.icon, tone: p.tone });
-    var text = h('div', { className: 'g-up-text' }, h('p', { className: 'g-up-title' }, p.title), meta ? h('p', { className: 'g-up-meta' }, meta) : null);
+    var link = kind === 'info' && typeof p.onOpen === 'function';
+    var lead = h(UpdateLead, { object: p.object, image: p.image, name: p.name, icon: p.icon, tone: p.tone });
+    var tag = link ? 'span' : 'p';
+    var text = h(link ? 'span' : 'div', { className: 'g-up-text' }, h(tag, { className: 'g-up-title' }, p.title), meta ? h(tag, { className: 'g-up-meta' }, meta) : null);
     var end = null;
     if (kind === 'task') end = h(Button, { variant: 'primary', size: 'sm', onClick: p.onAction }, p.action || 'Fix');
     else if (kind === 'chance') end = h(Button, { variant: 'brand', size: 'sm', onClick: p.onAction }, p.action || 'Book');
@@ -642,16 +646,32 @@
       h('button', { type: 'button', className: 'g-up-round is-no', 'aria-label': p.declineLabel || 'Decline', onClick: p.onDecline }, h(Icon, { name: 'x', size: 20 })),
       h('button', { type: 'button', className: 'g-up-round is-yes', 'aria-label': p.acceptLabel || 'Accept', onClick: p.onAccept }, h(Icon, { name: 'check', size: 20 })));
     else end = h(Icon, { name: 'chevron-right', size: 16, className: 'g-up-chev' });
-    return h('div', { className: cx('g-up', kind === 'info' ? 'is-info' : 'is-needs', p.unread === false && 'is-read', p.className), role: 'listitem' }, lead, text, end);
+    var cls = cx('g-up', kind === 'info' ? 'is-info' : 'is-needs', p.unread === false && 'is-read', link && 'is-link', p.className);
+    /* info rows open what they're about: with onOpen the whole row is a native button (Enter and Space work) */
+    if (link) return h('div', { className: 'g-up-item', role: 'listitem' }, h('button', { type: 'button', className: cls, onClick: p.onOpen }, lead, text, end));
+    return h('div', { className: cls, role: 'listitem' }, lead, text, end);
   }
   function UpdateGroup(p) {
     return h('section', { className: cx('g-upg', p.className) },
       h('header', { className: 'g-upg-head' }, h('h2', null, p.title), p.aside ? h('span', null, p.aside) : null),
       h('div', { className: 'g-upg-list', role: 'list' }, p.children));
   }
+  /* Toast: the app's only toast, for every short message ("Removed from Plans", "Logged out") and for Undo.
+     docked: fixed near the bottom, 32px up, or 12px above the tab bar (aboveTabBar).
+     Stays 2.4 s, or 5 s when it has an action; onClose fires when the time is up. */
+  var TOAST_MS = { plain: 2400, action: 5000 };
   function Toast(p) {
-    return h('div', { className: cx('g-toast', p.className), role: 'status' }, h('span', null, p.children), p.action ? h('button', { type: 'button', onClick: p.onAction }, p.action) : null);
+    var ms = p.duration || (p.action ? TOAST_MS.action : TOAST_MS.plain);
+    var onClose = p.onClose;
+    React.useEffect(function () {
+      if (typeof onClose !== 'function') return;
+      var t = setTimeout(onClose, ms);
+      return function () { clearTimeout(t); };
+    }, [onClose, ms]);
+    return h('div', { className: cx('g-toast', p.docked && 'g-toast-dock', p.docked && p.aboveTabBar && 'is-above-tabbar', p.className), role: 'status', 'aria-live': 'polite' },
+      h('span', null, p.children), p.action ? h('button', { type: 'button', onClick: p.onAction }, p.action) : null);
   }
+  Toast.duration = TOAST_MS;
 
   /* ActionBar: round solid icon buttons (each with a label) beside one full-width main button. Use when two text buttons won't fit at 16px */
   function ActionBar(p) {
