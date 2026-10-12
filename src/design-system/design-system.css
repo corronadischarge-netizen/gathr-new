@@ -437,3 +437,55 @@ body { margin: 0; font-family: var(--font-sans); background: var(--bg); color: v
 .g-toast span { flex: 1; font-size: 13px; line-height: 18px; font-weight: 500; }
 .g-toast button { position: relative; border: 0; background: none; padding: var(--space-2) var(--space-1); margin: calc(var(--space-2) * -1) 0; font: inherit; font-size: 15px; font-weight: 600; color: var(--night-950); cursor: pointer; }
 .g-toast button::after { content: ''; position: absolute; inset: -6px -10px; }
+
+/* Ticket: a brand moment, not app UI, so it keeps the shine recipe (expression fills only). Scoped to the ticket. From bundle.css v11.3 */
+.g-ticket-wrap {
+    --shine-top: linear-gradient(180deg, #ffffff2e 0%, #ffffff0a 38%, #ffffff00 55%);
+    --shine-violet: var(--shine-top), linear-gradient(150deg, var(--violet-300) 0%, var(--violet-500) 55%, color-mix(in srgb, var(--violet-500) 82%, var(--night-950)) 100%);
+    --shine-blue: var(--shine-top), linear-gradient(150deg, var(--blue-300) 0%, var(--blue-500) 55%, color-mix(in srgb, var(--blue-500) 82%, var(--night-950)) 100%);
+    --shine-pink: var(--shine-top), linear-gradient(150deg, color-mix(in srgb, var(--pink-300) 72%, var(--pink-100)) 0%, var(--pink-300) 50%, var(--pink-500) 100%);
+    --shine-yellow: var(--shine-top), linear-gradient(150deg, var(--yellow-100) 0%, var(--yellow-300) 45%, var(--yellow-500) 100%);
+    --shine-green: var(--shine-top), linear-gradient(150deg, color-mix(in srgb, var(--green-300) 72%, var(--green-100)) 0%, var(--green-300) 50%, var(--green-500) 100%);
+    --shine-red: var(--shine-top), linear-gradient(150deg, color-mix(in srgb, var(--red-300) 72%, var(--red-100)) 0%, var(--red-300) 50%, var(--red-500) 100%);
+    --shine-edge: inset 0 1px 0 #ffffff59, inset 0 -1px 0 #0000001f;
+}
+.g-ticket-wrap { position: relative; display: inline-block; width: 18em; filter: drop-shadow(0 1.1em 1.6em #00000099); flex: none; }
+.g-ticket {
+  --tk-stub: 12.6em; --tk-sc: .32em; --tk-gap: 1.05em; --tk-notch: .72em;
+  position: relative; display: flex; flex-direction: column; height: 29em; padding: 1.4em 1.25em 0; box-sizing: border-box; overflow: hidden;
+  background-color: var(--tk-fill); background-image: var(--tk-shine); color: var(--tk-ink);
+  border-radius: 1.1em; font-family: var(--font-sans); isolation: isolate;
+  -webkit-mask:
+    radial-gradient(circle at 50% 0, #0000 var(--tk-sc), #000 calc(var(--tk-sc) + .5px)) 0 0 / var(--tk-gap) 100% repeat-x,
+    radial-gradient(circle at 50% 100%, #0000 var(--tk-sc), #000 calc(var(--tk-sc) + .5px)) 0 0 / var(--tk-gap) 100% repeat-x,
+    radial-gradient(circle at 0 calc(100% - var(--tk-stub)), #0000 var(--tk-notch), #000 calc(var(--tk-notch) + .5px)),
+    radial-gradient(circle at 100% calc(100% - var(--tk-stub)), #0000 var(--tk-notch), #000 calc(var(--tk-notch) + .5px));
+  -webkit-mask-composite: source-in; mask-composite: intersect;
+}
+.g-ticket.is-night { box-shadow: inset 0 0 0 1px #ffffff14; }
+.g-tk-grain { opacity: .22; z-index: -1; }
+.g-tk-bloom { z-index: -1; bottom: var(--tk-stub); }
+.g-tk-head { display: flex; align-items: center; justify-content: space-between; gap: 1em; min-height: 2.2em; }
+.g-tk-logo .g-logo-word { fill: currentColor; }
+.g-tk-logo .g-logo-dot { fill: var(--yellow-300); }
+.g-ticket-yellow:not(.is-night) .g-tk-logo .g-logo-dot { fill: currentColor; }
+.g-tk-tag { position: relative; display: inline-flex; align-items: center; height: 2em; padding: 0 .85em; border-radius: var(--radius-full); background-color: var(--tk-pop); background-image: var(--tk-pop-shine); color: var(--tk-on-pop); font-size: .875em; font-weight: 600; letter-spacing: -0.01em; white-space: nowrap; transform: rotate(-4deg); box-shadow: var(--shine-edge); }
+.g-tk-tag::after { content: ""; position: absolute; top: calc(100% - 1px); right: 1.2em; width: .8em; height: .55em; background: var(--tk-pop); clip-path: polygon(0 0, 100% 0, 70% 100%); }
+.g-tk-main { margin-top: auto; padding-bottom: 1.2em; display: flex; flex-direction: column; gap: .4em; }
+.g-tk-name { margin-bottom: .2em !important; }
+.g-tk-name { margin: 0; font-family: var(--font-display); font-weight: 700; font-size: 2.25em; line-height: 1; letter-spacing: -0.04em; text-wrap: balance; }
+.g-tk-stop { color: var(--yellow-300); }
+.g-ticket-yellow:not(.is-night) .g-tk-stop { color: currentColor; }
+.g-tk-facts { display: flex; flex-wrap: wrap; gap: .3em; align-items: center; }
+.g-tk-pill { display: inline-flex; align-items: center; height: 1.85em; padding: 0 .75em; border-radius: var(--radius-full); box-shadow: inset 0 0 0 .1em currentColor; font-size: .875em; font-weight: 600; white-space: nowrap; }
+.g-tk-pill.is-solid { background: var(--night-950); color: var(--night-50); box-shadow: none; }
+.is-light-ink .g-tk-pill.is-solid, .is-night .g-tk-pill.is-solid { background: var(--night-50); color: var(--night-950); }
+.g-tk-arrow { display: inline-grid; place-items: center; width: 1.62em; height: 1.62em; border-radius: 50%; background: var(--tk-pop); color: var(--tk-on-pop); font-weight: 700; }
+/* stub: the code is centred and printed in the ticket's ink (black on light grounds, white on violet, blue and night), with the ground as its quiet zone */
+.g-tk-stub { position: relative; height: var(--tk-stub); flex: none; margin: 0 -1.25em; padding: 1.25em 1.25em 1.15em; box-sizing: border-box; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: .7em; }
+.g-tk-stub::before { content: ""; position: absolute; left: 1.25em; right: 1.25em; top: 0; border-top: .12em dashed currentColor; opacity: .4; }
+.is-night .g-tk-stub { background: var(--night-950); }
+.g-tk-code { width: 8em; height: 8em; flex: none; color: var(--tk-ink); }
+.g-tk-stub-meta { display: flex; align-items: center; gap: .6em; font-size: .75em; }
+.g-tk-admit { font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+.g-tk-no { font-weight: 600; }

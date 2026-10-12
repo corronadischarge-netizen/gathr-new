@@ -180,14 +180,12 @@
 .ob-steps i.now::after { animation: fill var(--motion-slow) var(--motion-fast) var(--ease-standard) forwards; }
 @keyframes fill { to { transform: none; } }
 
-/* ---------- booked: the tick draws itself, then the pass rises and the wristband drops onto it ----------
+/* ---------- booked: the tick draws itself, then the ticket rises ----------
    Only right after booking (.celebrate); opening a pass later just shows it. */
 .celebrate .ok-tick { animation: tag-pop var(--motion-slow) var(--ease-settle) both; }
 .celebrate .ok-tick path { stroke-dasharray: 24; animation: draw var(--motion-slower) var(--motion-fast) var(--ease-standard) both; }
 @keyframes draw { from { stroke-dashoffset: 24; } to { stroke-dashoffset: 0; } }
-.celebrate .pass-card { animation: rise var(--motion-slower) var(--motion-slow) var(--ease-enter) both; }
-.celebrate .pass-ic { animation: drop-on var(--motion-slow) calc(var(--motion-slow) + var(--motion-slower)) var(--ease-settle) both; }
-@keyframes drop-on { from { opacity: 0; translate: 0 -48px; } to { opacity: 1; translate: 0 0; } }
+.celebrate .pass-ticket { animation: rise var(--motion-slower) var(--motion-slow) var(--ease-enter) both; }
 
 /* ---------- host mode and the door ----------
    Switching between going out and hosting is a slow, full-screen cross-fade (the old screen fades out on top,
@@ -214,9 +212,9 @@
 @media (prefers-reduced-motion: reduce) {
   .ghost-fwd, .ghost-back { animation-name: fade-out !important; }
   .screen.under { transform: none; }
-  .g-tab-ind { transition: none; }
+  .g-tab-ind, .tk-slot { transition: none; }
   .screen.nav-fwd, .screen.nav-back, .sheet-slot.rise, .g-toast, .w-in, .w-card, .w-tag, .w-3d, .w-fade, .fade-up,
-  .mood, .vibe-tile, .celebrate .ok-tick, .celebrate .pass-card, .celebrate .pass-ic, .roll-up, .roll-down { animation-name: g-fade !important; }
+  .mood, .vibe-tile, .celebrate .ok-tick, .celebrate .pass-ticket, .roll-up, .roll-down { animation-name: g-fade !important; }
   .sheet-leaving .sheet-slot, .sheet-slot.sheet-leaving { animation-name: fade-out !important; }
   .shake, .bell.is-new .g-ibtn svg, .bell-count { animation: none !important; }
   .sheet-slot.settling { transition: none; }

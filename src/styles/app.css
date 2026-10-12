@@ -242,8 +242,6 @@ html.is-full .tab-fade { height: calc(110px + env(safe-area-inset-bottom, 0px));
 .vibe-check { position: absolute; top: 8px; right: 8px; width: 22px; height: 22px; border-radius: 50%; background: var(--night-50); color: var(--night-950); display: grid; place-items: center; }
 
 /* pass + plans */
-.pass-card { position: relative; overflow: visible !important; }
-.pass-ic { position: absolute; right: -10px; top: -74px; width: 88px !important; height: 88px !important; transform: rotate(14deg); }
 .empty-plan { padding-right: 96px !important; }
 .empty-ic { position: absolute; right: 4px; top: -18px; transform: rotate(12deg); }
 
@@ -364,6 +362,14 @@ html.is-full .map-ctrls { bottom: calc(132px + env(safe-area-inset-bottom, 0px))
 .guard { font-size: 13px; line-height: 16px; color: var(--go-text); }
 .pass-chip { display: inline-flex; align-items: center; height: 28px; padding: 0 12px; border-radius: 9999px; background: color-mix(in srgb, var(--green-300) 15%, transparent); color: var(--go-text); font: 600 13px/1 var(--font-sans); }
 .pass-chip.wait { background: var(--night-800); color: var(--night-300); }
+/* Plans: your tickets, fanned. The front one is upright; up to three sit behind it, tilted */
+.tk-stack { position: relative; height: 480px; }
+.tk-slot { all: unset; position: absolute; left: 50%; top: 0; cursor: pointer; border-radius: var(--radius-md); transition: transform var(--motion-slow) var(--ease-settle); }
+.tk-slot:not(.is-front) { top: var(--space-3); }
+.tk-slot:focus-visible { box-shadow: var(--focus-ring); }
+.tk-slot .g-ticket-wrap { display: block; }
+.tk-stack.is-single { height: auto; display: flex; justify-content: center; }
+.tk-stack.is-single .tk-slot { position: relative; left: 0; transform: none !important; }
 
 .no-cap { margin: 0 !important; }
 .no-cap figcaption { display: none !important; }
@@ -430,7 +436,6 @@ html.is-full .toast-live.over-tabs { bottom: calc(16px + var(--tabbar-h) + var(-
 .demo-box { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 8px; padding: 12px 14px; border-radius: 16px; background: var(--night-800); font-size: 13px; line-height: 18px; color: var(--ink-muted); }
 .demo-box b { width: 100%; color: var(--ink); font-weight: 600; }
 .demo-code { font: 700 20px/1 var(--font-sans); letter-spacing: .18em; color: var(--ink); font-variant-numeric: tabular-nums; }
-.pass-code { font: 700 20px/1 var(--font-sans); letter-spacing: .14em; color: var(--ink); }
 .poster-x { position: absolute; top: 52px; right: 16px; z-index: 2; }
 .note { color: var(--night-300); }
 .link-btn:disabled { cursor: default; }

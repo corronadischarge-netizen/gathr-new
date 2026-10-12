@@ -87,7 +87,7 @@ export function Scanner(p) {
             cv.height = hh;
             cx2.drawImage(v, 0, 0, w, hh);
             var img = cx2.getImageData(0, 0, w, hh),
-              q = jsQR(img.data, w, hh, { inversionAttempts: 'dontInvert' });
+              q = jsQR(img.data, w, hh, { inversionAttempts: 'attemptBoth' });
             found(q && q.data);
           }
           tick();

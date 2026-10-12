@@ -1,5 +1,4 @@
-import { BookedPlanCard } from '../cards/BookedPlanCard';
-import { EmptyPlanCard } from '../cards/EmptyPlanCard';
+import { TicketStack } from '../cards/TicketStack';
 import { GroupPlanSummaryCard } from '../cards/GroupPlanSummaryCard';
 import { priceTxt } from '../data/format';
 import { EVENTS, VENUES } from '../data/listings';
@@ -19,8 +18,8 @@ export function Plans(p) {
         {stop('your plans')}
       </div>
       <div className="col" style={{ gap: '12px' }}>
-        <span className="g-section-title">Booked</span>
-        {c.plan ? <BookedPlanCard ctx={c} /> : <EmptyPlanCard ctx={c} />}
+        <span className="g-section-title">Your tickets</span>
+        <TicketStack ctx={c} />
       </div>
       <div className="col" style={{ gap: '12px' }}>
         {sec(
