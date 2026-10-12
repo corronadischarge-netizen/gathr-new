@@ -1,3 +1,5 @@
+import { now } from '../lib/clock';
+
 export const WD = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
 export const MO = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
@@ -11,14 +13,14 @@ function midnight(d) {
 }
 
 export function todayTxt() {
-  var d = new Date();
+  var d = new Date(now());
   return WD[d.getDay()] + ' · ' + d.getDate() + ' ' + MO[d.getMonth()];
 }
 
 /* [key, long label, tag, short date, hue] for the day an event falls on */
 export function dayOf(e) {
   var d = new Date(e.iso),
-    diff = Math.round((midnight(d) - midnight(new Date())) / 86400000);
+    diff = Math.round((midnight(d) - midnight(new Date(now()))) / 86400000);
   if (diff >= 7) return ['later', 'Later', 'Later', 'coming up', 'red'];
   var tag = diff <= 0 ? 'Tonight' : diff === 1 ? 'Tmrw' : WD[d.getDay()].slice(0, 3);
   return [

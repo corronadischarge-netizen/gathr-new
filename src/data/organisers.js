@@ -109,6 +109,11 @@ export function orgToEvent(o, prof) {
     age: +o.age || 18,
     dress: o.dress || null,
     stag: o.stag,
+    // door rules the night form adds (home v3): stag fee, strict dress, entry closes, passes per booking
+    stagFee: +o.stagFee || null,
+    dressStrict: !!o.dressStrict,
+    arriveBy: o.arriveBy || null,
+    maxPasses: +o.maxPasses || null,
     about: o.about || '',
     capacity: +o.capacity || null,
     img: o.poster || '',

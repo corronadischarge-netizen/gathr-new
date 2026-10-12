@@ -1,6 +1,7 @@
 /* Real data: Pune listings pulled from District and Sort My Scene on 29 Sep 2026, plus ten more from District on 4 Oct 2026.
    Bookings (booked so far against a cap), friends and group votes are SAMPLE data: no live booking feed exists yet. */
 import { crowdLevel } from '../design-system/utils';
+import { now } from '../lib/clock';
 
 const SMS = 'https://assets.sortmyscene.com/img/event-hero/';
 
@@ -652,7 +653,7 @@ Object.keys(ISO).forEach((k) => {
 ORDER.sort((a, b) => new Date(EVENTS[a].iso) - new Date(EVENTS[b].iso));
 
 export function isPast(e) {
-  return Date.now() > new Date(e.iso).getTime() + 6 * 3600000;
+  return now() > new Date(e.iso).getTime() + 6 * 3600000;
 }
 
 export function upcoming() {

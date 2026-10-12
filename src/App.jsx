@@ -69,6 +69,7 @@ export function App() {
     dir: 'tab',
     login: false,
     loc: false,
+    group: null, // Going as (home v3): who's going, for the door verdict. null = not set
     phone: '',
     code: '',
     otpSent: false,
@@ -130,6 +131,7 @@ export function App() {
   /* returning visitors pick up where they left off: bookings, saves, plans, sign-in and settings live on the device */
   var PERSIST = [
     'saved',
+    'group',
     'planned',
     'onList',
     'guests',
