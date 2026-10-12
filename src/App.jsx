@@ -614,7 +614,7 @@ export function App() {
   }, []);
   /* offline: the home keeps the nights it had, and says so once (home v3 3.9) */
   useEffect(() => {
-    var off = () => toast('You’re offline. Showing what we had');
+    var off = () => toast("You're offline. Showing what we had");
     window.addEventListener('offline', off);
     if (!navigator.onLine || TEST.offline) off();
     return () => window.removeEventListener('offline', off);

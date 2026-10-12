@@ -147,7 +147,7 @@ export function EventScreen(p) {
           friendsTotal={e.nFriends}
         />
         <p className="meta" style={{ margin: 0 }}>
-          How we count: Booked so far is bookings on gathr against tonight’s cap, verified by gathr. Walk-ins aren’t
+          How we count: Booked so far is bookings on gathr against tonight's cap, verified by gathr. Walk-ins aren't
           counted, so the room can feel a little fuller
         </p>
 

@@ -384,7 +384,7 @@ export function BookSheet(p) {
           {capped ? meta('Max ' + maxPasses + ' passes per booking') : null}
           {condition ? (
             <p className="bk-cond" style={{ margin: 0 }}>
-              {condition + '. Make sure everyone’s sorted'}
+              {condition + ". Make sure everyone's sorted"}
             </p>
           ) : null}
           {e.door && e.price ? meta('Cover ' + rupees(e.price) + ' at the door') : null}
