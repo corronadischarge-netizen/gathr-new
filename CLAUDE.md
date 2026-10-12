@@ -4,24 +4,22 @@ gathr is Pune's going-out app for 18–30s. The promise: you'll know the room be
 
 The owner, Shubh, is a designer with no coding background. When you explain a change, say in plain words what you changed, why, and how to check it in the browser.
 
-## Design system (read before any UI work)
-The design system lives in `gathr-design/`. Release 21, 12 Oct 2026.
+## Design system (gathr-design, release 23)
 
-- `gathr-design/rules.md`: the brand and UI rules. Read this first, every session that touches UI.
-- `gathr-design/CHANGES-release-21.md`: the latest changes. Earlier lists: `CHANGES-release-19-20.md`, `CHANGES-release-18.md`.
-- `gathr-design/tokens.json` and `gathr-design/tokens.css`: every colour, size, radius, spacing and motion value. Each token says whether it's for the APP or EXPRESSION only.
-  - `tokens.json` is the source. `tokens.css` is generated from it. If the two ever disagree, `tokens.json` wins: say so instead of guessing.
-- `gathr-design/components/index.d.ts`: the component names and their props. This is the source of truth for props.
-- `gathr-design/components/<Name>/README.md`: how and when to use each component. `preview.html` next to it shows example markup.
-- `gathr-design/components/bundle.css` and `bundle.js`: the reference implementation (class names, styles, markup). In `bundle.css`, later rules override earlier ones.
-- `gathr-design/guides/`: the long-form guides (01 colour and type, 02 surfaces, 03 imagery, 04 voice, 05 app, 06 brand moments, 07 checklist).
-- `gathr-design/fonts/` and `gathr-design/assets/`: fonts, logo SVGs and the occasion gradients.
+- The design system lives in `gathr-design/`. It wins over everything else on visual details. Read `gathr-design/rules.md` first, then the component README for anything you build.
+- **Source of truth:** `gathr-design/tokens.json` for every value (colour, type, spacing, radius, shadow, motion). If `tokens.css` disagrees, tokens.json wins; regenerate with `python gathr-design/tools/regen_type_css.py gathr-design/tokens.json gathr-design/tokens.css`.
+- **Props:** `gathr-design/components/index.d.ts` wins over any other prop list. `components/bundle.css` and `bundle.js` are the reference implementation: match their structure, class intent and behaviour in the app's React components.
+- **Reuse before building.** Use the app's existing implementation of a design-system component. If it doesn't exist, build it from its README and index.d.ts, in the same folder as the app's other design-system components. Never inline a one-off look-alike.
+- **Never:** colours outside tokens.json · type sizes off the ladder (32/20/16/15/13/11) · italics in the app · gradients except named occasions, functional fades and the screen glow · shine on selections or buttons · glass on cards · more than one violet booking button per screen · more than one bobbing sticker per screen · percentages for crowd · a full stop at the end of a UI message.
+- **Host mode** screens are wrapped in `.g-host` (yellow-300 selections and main buttons).
+- **Every short message** is a `Toast`.
+- **Proposed release 24** components (DoorVerdict, NightTile, NightRail, GroupPill) are in `gathr-design/proposed/` and `specs/ds-new-components.md`. Build them from there for home v3; they'll move into the live system after.
+- When you change a design-system component, tell Shubh so the live design system can be updated to match.
 
 ## Rules for working in this app
 - Never invent a colour, size or spacing value. Use the tokens (as CSS variables from `tokens.css`).
 - Match component props and behaviour to `index.d.ts` and the component READMEs. If the app has its own version of a component, update it to match rather than adding a second one.
 - `bundle.js` expects React as a global (`window.React`) and puts components on `window.Gathr`. Don't load it as-is into the app; use it and `bundle.css` as the reference when building or updating the app's own React components.
-- Ignore `gathr-design/api/components/*.md` where it disagrees with `index.d.ts`. Those pages are auto-generated and some are out of date (for example CrowdMeter's).
 - Work one screen at a time. After each screen, stop, say what changed and how to check it, and wait for a go-ahead before the next.
 - Keep sample data labelled "sample" in the UI.
 - Run `gathr-design/guides/07-checklist.md` against a screen before calling it done.
