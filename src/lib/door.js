@@ -92,6 +92,30 @@ export function getDoorVerdict(door, group, profileAge, t) {
   return out('yes', [d.minAge >= 21 ? '21+ with ID' : 'ID needed'], ['id']);
 }
 
+/* the event page's "Who gets in" rows (section 7): [icon, words], from the rules we trust */
+export function doorRows(door, t) {
+  var d = trusted(door, t),
+    group =
+      d.stag === 'couples_only'
+        ? 'Couples only'
+        : d.mixedOnly
+          ? 'Mixed groups only'
+          : d.stag === 'not_allowed'
+            ? 'No stag entry'
+            : d.stag === 'fee'
+              ? 'Stags pay ' + rupees(d.stagFee || 0)
+              : d.stag === 'allowed'
+                ? 'Stag groups OK'
+                : 'Stag rules not listed';
+  var rows = [
+    ['users', group],
+    ['id-card', d.minAge != null ? d.minAge + '+, bring a government ID' : 'Age limit not listed'],
+    ['shirt', d.dress ? 'Dress code: ' + d.dress.toLowerCase() : 'Dress code: not listed']
+  ];
+  if (d.arriveBy) rows.push(['clock', 'Get in before ' + clock12(d.arriveBy)]);
+  return rows;
+}
+
 const ICON = { yes: 'check', unknown: 'info', no: 'x' };
 const IF_ICON = { dress: 'shirt', arrive: 'clock', fee: 'indian-rupee' };
 

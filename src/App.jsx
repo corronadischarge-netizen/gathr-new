@@ -30,6 +30,7 @@ import { NewPlan } from './screens/NewPlan';
 import { Notifs } from './screens/Notifs';
 import { DsPreview } from './screens/DsPreview';
 import { HomeDoor } from './screens/HomeDoor';
+import { AllNights } from './screens/AllNights';
 import { loadTravel } from './services/travel';
 import { pickedAreas } from './data/homeData';
 import { OrgEvent } from './screens/OrgEvent';
@@ -534,6 +535,7 @@ export function App() {
     phone: Phone,
     notifs: Notifs,
     dspreview: DsPreview,
+    allnights: AllNights,
     age: Age,
     tonight: HOME_LAYOUT === 'classic' ? Tonight : HomeDoor,
     map: MapScreen,
@@ -623,7 +625,9 @@ export function App() {
     if (el && !S.sheet) el.focus({ preventScroll: true });
   }, [scr, S.cur]);
   var hostTabs = S.mode === 'host' && HOST_TABS.some((t) => t[0] === scr);
-  var showTabs = hostTabs || (S.mode !== 'host' && TABS.indexOf(scr) >= 0 && !(scr === 'map' && S.mapSel));
+  // All nights (home v3) keeps the tab bar, under Tonight, as board 02 shows
+  var showTabs =
+    hostTabs || (S.mode !== 'host' && (TABS.indexOf(scr) >= 0 || scr === 'allnights') && !(scr === 'map' && S.mapSel));
   return (
     <div className={'stage' + (REVIEW ? ' has-review' : '')}>
       {REVIEW ? <ReviewPanel ctx={ctx} scr={scr} /> : null}
@@ -650,7 +654,7 @@ export function App() {
               key={hostTabs ? 'host' : 'guest'}
               className={'tabwrap' + (S.dir === 'mode' ? ' mode-in' : '')}
             >
-              {hostTabs ? <HostTabBar active={scr} onChange={tab} /> : <TabBar active={scr} onChange={tab} />}
+              {hostTabs ? <HostTabBar active={scr} onChange={tab} /> : <TabBar active={scr === 'allnights' ? 'tonight' : scr} onChange={tab} />}
             </div>
           ) : null}
           {S.scanning ? <Scanner ctx={ctx} /> : null}

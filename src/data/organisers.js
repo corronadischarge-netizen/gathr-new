@@ -45,6 +45,8 @@ export function orgVenuesLabel(pr) {
 export const STAGS = [
   ['welcome', 'Stags welcome'],
   ['groups', 'Couples and mixed groups only'],
+  ['couples', 'Couples only'],
+  ['fee', 'Stags pay an entry fee'],
   ['none', 'No stag entry']
 ];
 

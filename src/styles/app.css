@@ -656,3 +656,46 @@ html.is-sideways .upright-skip { margin-top: 16px; min-height: 44px; padding: 0 
 .home-end { margin-top: var(--space-11); display: flex; flex-direction: column; align-items: center; text-align: center; padding: 28px var(--space-5) var(--space-6); border-radius: var(--radius-lg); background: var(--night-900); }
 .home-end-title { margin: var(--space-3) 0 0; font-family: var(--font-display); font-size: 20px; line-height: 24px; font-weight: 700; letter-spacing: -0.02em; }
 .home-end-line { margin: var(--space-1) 0 var(--space-5); font-size: 15px; line-height: 20px; color: var(--ink-muted); }
+
+/* Going as sheet (home v3 section 6, board 04) */
+.ga { gap: var(--space-3); }
+.ga-caps { color: var(--ink-faint); text-transform: uppercase; margin-top: var(--space-2); }
+.ga-chips { display: flex; flex-wrap: wrap; gap: var(--space-2); }
+.ga-step { display: flex; align-items: center; justify-content: space-between; gap: var(--space-3); padding: var(--space-3) var(--space-4); border-radius: var(--radius-md); background: var(--night-800); }
+.ga-step-ctl { display: flex; align-items: center; gap: var(--space-4); }
+.ga-step-n { min-width: 24px; text-align: center; font-family: var(--font-display); font-size: 20px; line-height: 24px; font-weight: 700; }
+.ga-step .g-ibtn:disabled { opacity: var(--opacity-disabled); cursor: default; }
+.ga-note { display: flex; align-items: center; gap: var(--space-3); padding: var(--space-3) var(--space-4); border-radius: var(--radius-md); box-shadow: inset 0 0 0 1px var(--line); color: var(--ink-muted); font-size: 13px; line-height: 18px; }
+
+/* All nights (home v3 section 4, board 02) */
+.an-page { padding: var(--space-12) 0 140px; }
+.an-head { display: flex; align-items: center; gap: var(--space-3); }
+.an-title { flex: 1; min-width: 0; gap: 2px; }
+.an-title .g-section-title { margin: 0; }
+.an-chips { display: flex; gap: var(--space-2); margin-top: var(--space-3); padding: 0 var(--space-4); overflow-x: auto; scrollbar-width: none; }
+.an-chips::-webkit-scrollbar { display: none; }
+.an-chips .g-chip { flex: none; }
+.an-chips + .an-day { margin-top: var(--space-4); }
+.an-day { scroll-margin-top: 0; }
+.an-day + .an-day { margin-top: var(--space-6); }
+.an-day-head { position: sticky; top: 0; z-index: 2; display: flex; align-items: center; justify-content: space-between; gap: var(--space-3); padding-top: var(--space-3); padding-bottom: var(--space-2); background: var(--bg); }
+.an-day-head .g-section-title { margin: 0; }
+.an-notfor { all: unset; box-sizing: border-box; display: flex; align-items: center; justify-content: space-between; gap: var(--space-3); padding: var(--space-3) 0; color: var(--ink); cursor: pointer; box-shadow: inset 0 -1px 0 var(--line); }
+.an-notfor:focus-visible { box-shadow: var(--focus-ring); border-radius: var(--radius-sm); }
+
+/* Event page (home v3 section 7, board 03): VenueHero, then Who gets in, Tonight so far, How we count */
+.ev3 { padding-bottom: var(--space-12); }
+.ev3-body { gap: var(--space-6); padding-top: var(--space-6); }
+.ev3-door { gap: var(--space-3); }
+.ev3-card { display: flex; flex-direction: column; gap: var(--space-3); padding: var(--space-4); border-radius: var(--radius-md); background: var(--night-900); box-shadow: inset 0 0 0 1px var(--line); }
+.ev3-rules { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: var(--space-2); }
+.ev3-rules li { display: flex; align-items: center; gap: var(--space-2); font-size: 15px; line-height: 20px; }
+.ev3-rules .g-icon { color: var(--ink-muted); }
+.ev3-going { all: unset; box-sizing: border-box; display: flex; align-items: center; justify-content: space-between; gap: var(--space-3); min-height: 44px; margin-bottom: calc(var(--space-2) * -1); color: var(--ink-muted); font-size: 13px; line-height: 18px; cursor: pointer; }
+.ev3-going:focus-visible { box-shadow: var(--focus-ring); border-radius: var(--radius-sm); }
+.ev3-try { all: unset; box-sizing: border-box; display: flex; align-items: center; justify-content: space-between; gap: var(--space-3); min-height: 44px; padding: var(--space-3) var(--space-4); border-radius: var(--radius-md); background: var(--night-900); box-shadow: inset 0 0 0 1px var(--line); font-size: 15px; line-height: 20px; cursor: pointer; }
+.ev3-try:focus-visible { box-shadow: var(--focus-ring); }
+.ev3-more { display: flex; flex-direction: column; }
+.ev3-more .rule-link .g-icon { color: var(--ink-muted); }
+/* booking sheet: the door's condition for the group (home v3 5.8) */
+.bk-cond { font-size: 15px; line-height: 20px; font-weight: 600; color: var(--ink); }

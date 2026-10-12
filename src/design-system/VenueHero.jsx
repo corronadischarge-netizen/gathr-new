@@ -59,7 +59,14 @@ export function VenueHero(p) {
         <TrustLine cap={p.cap} updated={p.updated} />
       </div>
       <div className="g-vh2-cta">
-        <Button variant={p.actionVariant || 'brand'} size="lg" block icon="ticket" disabled={p.actionDisabled}>
+        {/* when someone can't book, the button says why, with the lock icon (home v3 section 7) */}
+        <Button
+          variant={p.actionVariant || 'brand'}
+          size="lg"
+          block
+          icon={p.actionDisabled ? 'lock' : 'ticket'}
+          disabled={p.actionDisabled}
+        >
           {p.action || 'Get passes'}
         </Button>
       </div>

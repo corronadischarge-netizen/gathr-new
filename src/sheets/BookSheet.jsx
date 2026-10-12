@@ -2,6 +2,10 @@ import { useEffect, useRef, useState } from 'react';
 import { AuthForm } from '../components/AuthForm';
 import { Switch } from '../components/Switch';
 import { rupees } from '../data/format';
+import { doorOf } from '../data/doorRules';
+import { currentGroup, isSet } from '../data/group';
+import { now } from '../lib/clock';
+import { getDoorVerdict, verdictText } from '../lib/door';
 import { Button, Chip, Sheet } from '../design-system';
 import { haptic } from '../lib/haptics';
 import { useMachine } from '../lib/machine';
@@ -87,6 +91,13 @@ export function BookSheet(p) {
       }
     );
   }
+  /* home v3 (5.8): the host's limit per booking, and the door's condition for this group */
+  var door = doorOf(e),
+    maxPasses = door.maxPasses || 6,
+    group = currentGroup(S),
+    capped = isSet(group) && group.size > maxPasses,
+    verdict = getDoorVerdict(door, group, S.age, now()),
+    condition = verdict.state === 'if' ? verdictText(verdict, group, 'line').text : null;
   var n = gpb ? crew.length : dbNight ? party.couples * 2 + party.stags + party.girls : S.guests,
     each = e.door ? 0 : e.price || 0,
     gross = each * n;
@@ -103,12 +114,12 @@ export function BookSheet(p) {
   var credit = each && S.credit > 0 && useCredit ? Math.min(S.credit, gross) : 0,
     total = gross - credit;
   var payLabel = e.rsvp
-    ? 'RSVP for ' + n
+    ? 'Get on the list · ' + n
     : each
       ? total
         ? 'Pay ' + rupees(total)
         : 'Book with credit'
-      : 'Book ' + n + (n === 1 ? ' pass' : ' passes') + ' · pay at the door';
+      : 'Get on the list';
   function done(payId, booking) {
     var earned = n >= 3 && each && !(booking && booking.guests) ? 50 : 0;
     c.set((o) => ({
@@ -359,8 +370,8 @@ export function BookSheet(p) {
                 type="button"
                 className="g-ibtn g-ibtn-solid step"
                 aria-label="One more pass"
-                disabled={n >= 6 || !!S.busy}
-                onClick={() => c.set({ guests: Math.min(6, n + 1) })}
+                disabled={n >= maxPasses || !!S.busy}
+                onClick={() => c.set({ guests: Math.min(maxPasses, n + 1) })}
               >
                 {svgIcon(['M5 12h14', 'M12 5v14'])}
               </button>
@@ -370,6 +381,13 @@ export function BookSheet(p) {
       )}
       {guestMode ? null : (
         <>
+          {capped ? meta('Max ' + maxPasses + ' passes per booking') : null}
+          {condition ? (
+            <p className="bk-cond" style={{ margin: 0 }}>
+              {condition + '. Make sure everyone’s sorted'}
+            </p>
+          ) : null}
+          {e.door && e.price ? meta('Cover ' + rupees(e.price) + ' at the door') : null}
           {each && S.credit > 0 && S.signedIn ? (
             <div className="rowc between" style={{ gap: '12px' }}>
               <div className="col" style={{ gap: '2px' }}>

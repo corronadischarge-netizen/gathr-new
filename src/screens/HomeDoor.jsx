@@ -26,7 +26,7 @@ import { Tap } from '../ui/Tap';
    ?home=classic shows the previous home */
 
 /* sounds for "Not feeling these?": the night tag, its name and its sticker (object stickers only) */
-const SOUNDS = [
+export const SOUNDS = [
   ['bollywood', 'Bollywood', 'disco-ball'],
   ['live', 'Live gigs', 'mic'],
   ['commercial', 'Commercial', 'speaker'],
@@ -47,13 +47,13 @@ function shortDate(day) {
   return WD[d.getUTCDay()].slice(0, 3) + ' ' + d.getUTCDate() + ' ' + MO[d.getUTCMonth()];
 }
 
-function priceLabel(e) {
+export function priceLabel(e) {
   if (e.rsvp || e.price === 0) return 'Free';
   if (e.price == null) return null;
   return '₹' + e.price.toLocaleString('en-IN');
 }
 
-function soundOf(e) {
+export function soundOf(e) {
   var s = SOUNDS.filter((x) => (e.tags || []).indexOf(x[0]) >= 0)[0];
   return s ? s[1] : (e.genre || '').split(/[,·]/)[0].trim();
 }
@@ -96,13 +96,13 @@ function groupPill(c, group) {
       state: 'group-set',
       people: [{ name: S.me.name || 'You', image: S.me.photo }],
       title: 'Going as ' + groupLabel(group) + ', ' + agePhrase(group, S.age),
-      onOpen: () => c.toast('Going as opens here (phase 4)')
+      onOpen: () => c.set({ sheet: 'goingas' })
     };
   return {
     state: 'group-unset',
     title: "Who's going?",
     line: 'Add your group to check the door',
-    onOpen: () => c.toast('Going as opens here (phase 4)')
+    onOpen: () => c.set({ sheet: 'goingas' })
   };
 }
 
@@ -113,7 +113,7 @@ export function HomeDoor(p) {
     w = homeWindow(t),
     group = currentGroup(S),
     items = homeItems(S, t),
-    allNights = () => c.toast('All nights opens here (phase 4)');
+    allNights = (day, sound) => c.go('allnights', { anDay: day || null, anFilters: sound ? { sound: sound } : {} });
   var on = (day) => items.filter((it) => it.day === day && !it.over);
 
   // the hero: tonight's best for the group; with nothing on tonight at all, tomorrow's
@@ -150,7 +150,7 @@ export function HomeDoor(p) {
         key={r.key}
         title={title(got)}
         seeAllLabel={seeAll(got)}
-        onSeeAll={allNights}
+        onSeeAll={() => allNights(r.days[0])}
         total={got.more || undefined}
       >
         {got.tiles.map(tile)}
@@ -289,7 +289,7 @@ export function HomeDoor(p) {
                 stickerSize={64}
                 action={x[1] + ' this week'}
                 className="home-mood"
-                onClick={allNights}
+                onClick={() => allNights(null, x[0][0])}
               />
             ))}
           </div>
@@ -306,7 +306,7 @@ export function HomeDoor(p) {
             <Stop />
           </h2>
           <p className="home-end-line">{isSet(group) ? fits + ' let your group in' : week.length + ' nights on'}</p>
-          <Button variant="primary" iconRight="arrow-right" onClick={allNights}>
+          <Button variant="primary" iconRight="arrow-right" onClick={() => allNights()}>
             See them all
           </Button>
         </section>

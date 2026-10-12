@@ -1,5 +1,5 @@
 /* Going as: who's going tonight, so the door rules can be checked for the whole group (home spec 5.1).
-   group = { type: 'guys' | 'girls' | 'mixed' | 'couple' | null, size, women, men, under21, under25, source: 'manual' | 'plan' }
+   group = { type: 'guys' | 'girls' | 'mixed' | 'couple' | 'solo' (just me, board 04) | null, size, women, men, under21, under25, source: 'manual' | 'plan' }
    null (or no type) = not set. Stored on the phone as S.group. */
 
 export function isSet(g) {
@@ -10,6 +10,8 @@ export function isSet(g) {
 export function stags(g) {
   if (!isSet(g)) return 0;
   if (g.type === 'guys') return g.size || 1;
+  // just me: we don't know your gender, so stag rules count (stricter, never a refused door)
+  if (g.type === 'solo') return 1;
   if (g.type === 'mixed') return Math.max(0, (g.men || 0) - (g.women || 0));
   return 0;
 }
@@ -27,7 +29,7 @@ function hasSplit(g) {
 
 /* "4 guys", "you", "a couple", "1 couple + 2 guys", "5 friends" */
 export function groupLabel(g) {
-  if (!isSet(g)) return 'you';
+  if (!isSet(g) || g.type === 'solo') return 'you';
   var n = g.size || 1;
   if (g.type === 'guys') return n === 1 ? 'you' : n + ' guys';
   if (g.type === 'girls') return n === 1 ? 'you' : n + ' girls';
@@ -38,7 +40,7 @@ export function groupLabel(g) {
     who = (g.men || 0) > (g.women || 0) ? 'guys' : 'girls';
   if (!c) return n + ' ' + who;
   var cs = c + (c === 1 ? ' couple' : ' couples');
-  return extra ? cs + ' + ' + extra + ' ' + who : cs;
+  return extra ? cs + ' + ' + extra + ' ' + (extra === 1 ? who.slice(0, -1) : who) : cs;
 }
 
 /* anyone under 21 / under 25: from the group, and from your own profile age (you're in the group) */

@@ -72,6 +72,54 @@ export function NewPlan(p) {
         </div>
         {meta('At the deadline, the top night wins and you book it for everyone')}
       </div>
+      {/* home v3: asked once, so every night's door rules are checked for the whole group */}
+      <div className="col" style={{ gap: '12px' }}>
+        <span className="g-section-title">Who's going?</span>
+        <div className="wrap" role="radiogroup" aria-label="Your group">
+          {[
+            ['guys', 'Guys'],
+            ['girls', 'Girls'],
+            ['mixed', 'Mixed group', 'users']
+          ].map((x) => (
+            <Chip
+              key={x[0]}
+              icon={x[2]}
+              role="radio"
+              aria-pressed={undefined}
+              aria-checked={d.groupType === x[0]}
+              selected={d.groupType === x[0]}
+              onClick={() => upd({ groupType: x[0], women: x[0] === 'mixed' ? d.women || 2 : 0 })}
+            >
+              {x[1]}
+            </Chip>
+          ))}
+        </div>
+        {d.groupType === 'mixed' ? (
+          <div className="wrap" role="radiogroup" aria-label="How many girls, you included">
+            {[1, 2, 3, 4].map((k) => (
+              <Chip
+                key={k}
+                role="radio"
+                aria-pressed={undefined}
+                aria-checked={d.women === k}
+                selected={d.women === k}
+                onClick={() => upd({ women: k })}
+              >
+                {k + (k === 1 ? ' girl' : ' girls')}
+              </Chip>
+            ))}
+          </div>
+        ) : null}
+        <div className="wrap" role="radiogroup" aria-label="Anyone under 21?">
+          <Chip role="radio" aria-pressed={undefined} aria-checked={!d.under21} selected={!d.under21} onClick={() => upd({ under21: false })}>
+            No, all 21+
+          </Chip>
+          <Chip role="radio" aria-pressed={undefined} aria-checked={!!d.under21} selected={!!d.under21} onClick={() => upd({ under21: true })}>
+            Someone is
+          </Chip>
+        </div>
+        {meta('It checks every night’s door rules for the whole group')}
+      </div>
       <div className="bottom-stack" style={{ alignItems: 'stretch' }}>
         <Button
           variant="primary"
@@ -91,6 +139,11 @@ export function NewPlan(p) {
                 deadline: d.deadline,
                 votes: votes,
                 members: ['Zoya', 'Aman', 'Kavya', 'Kabir'],
+                // the group's make-up, for the door verdicts (5 with you: the 4 sample friends + you)
+                groupType: d.groupType || null,
+                women: d.groupType === 'mixed' ? d.women || 0 : 0,
+                men: d.groupType === 'mixed' ? 5 - (d.women || 0) : 0,
+                under21: !!d.under21,
                 stage: 'voting',
                 booked: null,
                 fresh: true

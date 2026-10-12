@@ -297,7 +297,8 @@ export function pushNight(o, status, pr) {
         price: o.entry === 'free' ? null : +o.price || null,
         capacity: +o.capacity || null,
         min_age: +o.age || 18,
-        stag_policy: o.stag,
+        // the database knows welcome, groups and none; the home v3 options go as the nearest until it learns them
+        stag_policy: { fee: 'welcome', couples: 'groups' }[o.stag] || o.stag,
         dress: o.dress || null,
         status: status
       };

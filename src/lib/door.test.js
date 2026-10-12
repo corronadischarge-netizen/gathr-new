@@ -27,10 +27,13 @@ test('group maths: stags, couples, label, age phrase', () => {
   assert.equal(groupLabel(guys(1)), 'you');
   assert.equal(groupLabel(girls(1)), 'you');
   assert.equal(groupLabel(couple), 'a couple');
-  assert.equal(groupLabel(mixed(2, 3)), '2 couples + 1 guys');
+  assert.equal(groupLabel(mixed(2, 3)), '2 couples + 1 guy');
+  assert.equal(groupLabel(mixed(1, 4)), '1 couple + 3 guys');
   assert.equal(groupLabel(mixed(1, 1)), '1 couple');
   assert.equal(groupLabel({ type: 'mixed', size: 5 }), '5 friends');
   assert.equal(groupLabel(null), 'you');
+  assert.equal(groupLabel({ type: 'solo', size: 1 }), 'you');
+  assert.equal(stags({ type: 'solo', size: 1 }), 1);
   assert.equal(agePhrase(guys(4)), 'all 21+');
   assert.equal(agePhrase(guys(4, { under21: true })), 'someone under 21');
   assert.equal(agePhrase(guys(4), '18 to 20'), 'someone under 21');

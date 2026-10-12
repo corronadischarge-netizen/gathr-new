@@ -3,6 +3,7 @@ import { OrgBack } from '../components/OrgBack';
 import { VENUES } from '../data/listings';
 import { KindPicker, SoundPicker } from '../components/SoundPicker';
 import { ORG_KEY, STAGS, orgLoad, orgSave, orgVenueIds, syncOrg } from '../data/organisers';
+import { Switch } from '../components/Switch';
 import { Button, Chip } from '../design-system';
 import { store } from '../lib/utils';
 import { haptic } from '../lib/haptics';
@@ -91,6 +92,7 @@ export function OrgForm(p) {
   if (!D.family) need.push('a genre family');
   if (D.entry === 'paid' && !(+D.price > 0)) need.push('a price');
   if (!D.stag) need.push('your stag policy');
+  if (D.stag === 'fee' && !(+D.stagFee > 0)) need.push('the stag fee');
   if (!D.poster) need.push('a poster');
   const [saving, setSaving] = useState(null); // 'draft' or 'review' while a save is on its way
   function save(status) {
@@ -359,6 +361,22 @@ export function OrgForm(p) {
           ))}
         </div>
       </div>
+      {D.stag === 'fee'
+        ? F(
+            'Stag entry fee',
+            'of-stagfee',
+            <div className="field-row">
+              <span className="meta">₹</span>
+              <input
+                id="of-stagfee"
+                inputMode="numeric"
+                value={D.stagFee || ''}
+                placeholder="500"
+                onChange={(e) => upd({ stagFee: e.target.value.replace(/\D/g, '').slice(0, 5) })}
+              />
+            </div>
+          )
+        : null}
       {F(
         'Dress code (optional)',
         'of-dress',
@@ -369,6 +387,35 @@ export function OrgForm(p) {
             maxLength={40}
             placeholder="Smart casual, no shorts"
             onChange={(e) => upd({ dress: e.target.value })}
+          />
+        </div>
+      )}
+      {D.dress ? (
+        <div className="rowc between" style={{ gap: '12px' }}>
+          <div className="col" style={{ gap: '2px' }}>
+            <span className="title15">Strict dress code</span>
+            {meta('People are turned away without it')}
+          </div>
+          <Switch on={!!D.dressStrict} label="Strict dress code" onClick={() => upd({ dressStrict: !D.dressStrict })} />
+        </div>
+      ) : null}
+      {F(
+        'Entry closes (optional)',
+        'of-arrive',
+        <div className="field-row">
+          <input id="of-arrive" type="time" value={D.arriveBy || ''} onChange={(e) => upd({ arriveBy: e.target.value })} />
+        </div>
+      )}
+      {F(
+        'Most passes per booking (optional)',
+        'of-maxpasses',
+        <div className="field-row">
+          <input
+            id="of-maxpasses"
+            inputMode="numeric"
+            value={D.maxPasses || ''}
+            placeholder="6"
+            onChange={(e) => upd({ maxPasses: e.target.value.replace(/\D/g, '').slice(0, 2) })}
           />
         </div>
       )}
