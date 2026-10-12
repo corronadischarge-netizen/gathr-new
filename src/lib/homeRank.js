@@ -29,7 +29,8 @@ export function heroPick(items, day) {
       !it.over &&
       !it.soldOut &&
       !it.promoted &&
-      (it.verdict.state === 'yes' || it.verdict.state === 'if')
+      // no group set: the house rule is shown plainly and doesn't rule a night out (age still does)
+      (it.verdict.state === 'yes' || it.verdict.state === 'if' || it.verdict.plain)
   );
   if (!c.length) return null;
   c = c

@@ -104,3 +104,10 @@ test('rails: the window day, the next 6 days, then next week', () => {
   var later = night({ day: '2026-10-24' });
   assert.equal(railFor([later], rails[7]).tiles[0].id, later.id);
 });
+
+test('group not set: plain house rules can be the hero; an age no or a missing age limit can\'t', () => {
+  var plain = night({ verdict: { state: 'unknown', plain: true } }),
+    ageNo = night({ verdict: { state: 'no' }, friends: 3 }),
+    ageUnknown = night({ verdict: { state: 'unknown', plain: false }, friends: 3 });
+  assert.equal(heroPick([plain, ageNo, ageUnknown], DAY).id, plain.id);
+});

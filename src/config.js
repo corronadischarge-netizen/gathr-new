@@ -33,3 +33,11 @@ export const REVIEW = /[?&]review\b/.test(location.search);
 
 /* Which home: the door-first home v3 by default; ?home=classic shows the previous one, for the comparison test */
 export const HOME_LAYOUT = /[?&]home=classic\b/.test(location.search) ? 'classic' : 'door';
+
+/* Test switches for home v3's edge states (phase 5): ?loading shows the skeletons, ?offline the offline toast,
+   ?group=none the home as if no group or plan were set */
+export const TEST = {
+  loading: /[?&]loading\b/.test(location.search),
+  offline: /[?&]offline\b/.test(location.search),
+  noGroup: /[?&]group=none\b/.test(location.search)
+};

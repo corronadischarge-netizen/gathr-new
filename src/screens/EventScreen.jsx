@@ -8,6 +8,7 @@ import { Button, DoorVerdict, Icon, TonightSoFar, VenueHero } from '../design-sy
 import { homeWindow, now } from '../lib/clock';
 import { doorRows, getDoorVerdict, verdictSource, verdictText } from '../lib/door';
 import { heroPick } from '../lib/homeRank';
+import { log } from '../lib/log';
 import { shareToast } from '../lib/utils';
 import { Share } from '../services/share';
 import { btnLabel, icon } from '../ui/helpers';
@@ -52,6 +53,7 @@ export function EventScreen(p) {
     c.set({ guests: n, sheet: e.age >= 21 && !S.age ? 'age' : 'list', after: 'list' });
   }
   function ask() {
+    log('verdict_ask_venue', { nightId: e.id });
     // no venue numbers yet: the question goes to gathr, who calls the venue
     Share.open(
       'mailto:' +
@@ -130,7 +132,7 @@ export function EventScreen(p) {
                 </li>
               ))}
             </ul>
-            <button type="button" className="ev3-going" onClick={() => c.set({ sheet: 'goingas' })}>
+            <button type="button" className="ev3-going" onClick={() => c.set({ sheet: 'goingas', gaFrom: 'event' })}>
               <span>{'Going as ' + groupLabel(group) + ' · ' + agePhrase(group, S.age)}</span>
               {icon('chevron-right', 20)}
             </button>

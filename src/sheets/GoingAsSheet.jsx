@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { currentGroup, groupLabel } from '../data/group';
 import { Button, Chip, Icon, IconButton, Sheet } from '../design-system';
+import { log } from '../lib/log';
 
 /* Going as (home spec section 6, board 04): who's going tonight, so every night's door rules are checked for the
    whole group. Saving re-ranks the home and changes every verdict at once */
@@ -52,7 +53,11 @@ export function GoingAsSheet(p) {
     x.size = x.women + x.men;
     setG(x);
   }
+  useEffect(() => {
+    log('going_as_open', { from: S.gaFrom || 'home' });
+  }, []);
   function save(next) {
+    log('going_as_save', { type: next.type, size: next.size, under21: !!next.under21 });
     c.set({ group: Object.assign({}, next, { source: 'manual' }), sheet: null });
   }
   var count = g.type !== 'solo' && g.type !== 'couple';

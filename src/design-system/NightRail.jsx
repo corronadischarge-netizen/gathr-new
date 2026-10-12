@@ -1,16 +1,44 @@
-import { Children } from 'react';
+import { Children, useEffect, useRef } from 'react';
 import { Button } from './Button';
 import { Icon } from './Icon';
 import { cx } from './utils';
 
 /* A titled horizontal row of NightTiles for one day. The next tile peeks from the right; tiles snap to their start.
-   When the day has more nights than tiles (total), a "See all {n}" end tile closes the row */
+   When the day has more nights than tiles (total), a "See all {n}" end tile closes the row.
+   App additions for logging: onView (first time half of it is on screen), onScroll(maxIndex) (the furthest tile seen) */
 export function NightRail(p) {
-  var tiles = Children.toArray(p.children).filter(Boolean);
+  var tiles = Children.toArray(p.children).filter(Boolean),
+    box = useRef(null),
+    far = useRef(-1);
+  useEffect(() => {
+    if (!p.onView || !box.current || typeof IntersectionObserver === 'undefined') return;
+    var io = new IntersectionObserver(
+      (es) => {
+        if (es.some((x) => x.isIntersecting)) {
+          io.disconnect();
+          p.onView();
+        }
+      },
+      { threshold: 0.5 }
+    );
+    io.observe(box.current);
+    return () => io.disconnect();
+  }, []);
   if (!tiles.length) return null;
   var more = p.total && p.total > tiles.length;
+  function scrolled(e) {
+    if (!p.onScroll) return;
+    var el = e.currentTarget,
+      first = el.firstElementChild,
+      step = first ? first.getBoundingClientRect().width + 12 : 168,
+      i = Math.min(tiles.length - 1, Math.floor((el.scrollLeft + el.clientWidth - 16) / step));
+    if (i > far.current) {
+      far.current = i;
+      p.onScroll(i);
+    }
+  }
   return (
-    <section className={cx('g-rail', p.className)}>
+    <section className={cx('g-rail', p.className)} ref={box}>
       <div className="g-rail-head">
         <h2 className="g-rail-title">{p.title}</h2>
         {p.seeAllLabel && p.onSeeAll ? (
@@ -19,7 +47,13 @@ export function NightRail(p) {
           </Button>
         ) : null}
       </div>
-      <div className="g-rail-scroll" role="list" aria-label={p.title + ', ' + (p.total || tiles.length) + ' nights'} tabIndex={0}>
+      <div
+        className="g-rail-scroll"
+        role="list"
+        aria-label={p.title + ', ' + (p.total || tiles.length) + ' nights'}
+        tabIndex={0}
+        onScroll={scrolled}
+      >
         {tiles.map((t, i) => (
           <div key={t.key || i} role="listitem" className="g-rail-item">
             {t}

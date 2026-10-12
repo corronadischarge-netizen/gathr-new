@@ -7,6 +7,7 @@ import { Chip, Icon, IconButton, NightTile } from '../design-system';
 import { addDays, homeWindow, now, weekdayOf } from '../lib/clock';
 import { verdictText } from '../lib/door';
 import { notForYou, railItems } from '../lib/homeRank';
+import { log } from '../lib/log';
 import { SOUNDS, priceLabel } from './HomeDoor';
 
 /* All nights (home spec section 4, board 02): the full list, by day, with the time chips and quick filters.
@@ -114,7 +115,7 @@ export function AllNights(p) {
             {isSet(group) ? 'Going as ' + groupLabel(group) + ' · ' + agePhrase(group, S.age) : 'Going as you · set your group to check the door'}
           </span>
         </div>
-        <IconButton icon="sliders-horizontal" label="Who's going" variant="solid" onClick={() => c.set({ sheet: 'goingas' })} />
+        <IconButton icon="sliders-horizontal" label="Who's going" variant="solid" onClick={() => c.set({ sheet: 'goingas', gaFrom: 'allnights' })} />
       </div>
       <div className="an-chips" role="group" aria-label="Jump to">
         {chips.map((x) => (
@@ -160,7 +161,10 @@ export function AllNights(p) {
                   open[day] ? (
                     out.map(row)
                   ) : (
-                    <button type="button" className="an-notfor" onClick={() => setOpen(Object.assign({}, open, { [day]: true }))}>
+                    <button type="button" className="an-notfor" onClick={() => {
+                        log('not_for_you_expand', { day: day });
+                        setOpen(Object.assign({}, open, { [day]: true }));
+                      }}>
                       <span className="col">
                         <span className="title15">{'Not for your group · ' + out.length}</span>
                         <span className="meta">{out[0].verdict.reasons[0]}</span>

@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { HOST_TABS, HostTabBar } from './components/HostTabBar';
 import { ReviewPanel } from './components/ReviewPanel';
 import { Scanner } from './components/Scanner';
-import { HOME_LAYOUT, REVIEW } from './config';
+import { HOME_LAYOUT, REVIEW, TEST } from './config';
 import { EVENTS, VENUES, isPast } from './data/listings';
 import { NEXT_CITIES } from './data/options';
 import { hostNights } from './data/hostNights';
@@ -75,6 +75,7 @@ export function App() {
     login: false,
     loc: false,
     group: null, // Going as (home v3): who's going, for the door verdict. null = not set
+    groupOff: TEST.noGroup, // ?group=none (test): the home as if no group or plan were set
     phone: '',
     code: '',
     otpSent: false,
@@ -277,7 +278,8 @@ export function App() {
         setRemoteFeed(feed);
         set({ feedAt: Date.now() });
       })
-      .catch(() => {});
+      // the feed couldn't load (offline): the home stops waiting and shows what it has
+      .catch(() => set({ feedFailed: true }));
     if (!S.signedIn) return;
     Remote.pullMine()
       .then((mine) => {
@@ -609,6 +611,13 @@ export function App() {
       gone = true;
       if (handle) handle.remove();
     };
+  }, []);
+  /* offline: the home keeps the nights it had, and says so once (home v3 3.9) */
+  useEffect(() => {
+    var off = () => toast('You’re offline. Showing what we had');
+    window.addEventListener('offline', off);
+    if (!navigator.onLine || TEST.offline) off();
+    return () => window.removeEventListener('offline', off);
   }, []);
   /* road travel times from your picked areas to every venue (routing service; kept on the phone for a week) */
   var areasKey = pickedAreas(S).join('|');

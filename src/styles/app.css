@@ -699,3 +699,17 @@ html.is-sideways .upright-skip { margin-top: 16px; min-height: 44px; padding: 0 
 .ev3-more .rule-link .g-icon { color: var(--ink-muted); }
 /* booking sheet: the door's condition for the group (home v3 5.8) */
 .bk-cond { font-size: 15px; line-height: 20px; font-weight: 600; color: var(--ink); }
+
+/* Home v3 states (section 3.9): skeletons while loading, the nothing-fits and quiet-week cards, long names */
+.home-skel { background: var(--night-800); border-radius: var(--radius-md); }
+.home-skel-pill { height: 56px; border-radius: var(--radius-full); }
+.home-skel-line { width: 55%; height: 16px; border-radius: var(--radius-full); }
+.home-skel-card { height: 360px; border-radius: var(--radius-lg); }
+.home-skel-btn { height: 56px; border-radius: var(--radius-full); }
+.home-skel-row { display: flex; gap: var(--space-3); padding: 0 var(--space-4); overflow: hidden; }
+.home-card { display: flex; flex-direction: column; align-items: center; gap: var(--space-3); padding: 28px var(--space-5) var(--space-6); border-radius: var(--radius-lg); background: var(--night-900); text-align: center; }
+.home-card-title { margin: 0; font-family: var(--font-display); font-size: 20px; line-height: 24px; font-weight: 700; letter-spacing: -0.02em; }
+.home-card-line { margin: 0; font-size: 15px; line-height: 20px; color: var(--ink-muted); }
+.home-hero .g-venue-name { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.home-swap { animation: g-fade var(--dur-base) var(--ease-standard); }
+@media (prefers-reduced-motion: reduce) { .home-swap { animation: none; } }

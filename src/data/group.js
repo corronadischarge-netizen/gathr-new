@@ -74,6 +74,7 @@ export function groupFromPlan(gp) {
 
 /* the group the home checks the door for: what you set in Going as wins; otherwise an active plan's group */
 export function currentGroup(S) {
+  if (S.groupOff) return null; // ?group=none: the home as if nothing were set
   if (isSet(S.group) && S.group.source === 'manual') return S.group;
   if (S.gp && (S.gp.stage === 'voting' || S.gp.stage === 'booked')) return groupFromPlan(S.gp);
   return isSet(S.group) ? S.group : null;
