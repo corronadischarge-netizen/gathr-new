@@ -489,3 +489,7 @@ body { margin: 0; font-family: var(--font-sans); background: var(--bg); color: v
 .g-tk-stub-meta { display: flex; align-items: center; gap: .6em; font-size: .75em; }
 .g-tk-admit { font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
 .g-tk-no { font-weight: 600; }
+
+/* Sticker: a 3D object from assets/Stickers, still unless it's the screen's one bob (motion.css). From bundle.css */
+.g-sticker { display: block; object-fit: contain; filter: drop-shadow(0 14px 18px #00000099); transform: rotate(var(--tilt, 0deg)); }
+.g-sticker-ph { display: grid; place-items: center; border-radius: 28%; background: var(--night-700); color: var(--night-300); font-size: 11px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; box-shadow: inset 0 0 0 1.5px var(--night-600); transform: rotate(var(--tilt, 0deg)); }

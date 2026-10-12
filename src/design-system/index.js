@@ -37,6 +37,7 @@ export { Stop } from './Stop';
 export { SocialSlide } from './SocialSlide';
 export { EventPoster } from './EventPoster';
 export { Ticket } from './Ticket';
+export { Sticker } from './Sticker';
 export { SiteHeader } from './SiteHeader';
 export { Update, UpdateGroup, UpdateLead } from './Update';
 export { Toast } from './Toast';

@@ -18,7 +18,7 @@ export function PickCard(p) {
           ctaSpan
         />
       </Tap>
-      {i3('vinyl', 92, 'float-ic feature-ic')}
+      {i3('vinyl', 92, 'feature-ic bob')}
       <span className="promo-tag on-feature">Promoted</span>
     </div>
   );

@@ -1,5 +1,5 @@
 import { IMAGES_3D } from '../assets/images';
-import { Avatar, Icon } from '../design-system';
+import { Avatar, Icon, Sticker } from '../design-system';
 
 /* gathr's own display headline: lowercase with the yellow full stop (none after a question mark) */
 export function stop(txt, cls) {
@@ -87,16 +87,18 @@ export function sampleTag() {
   return null;
 }
 
-/* 3D nightlife icons (images). Decorative, so hidden from screen readers. */
+/* A 3D object, drawn with the design system's Sticker. Decorative, so hidden from screen readers.
+   The 'bob' class makes it the screen's one floating sticker (Sticker bob); other classes place it */
 export function i3(name, size, cls, style) {
+  var c = (cls || '').split(' ').filter(Boolean),
+    bob = c.indexOf('bob') >= 0;
   return (
-    <img
+    <Sticker
       src={IMAGES_3D[name]}
-      alt=""
-      aria-hidden
-      draggable={false}
-      className={'i3' + (cls ? ' ' + cls : '')}
-      style={Object.assign({ width: size + 'px', height: size + 'px' }, style || {})}
+      size={size}
+      bob={bob}
+      className={['i3'].concat(c.filter((x) => x !== 'bob')).join(' ')}
+      style={style}
     />
   );
 }
