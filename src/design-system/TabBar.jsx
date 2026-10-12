@@ -32,7 +32,7 @@ export function TabBar(p) {
                 : undefined
             }
           >
-            <Icon name={t[1]} size={24} />
+            <Icon key={on ? 'on' : 'off'} name={t[1]} size={24} filled={on} />
           </button>
         );
       })}

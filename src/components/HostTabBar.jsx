@@ -1,5 +1,5 @@
-import { TabIndicator } from '../design-system';
-import { icon, svgIcon } from '../ui/helpers';
+import { Icon, TabIndicator } from '../design-system';
+import { svgIcon } from '../ui/helpers';
 
 /* ================= HOST MODE =================
      One account, two modes. Hosting swaps the tab bar for door tools; switching back is one tap. */
@@ -33,7 +33,7 @@ export function HostTabBar(p) {
             aria-current={on ? 'page' : undefined}
             onClick={() => p.onChange(t[0])}
           >
-            {t[2] ? svgIcon(t[2], 24) : icon(t[3], 24)}
+            {t[2] ? svgIcon(t[2], 24) : <Icon key={on ? 'on' : 'off'} name={t[3]} size={24} filled={on} />}
           </button>
         );
       })}

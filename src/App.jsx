@@ -229,7 +229,7 @@ export function App() {
   function tab(t) {
     set({ stack: [t], sheet: null, dir: 'tab', seen: true });
   }
-  /* a short message at the top; with an action (e.g. Undo) it stays 4s instead of 2.4s */
+  /* a short message near the bottom (Toast); it closes itself after 2.4 s, or 5 s with an action (Undo) */
   function toast(t, action) {
     set({ toast: t, toastAct: action ? Object.assign({ for: t }, action) : null });
   }
@@ -448,18 +448,6 @@ export function App() {
   function scrTop() {
     return S.stack[S.stack.length - 1];
   }
-  useEffect(() => {
-    if (!S.toast) return;
-    var id = setTimeout(
-      () => {
-        set({ toast: null });
-      },
-      S.toastAct && S.toastAct.for === S.toast ? 5000 : 2400
-    );
-    return () => {
-      clearTimeout(id);
-    };
-  }, [S.toast]);
   var scr = S.stack[S.stack.length - 1];
   var ev = EVENTS[S.cur],
     ven = VENUES[ev.venue];
@@ -656,10 +644,13 @@ export function App() {
           {S.scanning ? <Scanner ctx={ctx} /> : null}
           {S.sheet ? <SheetLayer ctx={ctx} hostRef={sheetRef} /> : null}
           <div ref={sheetExitRef} className="sheet-exit" aria-hidden="true" />
-          <div className={'toast-live' + (showTabs ? ' over-tabs' : '')} aria-live="polite">
+          <div className="toast-live" aria-live="polite">
             {S.toast ? (
               <Toast
                 key={S.toast}
+                docked
+                aboveTabBar={showTabs}
+                onClose={() => set({ toast: null })}
                 action={S.toastAct && S.toastAct.for === S.toast ? S.toastAct.label : null}
                 onAction={S.toastAct && S.toastAct.run}
               >

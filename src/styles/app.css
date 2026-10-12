@@ -422,12 +422,11 @@ html.is-full .real-map .maplibregl-ctrl-bottom-right { bottom: calc(96px + env(s
 
 
 /* ===== audit fixes (29 Sep 2026) ===== */
-/* the toast sits near the bottom, above the tab bar when there is one */
-.toast-live { position: absolute; left: var(--space-4); right: var(--space-4); bottom: var(--space-8); z-index: 9; pointer-events: none; }
-.toast-live.over-tabs { bottom: calc(24px + var(--tabbar-h) + var(--space-3)); }
-html.is-full .toast-live { bottom: calc(var(--space-8) + env(safe-area-inset-bottom, 0px)); }
-html.is-full .toast-live.over-tabs { bottom: calc(16px + var(--tabbar-h) + var(--space-3) + env(safe-area-inset-bottom, 0px)); }
-.toast-live .g-toast { pointer-events: auto; }
+/* Toast docked (design system): 32px up, or 12px above the tab bar. Inside the phone frame, so absolute, not fixed */
+.g-toast-dock { position: absolute; left: var(--space-4); right: var(--space-4); bottom: var(--space-8); z-index: 9; }
+.g-toast-dock.is-above-tabbar { bottom: calc(24px + var(--tabbar-h) + var(--space-3)); }
+html.is-full .g-toast-dock { bottom: calc(var(--space-8) + env(safe-area-inset-bottom, 0px)); }
+html.is-full .g-toast-dock.is-above-tabbar { bottom: calc(16px + var(--tabbar-h) + var(--space-3) + env(safe-area-inset-bottom, 0px)); }
 .or-row { display: flex; align-items: center; gap: 12px; color: var(--ink-muted); font-size: 13px; }
 .or-row i { flex: 1; height: 1px; background: var(--line); }
 .google-btn { gap: 10px; }
