@@ -631,10 +631,11 @@ html.is-sideways .upright-skip { margin-top: 16px; min-height: 44px; padding: 0 
 /* Updates: 56 top, 16 gutter (pad-top); back button, 16, the title, 24, the first group */
 .updates .updates-title { margin: var(--space-4) 0 var(--space-6); }
 .updates > .meta, .updates > .note { margin-top: var(--space-6); }
-/* host mode's colour (Shubh's call, 12 Oct 2026; a design-system exception like the door scanner):
-   while hosting, every selection and the host's main buttons are yellow, with near-black text, so hosting feels like its own, upbeat space.
-   Swapping the brand colour covers chips, toggles, tabs, picked rows and sheets in one place. Status colours (green in, red no entry) stay. */
-.host-mode { --brand: var(--yellow-300); --on-brand: var(--on-fill); --brand-soft: color-mix(in srgb, var(--yellow-300) 16%, transparent); }
-.host-mode .pick-row.on .pick-box { background: var(--yellow-300); color: var(--on-fill); }
-.host-mode .card.picked { box-shadow: inset 0 0 0 2px var(--yellow-300); }
-.g-btn.is-host, .g-btn.is-host:hover { background-color: var(--yellow-300); color: var(--on-fill); box-shadow: none; }
+/* Host mode (design system r22/r23, .g-host in bundle.css): every selection and the host's main (brand) buttons
+   are yellow-300 with night-900 text, flat like every selection. Swapping the brand colour covers chips, toggles,
+   tabs, picked rows, links and sheets in one place. Status colours (green in, red no entry, the scanner's amber) stay. */
+.g-host { --brand: var(--yellow-300); --on-brand: var(--night-900); --brand-soft: color-mix(in srgb, var(--yellow-300) 16%, transparent); --brand-text: var(--yellow-300); }
+.g-host .pick-row.on .pick-box { background: var(--yellow-300); color: var(--night-900); }
+.g-host .card.picked { box-shadow: inset 0 0 0 2px var(--yellow-300); }
+.g-host .g-pin.is-selected .g-pin-text span { color: var(--yellow-100); }
+.g-host [aria-checked="true"], .g-host input[type="checkbox"]:checked, .g-host input[type="radio"]:checked { accent-color: var(--yellow-300); }

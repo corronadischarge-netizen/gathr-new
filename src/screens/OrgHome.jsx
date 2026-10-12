@@ -79,8 +79,7 @@ export function OrgHome(p) {
         ))}
       </div>
       <Button
-        variant="primary"
-        className="is-host"
+        variant="brand"
         size="lg"
         block
         icon="ticket"

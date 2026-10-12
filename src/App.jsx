@@ -628,7 +628,7 @@ export function App() {
     <div className={'stage' + (REVIEW ? ' has-review' : '')}>
       {REVIEW ? <ReviewPanel ctx={ctx} scr={scr} /> : null}
       <div className="phone-wrap">
-        <div className={'phone' + (S.mode === 'host' ? ' host-mode' : '')} ref={phoneRef}>
+        <div className={'phone' + (S.mode === 'host' ? ' g-host' : '')} ref={phoneRef}>
           {Under ? (
             <div ref={underRef} className="screen under" aria-hidden="true" inert="">
               <Under ctx={ctx} />

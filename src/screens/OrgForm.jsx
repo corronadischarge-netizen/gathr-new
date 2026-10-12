@@ -375,8 +375,7 @@ export function OrgForm(p) {
       {meta('Government ID is checked for everyone. That’s Pune law')}
       <div className="bottom-stack" style={{ alignItems: 'stretch' }}>
         <Button
-          variant="primary"
-          className="is-host"
+          variant="brand"
           size="lg"
           block
           disabled={need.length > 0 || !!saving}
