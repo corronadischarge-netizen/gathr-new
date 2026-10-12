@@ -157,17 +157,18 @@
   --text-poster: 700 144px/0.95 var(--font-display); /* Posters and social covers on a 1080 canvas. */
   --text-hero: 700 64px/1 var(--font-display); /* Web hero, social headlines, venue hero name. */
   --text-display: 700 32px/1.08 var(--font-display); /* The one screen headline ("this week in pune."). Plus Jakarta Sans 700. One per screen, and the only text above 22px in the app. */
-  --text-title: 600 20px/1.2 var(--font-display); /* Sheet titles, venue name on detail, the feature card title. */
-  --text-section: 600 16px/1.3 var(--font-display); /* Feed section headers ("Near you"), Plus Jakarta Sans 600, sentence case, with a subtle "See all" pill. */
+  --text-title: 600 20px/1.2 var(--font-display); /* Sheet titles; the one name on a big media card (VenueCard, FeatureCard). */
+  --text-section: 600 16px/1.3 var(--font-display); /* Page-level headings ("Near you", "Listed nights"), Plus Jakarta Sans 600, sentence case. */
   --text-numeral: 300 96px/0.9 var(--font-sans); /* Rank numbers, big stats, countdowns. Light weight so size does the shouting. */
   --text-eyebrow: 500 13px/18px var(--font-sans); /* Small context line directly above a screen or section headline, in ink-muted. It complements the headline and never competes: at most a third of its size. */
-  --text-accent: italic 300 16px/28px var(--font-sans); /* Expression zone only (onboarding, social, posters): the light italic lead-in above a big headline. In the app use eyebrow instead. */
+  --text-accent: 300 16px/28px var(--font-sans); /* Expression zone only (onboarding, social, posters): the light lead-in above a big headline. No italics anywhere. In the app use eyebrow instead. */
   --text-lead: 300 20px/28px var(--font-sans); /* Intro lines under a display headline; landing paragraphs. */
-  --text-headline: 600 16px/22px var(--font-sans); /* Item titles: card and row names, 15–16px DM Sans 600. Organiser event names are written as the organiser wrote them, with no gathr full stop. */
+  --text-headline: 600 15px/20px var(--font-sans); /* Names of things (friends, nights, venues, settings rows, update titles) and every heading inside a card. DM Sans 600. Organiser event names keep their own spelling, with no gathr full stop. */
   --text-body: 400 15px/22px var(--font-sans); /* Default app text. */
+  --text-body-light: 300 15px/20px var(--font-sans); /* Single-line tips beside an icon, e.g. VenueHero "Before you go". DM Sans 300. */
   --text-body-sm: 400 13px/18px var(--font-sans); /* Meta: times, areas, prices and counts in ink-muted; tabular figures. */
-  --text-label: 600 16px/20px var(--font-sans); /* Buttons: 16px 600, starting with a verb. Small buttons use 13px 600. */
-  --text-caps: 700 11px/14px var(--font-sans); /* Labels: 11px 700, all caps, +4% tracking. Badges, day tags, the "sample data" note. */
+  --text-label: 600 16px/20px var(--font-sans); /* Buttons 16px 600, starting with a verb; chips, small buttons and nav links 15px; tags, map pins and captions 13px. */
+  --text-caps: 600 11px/14px var(--font-sans); /* Labels: 11px 600, all caps, +4% tracking. Badges, day tags. */
 }
 .poster {
   font-family: var(--font-display);
@@ -224,7 +225,6 @@
   line-height: 28px;
   font-weight: 300;
   letter-spacing: -0.03em;
-  font-style: italic;
 }
 .lead {
   font-family: var(--font-sans);
@@ -235,8 +235,8 @@
 }
 .headline {
   font-family: var(--font-sans);
-  font-size: 16px;
-  line-height: 22px;
+  font-size: 15px;
+  line-height: 20px;
   font-weight: 600;
   letter-spacing: -0.02em;
 }
@@ -245,6 +245,13 @@
   font-size: 15px;
   line-height: 22px;
   font-weight: 400;
+  letter-spacing: -0.02em;
+}
+.body-light {
+  font-family: var(--font-sans);
+  font-size: 15px;
+  line-height: 20px;
+  font-weight: 300;
   letter-spacing: -0.02em;
 }
 .body-sm {
@@ -265,7 +272,7 @@
   font-family: var(--font-sans);
   font-size: 11px;
   line-height: 14px;
-  font-weight: 700;
+  font-weight: 600;
   letter-spacing: 0.04em;
 }
 @font-face {
