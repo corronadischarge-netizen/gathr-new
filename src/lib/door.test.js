@@ -61,7 +61,7 @@ test('guys: no stag entry, couples only, mixed groups only → no', () => {
 test('guys: stag rule missing → unknown', () => {
   var v = verdict(door({ stag: null }), guys(4));
   assert.equal(v.state, 'unknown');
-  assert.deepEqual(v.reasons, ['Stag rules unknown']);
+  assert.deepEqual(v.reasons, ['Stag rules not listed']);
 });
 
 test('girls: stag rules don\'t apply', () => {
@@ -96,7 +96,7 @@ test('under 21: a 21+ night is no; an unknown age limit is unknown', () => {
   assert.equal(v.state, 'no');
   assert.deepEqual(v.reasons, ['21+ only']);
   assert.equal(verdict(door({ minAge: 18 }), guys(4, { under21: true })).state, 'yes');
-  assert.deepEqual(verdict(door({ minAge: null }), girls(2, { under21: true })).reasons, ['Age limit unknown']);
+  assert.deepEqual(verdict(door({ minAge: null }), girls(2, { under21: true })).reasons, ['Age limit not listed']);
   // all 21+: an unknown age limit doesn't matter
   assert.equal(verdict(door({ minAge: null }), girls(2)).state, 'yes');
 });
@@ -128,7 +128,7 @@ test('group not set: the rule in plain words, never "Lets you in"', () => {
     [door({ stag: 'couples_only' }), 'Couples only'],
     [door({ mixedOnly: true }), 'Mixed groups only'],
     [door({ stag: 'not_allowed' }), 'No stag entry'],
-    [door({ stag: null }), 'Stag rules unknown']
+    [door({ stag: null }), 'Stag rules not listed']
   ];
   cases.forEach(([d, rule]) => {
     var v = verdict(d, null);
@@ -139,7 +139,7 @@ test('group not set: the rule in plain words, never "Lets you in"', () => {
   });
   // your own age still applies with no group set
   assert.equal(verdict(door({ minAge: 21 }), null, '18 to 20').state, 'no');
-  assert.deepEqual(verdict(door({ minAge: null }), null, '18 to 20').reasons, ['Age limit unknown']);
+  assert.deepEqual(verdict(door({ minAge: null }), null, '18 to 20').reasons, ['Age limit not listed']);
 });
 
 test('a gathr check older than 30 days counts as not known', () => {
@@ -148,7 +148,7 @@ test('a gathr check older than 30 days counts as not known', () => {
   assert.equal(verdict(fresh, guys(4)).state, 'no');
   var v = verdict(stale, guys(4));
   assert.equal(v.state, 'unknown');
-  assert.deepEqual(v.reasons, ['Stag rules unknown']);
+  assert.deepEqual(v.reasons, ['Stag rules not listed']);
   assert.equal(v.source, null);
 });
 
@@ -172,7 +172,7 @@ test('copy: pill and line text, icons (5.4)', () => {
   assert.equal(verdictText(verdict(door({ stag: 'fee', stagFee: 500 }), g), g, 'line').icon, 'indian-rupee');
   assert.deepEqual(verdictText(verdict(door({ stag: null }), g), g, 'line'), {
     state: 'unknown',
-    text: 'Stag rules unknown',
+    text: 'Stag rules not listed',
     icon: 'info'
   });
   assert.deepEqual(verdictText(verdict(door({ stag: 'couples_only' }), g), g, 'pill'), {

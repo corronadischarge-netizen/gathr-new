@@ -42,7 +42,9 @@ export function homeItems(S, t) {
         soldOut: crowd === 'full',
         over: isPast(e),
         soundMatch: (e.tags || []).some((x) => tags.indexOf(x) >= 0),
-        mins: travelMins(v, areas),
+        // road minutes from the routing service; the straight-line estimate until it answers (or offline)
+        mins: S.travel && S.travel[e.venue] != null ? S.travel[e.venue] : travelMins(v, areas),
+        minsFromRoads: !!(S.travel && S.travel[e.venue] != null),
         price: e.rsvp ? 0 : e.price == null ? null : e.price,
         promoted: !!e.promoted,
         sample: door.sample

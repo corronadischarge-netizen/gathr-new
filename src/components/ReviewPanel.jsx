@@ -70,6 +70,7 @@ export function ReviewPanel(p) {
       ['venuedash', 'Venue view'],
       ['notifs', 'Updates'],
       ['promoinvite', 'Promoter invite'],
+      ['dspreview', 'Home v3 · components'],
       ['map', 'Map'],
       ['venue', 'Venue'],
       ['search', 'Search'],

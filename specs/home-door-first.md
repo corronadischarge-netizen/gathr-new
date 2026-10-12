@@ -167,15 +167,15 @@ Check in this order and stop at the first that applies:
    - stag = couples_only and stags > 0 → "Couples only tonight"
    - mixedOnly and type = guys → "Mixed groups only"
 2. **unknown**, if a rule that matters for this group is missing:
-   - stags > 0 and stag = null → "Stag rules unknown"
-   - minAge = null and group.under21 → "Age limit unknown"
+   - stags > 0 and stag = null → "Stag rules not listed"
+   - minAge = null and group.under21 → "Age limit not listed"
 3. **if**, if the group fits but something is on them (at most two reasons, most important first):
    - dressStrict and dress → "{dress} only" (e.g. "formals only")
    - arriveBy → "before {time}" (e.g. "before 10:30")
    - stag = fee and stags > 0 → "stags ₹{fee}"
 4. **yes** otherwise. One bring-item reason: minAge ≥ 21 → "21+ with ID", else "ID needed" (government ID is mandatory in Pune).
 
-Group not set (type null): never return yes/no on group rules. Return the rule plainly with state `unknown` styling but rule text: "Stags OK", "Couples only", "Mixed groups only", "Stag rules unknown". Age rules still apply from the profile age if known.
+Group not set (type null): never return yes/no on group rules. Return the rule plainly with state `unknown` styling but rule text: "Stags OK", "Couples only", "Mixed groups only", "Stag rules not listed". Age rules still apply from the profile age if known.
 
 Write unit tests for every branch (guys / girls / couple / mixed with stags / mixed without stags / under 21 / group not set / stale gathr check / guest answers under 5).
 
@@ -184,7 +184,7 @@ Write unit tests for every branch (guys / girls / couple / mixed with stags / mi
 |---|---|---|---|
 | yes | "Lets {group label} in · {bring-item}" (tiles and rows: "Lets you in" + " · 18+" when minAge = 18) | check | go (green) |
 | if | "Lets {group label} in · {reason1}, {reason2}" (tiles and rows: "{Reason1}", e.g. "Formals only") | shirt (dress) · clock (arrive by) · indian-rupee (stag fee) | light (white pill) / ink line |
-| unknown | "{Missing rule}" e.g. "Stag rules unknown" + "Ask the venue" button where there's room | info | dark pill / ink-muted line |
+| unknown | "{Missing rule}" e.g. "Stag rules not listed" + "Ask the venue" button where there's room | info | dark pill / ink-muted line |
 | no | "{Reason}" e.g. "Couples only tonight" | x | limit (red) text |
 
 Source line (shown next to the pill on hero, event page; hidden on tiles and rows):
@@ -241,7 +241,7 @@ Component: **Sheet** (strong glass) over the dimmed home. Title "Who's going?", 
 - **VenueHero**: booked + cap (CrowdBlock with the dot grid and trust line, as the design system has it), cover, door time, distance, updated time. `action` = the same label as the hero button for this group ("Get 4 passes"). When the verdict is `no`: `actionDisabled` with the reason as the label ("Couples only tonight") and the lock icon.
 - **"Who gets in"** section (section title), card `night-900` radius 16 padding 16, the whole card opens Going as:
   - DoorVerdict pill + source line
-  - rule rows (15, icon 20 `ink-muted`): group rule ("Stag groups OK", "Couples only", "Mixed groups only", "Stag rules unknown"), age ("21+, bring a government ID"), dress ("Dress code: formals" or "Dress code: not listed"), arrive by when set
+  - rule rows (15, icon 20 `ink-muted`): group rule ("Stag groups OK", "Couples only", "Mixed groups only", "Stag rules not listed"), age ("21+, bring a government ID"), dress ("Dress code: formals" or "Dress code: not listed"), arrive by when set
   - last line (13, muted) "Going as {group label} · {age phrase}" + chevron
   - unknown state adds Button `subtle sm` "Ask the venue" (opens WhatsApp or call; logs `verdict_ask_venue`)
 - **TonightSoFar** (booked, saved, last hour, friends), then the "How we count" note word for word.
@@ -269,7 +269,7 @@ Component: **Sheet** (strong glass) over the dimmed home. Title "Who's going?", 
 | End card | {30} nights this week. / {22} let your group in / See them all |
 | All nights title | All nights · {30} |
 | Not-for-you row | Not for your group · {n} / {Couples only tonight} |
-| Unknown | Stag rules unknown / Age limit unknown / Ask the venue |
+| Unknown | Stag rules not listed / Age limit not listed / Ask the venue |
 | Price missing | Price not listed |
 | Free | Free |
 | Nothing fits tonight | Nothing tonight lets your group in / {5} tonight have rules that don't fit / See tomorrow / Change group |

@@ -16,6 +16,10 @@ export const CFG = Object.assign(
     sms: { provider: 'off', firebase: null },
     payments: { provider: 'demo', razorpayKeyId: '' },
     contactEmail: 'hello@gathr.app',
+    /* Road travel times from your areas to venues (OSRM table API, OpenStreetMap roads, no live traffic).
+       The public OSRM server is for testing only (fair use); point this at gathr's own OSRM, or swap the service,
+       before launch. Empty: the app estimates from straight-line distance instead. */
+    routing: { url: 'https://router.project-osrm.org' },
     /* Where the gathr web app is hosted, e.g. 'https://gathr.web.app/'. Links people share (promoter invites)
        point here. Empty until it's hosted: invites are then shared as a code to type into the app. */
     publicUrl: ''

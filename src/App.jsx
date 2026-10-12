@@ -28,6 +28,9 @@ import { Invite } from './screens/Invite';
 import { MapScreen } from './screens/MapScreen';
 import { NewPlan } from './screens/NewPlan';
 import { Notifs } from './screens/Notifs';
+import { DsPreview } from './screens/DsPreview';
+import { loadTravel } from './services/travel';
+import { pickedAreas } from './data/homeData';
 import { OrgEvent } from './screens/OrgEvent';
 import { OrgForm } from './screens/OrgForm';
 import { OrgHome } from './screens/OrgHome';
@@ -529,6 +532,7 @@ export function App() {
     areas: Areas,
     phone: Phone,
     notifs: Notifs,
+    dspreview: DsPreview,
     age: Age,
     tonight: Tonight,
     map: MapScreen,
@@ -603,6 +607,11 @@ export function App() {
       if (handle) handle.remove();
     };
   }, []);
+  /* road travel times from your picked areas to every venue (routing service; kept on the phone for a week) */
+  var areasKey = pickedAreas(S).join('|');
+  useEffect(() => {
+    loadTravel(pickedAreas(S), VENUES).then((m) => set({ travel: m }));
+  }, [areasKey]);
   var first = useRef(true);
   useEffect(() => {
     if (first.current) {

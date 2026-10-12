@@ -493,3 +493,78 @@ body { margin: 0; font-family: var(--font-sans); background: var(--bg); color: v
 /* Sticker: a 3D object from assets/Stickers, still unless it's the screen's one bob (motion.css). From bundle.css */
 .g-sticker { display: block; object-fit: contain; filter: drop-shadow(0 14px 18px #00000099); transform: rotate(var(--tilt, 0deg)); }
 .g-sticker-ph { display: grid; place-items: center; border-radius: 28%; background: var(--night-700); color: var(--night-300); font-size: 11px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; box-shadow: inset 0 0 0 1.5px var(--night-600); transform: rotate(var(--tilt, 0deg)); }
+
+/* TagPill: a short label on a photo or collage (bundle.css .g-tag) */
+.g-tag { display: inline-flex; align-items: center; gap: 6px; height: 34px; padding: 0 14px 0 12px; border-radius: var(--radius-full); font-size: 13px; font-weight: 600; white-space: nowrap; box-shadow: 0 8px 20px #00000059; }
+.g-tag-light { background: var(--night-50); color: var(--night-950); }
+.g-tag-glass { background: var(--glass-scrim); color: var(--night-50); -webkit-backdrop-filter: blur(var(--blur-sm)); backdrop-filter: blur(var(--blur-sm)); box-shadow: inset 0 0 0 1px #ffffff1f, 0 8px 20px #00000059; }
+.g-tag-dark { background: var(--night-900); color: var(--night-50); box-shadow: inset 0 0 0 1px var(--night-700), 0 8px 20px #00000059; }
+.g-tag-go { background: var(--go); color: var(--on-fill); }
+.g-tag-brand { background: var(--brand); color: var(--on-brand); }
+
+/* DoorVerdict (proposed r24): will they let us in? Words carry it; colour repeats it */
+.g-dv-pill { display: flex; align-items: center; justify-content: space-between; gap: var(--space-3); min-width: 0; }
+.g-dv-tag { min-width: 0; max-width: 100%; }
+.g-dv-tag > span:last-child { overflow: hidden; text-overflow: ellipsis; }
+.g-dv-pill.is-no .g-dv-tag { color: var(--limit-text); }
+.g-dv-src { flex: none; font-size: 11px; line-height: 14px; color: var(--ink-faint); white-space: nowrap; }
+.g-dv-line { display: inline-flex; align-items: center; gap: var(--space-1); max-width: 100%; min-width: 0; font-size: 13px; line-height: 18px; font-weight: 600; }
+.g-dv-line .g-dv-text { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.g-dv-line.is-yes { color: var(--go-text); }
+.g-dv-line.is-if { color: var(--ink); }
+.g-dv-line.is-unknown { color: var(--ink-muted); }
+.g-dv-line.is-no { color: var(--limit-text); }
+
+/* NightTile (proposed r24): one link, a 4:5 poster with the gathr touch, then door, name, where and when, price */
+.g-nt { display: block; color: var(--ink); text-decoration: none; cursor: pointer; outline: none; transition: transform var(--dur-fast) var(--ease-standard); }
+.g-nt:active { transform: scale(.98); }
+.g-nt:focus-visible { box-shadow: var(--focus-ring); }
+.g-nt-tile { width: 156px; border-radius: var(--radius-md); }
+.g-nt-tile .g-nt-img { width: 156px; height: 195px; border-radius: var(--radius-md); background-position: center 30%; box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--white) 8%, transparent); }
+.g-nt-grain { opacity: .16; }
+/* the gathr touch's fade to night-950 under the photo, so the crowd chip reads on any poster */
+.g-nt-tile .g-media.g-nt-img:not(.g-media-empty)::after { content: ""; position: absolute; inset: 50% 0 0; background: linear-gradient(180deg, transparent, color-mix(in srgb, var(--night-950) 70%, transparent)); pointer-events: none; }
+.g-nt-badge { position: absolute; left: var(--space-2); top: var(--space-2); z-index: 1; }
+.g-nt-crowd { position: absolute; left: var(--space-2); bottom: var(--space-2); z-index: 1; }
+.g-nt-body { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.g-nt-tile .g-nt-body { margin-top: var(--space-2); }
+.g-nt-name { font-size: 15px; line-height: 20px; font-weight: 600; letter-spacing: -0.02em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.g-nt.is-soldout .g-nt-name { opacity: .6; }
+.g-nt-foot { display: flex; align-items: baseline; justify-content: space-between; gap: var(--space-2); min-width: 0; }
+.g-nt-meta { min-width: 0; font-size: 13px; line-height: 18px; color: var(--ink-muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.g-nt-price { flex: none; font-family: var(--font-display); font-weight: 700; font-size: 16px; line-height: 20px; letter-spacing: -0.02em; white-space: nowrap; }
+.g-nt-noprice { flex: none; font-size: 13px; line-height: 18px; color: var(--ink-faint); white-space: nowrap; }
+.g-nt-row { display: flex; align-items: center; gap: var(--space-3); padding: var(--space-3) 0; border-radius: 0; box-shadow: inset 0 -1px 0 var(--line); }
+.g-nt-row:focus-visible { box-shadow: var(--focus-ring); border-radius: var(--radius-sm); }
+.g-nt-row .g-nt-img { flex: none; width: 64px; height: 80px; border-radius: var(--radius-sm); background-position: center 30%; }
+.g-nt-row .g-nt-body { flex: 1; }
+.g-nt-end { flex: none; display: flex; flex-direction: column; align-items: flex-end; gap: 6px; }
+.g-nt-row .g-nt-price { font-size: 20px; line-height: 24px; }
+.g-nt-skel { display: block; background: var(--night-800); }
+.g-nt-tile .g-nt-skel.g-nt-img { width: 156px; height: 195px; border-radius: var(--radius-md); }
+.g-nt-row .g-nt-skel.g-nt-img { width: 64px; height: 80px; border-radius: var(--radius-sm); }
+.g-nt-bar { height: 12px; margin: 4px 0; border-radius: var(--radius-full); width: 100%; }
+.g-nt-bar.is-short { width: 60%; }
+
+/* NightRail (proposed r24): title + See all, then tiles that snap and let the next one peek */
+.g-rail-head { display: flex; align-items: center; justify-content: space-between; gap: var(--space-3); padding: 0 var(--space-4); }
+.g-rail-title { margin: 0; font-family: var(--font-display); font-size: 16px; line-height: 1.3; font-weight: 600; letter-spacing: -0.02em; }
+.g-rail-scroll { display: flex; gap: var(--space-3); margin-top: var(--space-3); padding: 0 var(--space-4) var(--space-1); overflow-x: auto; scroll-snap-type: x mandatory; scroll-padding-inline: var(--space-4); scrollbar-width: none; outline: none; }
+.g-rail-scroll::-webkit-scrollbar { display: none; }
+.g-rail-scroll:focus-visible { box-shadow: var(--focus-ring); border-radius: var(--radius-md); }
+.g-rail-item { flex: none; display: flex; scroll-snap-align: start; }
+.g-rail-end { width: 156px; min-height: 195px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--space-2); border-radius: var(--radius-md); background: var(--night-900); color: var(--ink); font-size: 15px; line-height: 20px; font-weight: 600; cursor: pointer; outline: none; }
+.g-rail-end:focus-visible { box-shadow: var(--focus-ring); }
+
+/* GroupPill (proposed r24): who you're going with. Solid night-900, never glass, never violet */
+.g-gp { width: 100%; min-height: 56px; display: flex; align-items: center; gap: var(--space-3); padding: var(--space-2) var(--space-3) var(--space-2) var(--space-2); border: 0; border-radius: var(--radius-full); background: var(--night-900); box-shadow: inset 0 0 0 1px var(--line); color: var(--ink); font: inherit; text-align: left; cursor: pointer; }
+.g-gp:focus-visible { outline: 2px solid transparent; box-shadow: var(--focus-ring); }
+.g-gp-faces { display: flex; flex: none; }
+.g-gp-face { box-shadow: 0 0 0 2px var(--night-900); }
+.g-gp-face + .g-gp-face { margin-left: calc(var(--space-2) * -1); }
+.g-gp-you { width: 32px; height: 32px; display: grid; place-items: center; border-radius: var(--radius-full); background: var(--night-800); color: var(--ink-muted); }
+.g-gp-copy { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.g-gp-title { font-size: 15px; line-height: 20px; font-weight: 600; letter-spacing: -0.02em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.g-gp-line { font-size: 13px; line-height: 18px; color: var(--ink-muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.g-gp-change { flex: none; font-size: 13px; font-weight: 600; color: var(--ink-muted); padding-right: var(--space-1); }
+.g-gp-chev { flex: none; color: var(--ink-muted); }

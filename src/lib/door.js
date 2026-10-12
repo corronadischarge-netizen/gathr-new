@@ -44,7 +44,7 @@ function plainRule(d) {
   if (d.stag === 'not_allowed') return 'No stag entry';
   if (d.stag === 'fee') return 'Stags ' + rupees(d.stagFee || 0);
   if (d.stag === 'allowed') return 'Stags OK';
-  return 'Stag rules unknown';
+  return 'Stag rules not listed';
 }
 
 /* → { state: 'yes' | 'if' | 'unknown' | 'no', reasons: [text], kinds: [kind], plain, minAge, source } */
@@ -63,15 +63,15 @@ export function getDoorVerdict(door, group, profileAge, t) {
     return out('no', [d.minAge + '+ only'], ['age']);
   // no group set: say the rule plainly, styled as unknown
   if (!set) {
-    if (d.minAge == null && u21) return out('unknown', ['Age limit unknown'], ['age']);
+    if (d.minAge == null && u21) return out('unknown', ['Age limit not listed'], ['age']);
     return Object.assign(out('unknown', [plainRule(d)], ['stag']), { plain: true });
   }
   if (d.stag === 'not_allowed' && st > 0) return out('no', ['No stag entry'], ['stag']);
   if (d.stag === 'couples_only' && st > 0) return out('no', ['Couples only tonight'], ['stag']);
   if (d.mixedOnly && group.type === 'guys') return out('no', ['Mixed groups only'], ['stag']);
   // 2. unknown: a rule that matters for this group is missing
-  if (st > 0 && d.stag == null) return out('unknown', ['Stag rules unknown'], ['stag']);
-  if (d.minAge == null && u21) return out('unknown', ['Age limit unknown'], ['age']);
+  if (st > 0 && d.stag == null) return out('unknown', ['Stag rules not listed'], ['stag']);
+  if (d.minAge == null && u21) return out('unknown', ['Age limit not listed'], ['age']);
   // 3. if: the group fits, but something is on them (two at most, most important first)
   var r = [],
     k = [];
@@ -111,13 +111,23 @@ export function verdictText(v, group, look) {
   return { state: v.state, text: text, icon: v.state === 'if' ? IF_ICON[v.kinds[0]] : ICON[v.state] };
 }
 
-/* where the rule came from, next to the pill: "Set by the host", "Checked by gathr · 3 days ago", "From 12 guests" */
-export function sourceLine(v, t, tight) {
-  var s = v && v.source;
-  if (!s) return null;
-  if (s.source === 'host') return 'Set by the host';
-  if (s.source === 'guests') return 'From ' + s.guestAnswers + ' guests';
-  if (tight) return 'Checked by gathr';
-  var days = Math.max(0, Math.floor((t - Date.parse(s.checkedAt)) / DAY));
+/* where the rule came from, next to the pill: "Set by the host", "Checked by gathr · 3 days ago", "From 12 guests".
+   src = { kind: 'host' | 'gathr' | 'guests', checkedAt, count } (DoorVerdict's source prop) */
+export function formatSource(src, t, tight) {
+  if (!src || !src.kind) return null;
+  if (src.kind === 'host') return 'Set by the host';
+  if (src.kind === 'guests') return 'From ' + src.count + ' guests';
+  if (tight || !src.checkedAt) return 'Checked by gathr';
+  var days = Math.max(0, Math.floor((t - Date.parse(src.checkedAt)) / DAY));
   return 'Checked by gathr · ' + (days === 0 ? 'today' : days === 1 ? '1 day ago' : days + ' days ago');
+}
+
+/* a verdict's source, in DoorVerdict's shape */
+export function verdictSource(v) {
+  var s = v && v.source;
+  return s ? { kind: s.source, checkedAt: s.checkedAt, count: s.guestAnswers } : null;
+}
+
+export function sourceLine(v, t, tight) {
+  return formatSource(verdictSource(v), t, tight);
 }

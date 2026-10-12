@@ -211,7 +211,8 @@
 @media (prefers-reduced-motion: reduce) {
   .ghost-fwd, .ghost-back { animation-name: fade-out !important; }
   .screen.under { transform: none; }
-  .g-tab-ind, .tk-slot { transition: none; }
+  .g-tab-ind, .tk-slot, .g-nt { transition: none; }
+  .g-nt:active { transform: none; }
   .screen.nav-fwd, .screen.nav-back, .sheet-slot.rise, .g-toast, .w-in, .w-card, .w-tag, .w-3d, .w-fade, .fade-up,
   .mood, .vibe-tile, .celebrate .ok-tick, .celebrate .pass-ticket, .roll-up, .roll-down { animation-name: g-fade !important; }
   .sheet-leaving .sheet-slot, .sheet-slot.sheet-leaving { animation-name: fade-out !important; }

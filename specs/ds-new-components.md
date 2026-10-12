@@ -56,7 +56,7 @@ interface DoorVerdictProps {
 - No full stop at the end.
 - With no group set, use `unknown` styling for rule text ("Stags OK", "Couples only") so nothing claims "Lets you in" from group rules.
 
-**Copy patterns:** yes "Lets {group} in · {bring-item}" · if "Lets {group} in · {cond1}, {cond2}" (line: "{Cond1}") · unknown "{Rule} unknown" · no "{Reason}".
+**Copy patterns:** yes "Lets {group} in · {bring-item}" · if "Lets {group} in · {cond1}, {cond2}" (line: "{Cond1}") · unknown "{Rule} not listed" · no "{Reason}".
 
 **Accessibility:** the element's text is its accessible name; add a visually hidden "Door: " prefix. Icon `aria-hidden`.
 
