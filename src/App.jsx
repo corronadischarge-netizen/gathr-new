@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { HOST_TABS, HostTabBar } from './components/HostTabBar';
 import { ReviewPanel } from './components/ReviewPanel';
 import { Scanner } from './components/Scanner';
-import { REVIEW } from './config';
+import { HOME_LAYOUT, REVIEW } from './config';
 import { EVENTS, VENUES, isPast } from './data/listings';
 import { NEXT_CITIES } from './data/options';
 import { hostNights } from './data/hostNights';
@@ -29,6 +29,7 @@ import { MapScreen } from './screens/MapScreen';
 import { NewPlan } from './screens/NewPlan';
 import { Notifs } from './screens/Notifs';
 import { DsPreview } from './screens/DsPreview';
+import { HomeDoor } from './screens/HomeDoor';
 import { loadTravel } from './services/travel';
 import { pickedAreas } from './data/homeData';
 import { OrgEvent } from './screens/OrgEvent';
@@ -534,7 +535,7 @@ export function App() {
     notifs: Notifs,
     dspreview: DsPreview,
     age: Age,
-    tonight: Tonight,
+    tonight: HOME_LAYOUT === 'classic' ? Tonight : HomeDoor,
     map: MapScreen,
     search: Search,
     plans: Plans,

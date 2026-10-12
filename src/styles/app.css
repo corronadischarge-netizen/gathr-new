@@ -638,3 +638,21 @@ html.is-sideways .upright-skip { margin-top: 16px; min-height: 44px; padding: 0 
 .g-host .card.picked { box-shadow: inset 0 0 0 2px var(--yellow-300); }
 .g-host .g-pin.is-selected .g-pin-text span { color: var(--yellow-100); }
 .g-host [aria-checked="true"], .g-host input[type="checkbox"]:checked, .g-host input[type="radio"]:checked { accent-color: var(--yellow-300); }
+
+/* ===== Home v3 (door-first): spacing from specs/home-door-first.md section 9 =====
+   Tokens where the spec's numbers are on the scale (12, 16, 24, 44, 48). 40, 36, 28 and 10 come from the spec and aren't
+   spacing tokens: flagged for the design system. */
+.home-door { padding: var(--space-12) 0 140px; }
+.home-pill { margin-top: var(--space-4); }
+.home-hero { margin-top: var(--space-6); gap: 10px; }
+.home-title { margin: 0; }
+.home-sample { font-size: 11px; line-height: 14px; color: var(--ink-faint); white-space: nowrap; }
+.home-rails { margin-top: 40px; gap: 36px; }
+.home-sounds { margin-top: var(--space-11); gap: var(--space-3); }
+.home-moods { display: flex; gap: var(--space-3); padding: var(--space-6) var(--space-4) var(--space-1); overflow-x: auto; scroll-snap-type: x mandatory; scroll-padding-inline: var(--space-4); scrollbar-width: none; }
+.home-moods::-webkit-scrollbar { display: none; }
+.home-mood.g-mood { flex: none; width: 140px; min-height: 168px; padding-top: 64px; scroll-snap-align: start; }
+.home-rest { margin-top: 40px; }
+.home-end { margin-top: var(--space-11); display: flex; flex-direction: column; align-items: center; text-align: center; padding: 28px var(--space-5) var(--space-6); border-radius: var(--radius-lg); background: var(--night-900); }
+.home-end-title { margin: var(--space-3) 0 0; font-family: var(--font-display); font-size: 20px; line-height: 24px; font-weight: 700; letter-spacing: -0.02em; }
+.home-end-line { margin: var(--space-1) 0 var(--space-5); font-size: 15px; line-height: 20px; color: var(--ink-muted); }

@@ -30,3 +30,6 @@ export const CFG = Object.assign(
 export const APP_URL = location.origin + location.pathname;
 
 export const REVIEW = /[?&]review\b/.test(location.search);
+
+/* Which home: the door-first home v3 by default; ?home=classic shows the previous one, for the comparison test */
+export const HOME_LAYOUT = /[?&]home=classic\b/.test(location.search) ? 'classic' : 'door';

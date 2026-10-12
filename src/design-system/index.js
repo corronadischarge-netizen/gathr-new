@@ -43,6 +43,7 @@ export { DoorVerdict } from './DoorVerdict';
 export { NightTile } from './NightTile';
 export { NightRail } from './NightRail';
 export { GroupPill } from './GroupPill';
+export { MoodTile } from './MoodTile';
 export { SiteHeader } from './SiteHeader';
 export { Update, UpdateGroup, UpdateLead } from './Update';
 export { Toast } from './Toast';
