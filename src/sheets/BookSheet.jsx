@@ -3,7 +3,8 @@ import { AuthForm } from '../components/AuthForm';
 import { Switch } from '../components/Switch';
 import { rupees } from '../data/format';
 import { doorOf } from '../data/doorRules';
-import { currentGroup, isSet } from '../data/group';
+import { groupFor } from '../data/homeData';
+import { isSet } from '../data/group';
 import { now } from '../lib/clock';
 import { getDoorVerdict, verdictText } from '../lib/door';
 import { Button, Chip, Sheet } from '../design-system';
@@ -94,7 +95,7 @@ export function BookSheet(p) {
   /* home v3 (5.8): the host's limit per booking, and the door's condition for this group */
   var door = doorOf(e),
     maxPasses = door.maxPasses || 6,
-    group = currentGroup(S),
+    group = groupFor(S, now()),
     capped = isSet(group) && group.size > maxPasses,
     verdict = getDoorVerdict(door, group, S.age, now()),
     condition = verdict.state === 'if' ? verdictText(verdict, group, 'line').text : null;

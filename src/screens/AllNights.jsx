@@ -1,16 +1,16 @@
 import { useEffect, useState } from 'react';
 import { MO, WD } from '../data/dates';
-import { agePhrase, currentGroup, groupLabel, isSet } from '../data/group';
-import { homeItems } from '../data/homeData';
+import { agePhrase, groupLabel, isSet } from '../data/group';
+import { groupFor, homeItems } from '../data/homeData';
 import { EVENTS, VENUES } from '../data/listings';
 import { Chip, Icon, IconButton, NightTile } from '../design-system';
-import { addDays, homeWindow, now, weekdayOf } from '../lib/clock';
+import { addDays, homeWindow, now } from '../lib/clock';
 import { verdictText } from '../lib/door';
 import { notForYou, railItems } from '../lib/homeRank';
 import { log } from '../lib/log';
 import { SOUNDS, priceLabel } from './HomeDoor';
 
-/* All nights (home spec section 4, board 02): the full list, by day, with the time chips and quick filters.
+/* All nights (home spec section 4, board 02): the full list, by day, with one row of quick filters.
    Opened from a rail's "See all" (at that day), a sound tile (filtered), or the end card.
    Nights that don't fit the group collapse at the end of each day */
 
@@ -23,26 +23,12 @@ function dayHeading(day, w) {
   return wd.slice(0, 3) + ' ' + d.getUTCDate() + ' ' + MO[d.getUTCMonth()];
 }
 
-/* the coming Friday to Sunday (the rest of it, when it's already the weekend) */
-function weekendDays(w) {
-  var wd = weekdayOf(w.day),
-    start = wd === 5 || wd === 6 || wd === 0 ? 0 : 5 - wd,
-    out = [];
-  for (var i = start; i < 7; i++) {
-    var d = addDays(w.day, i),
-      x = weekdayOf(d);
-    if (x === 5 || x === 6 || x === 0) out.push(d);
-    if (x === 0) break;
-  }
-  return out;
-}
-
 export function AllNights(p) {
   var c = p.ctx,
     S = c.S,
     t = now(),
     w = homeWindow(t),
-    group = currentGroup(S),
+    group = groupFor(S, t),
     f = S.anFilters || {},
     [open, setOpen] = useState({});
   var all = homeItems(S, t).filter((it) => !it.over && it.day >= w.day);
@@ -63,16 +49,6 @@ export function AllNights(p) {
   }
   var any = Object.keys(f).length > 0;
 
-  // time chips: tonight, tomorrow, the weekend, later (counts over the filtered list)
-  var wk = weekendDays(w),
-    tom = addDays(w.day, 1),
-    count = (pred) => shown.filter((it) => pred(it.day)).length;
-  var chips = [
-    [w.when === 'tonight' ? 'Tonight' : 'Tomorrow', w.day, count((d) => d === w.day)],
-    w.when === 'tonight' ? ['Tomorrow', tom, count((d) => d === tom)] : null,
-    wk.length ? ['Weekend', wk[0], count((d) => wk.indexOf(d) >= 0)] : null,
-    ['Later', addDays(wk.length ? wk[wk.length - 1] : tom, 1), count((d) => d > (wk.length ? wk[wk.length - 1] : tom))]
-  ].filter(Boolean);
   function jump(day) {
     var target = days.filter((d) => d >= day)[0];
     var el = target && document.getElementById('an-' + target);
@@ -112,18 +88,13 @@ export function AllNights(p) {
         <div className="col an-title">
           <h1 className="g-section-title">{'All nights · ' + all.length}</h1>
           <span className="meta">
-            {isSet(group) ? 'Going as ' + groupLabel(group) + ' · ' + agePhrase(group, S.age) : 'Going as you · set your group to check the door'}
+            {isSet(group) ? 'Going as ' + groupLabel(group) + ' · ' + agePhrase(group, S.age) : 'Going as you'}
           </span>
         </div>
         <IconButton icon="sliders-horizontal" label="Who's going" variant="solid" onClick={() => c.set({ sheet: 'goingas', gaFrom: 'allnights' })} />
       </div>
-      <div className="an-chips" role="group" aria-label="Jump to">
-        {chips.map((x) => (
-          <Chip key={x[0]} onClick={() => jump(x[1])} aria-pressed={undefined} disabled={!x[2]}>
-            {x[0] + ' · ' + x[2]}
-          </Chip>
-        ))}
-      </div>
+      {/* one row of filters (board 02; Shubh, 13 Oct: two stacked chip rows don't look good). The days are the
+          sticky headings below, and "See all" opens the list at its day */}
       <div className="an-chips" role="group" aria-label="Filters">
         <Chip selected={!!f.cheap} onClick={() => toggle('cheap', true)}>
           Under ₹500

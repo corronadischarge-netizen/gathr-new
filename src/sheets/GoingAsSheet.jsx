@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { currentGroup, groupLabel } from '../data/group';
+import { currentGroup, groupFromPlan, groupLabel } from '../data/group';
 import { Button, Chip, Icon, IconButton, Sheet } from '../design-system';
 import { log } from '../lib/log';
 
@@ -61,6 +61,8 @@ export function GoingAsSheet(p) {
     c.set({ group: Object.assign({}, next, { source: 'manual' }), sheet: null });
   }
   var count = g.type !== 'solo' && g.type !== 'couple';
+  // an active plan's group, offered as a one-tap fill
+  var plan = S.gp && (S.gp.stage === 'voting' || S.gp.stage === 'booked') ? groupFromPlan(S.gp) : null;
   return (
     <Sheet title="Who's going?" subtitle="We'll check the door rules for you" onClose={() => c.set({ sheet: null })}>
       <div className="col ga">
@@ -92,10 +94,22 @@ export function GoingAsSheet(p) {
         <p className="meta" style={{ margin: 0 }}>
           One person under 21 changes what lets you in
         </p>
-        <div className="ga-note">
-          <Icon name="calendar" size={20} />
-          <span>Started a plan? It fills this in for you</span>
-        </div>
+        {plan ? (
+          // a plan's group fills in only when you ask (Shubh, 13 Oct)
+          <button type="button" className="ga-note is-plan" onClick={() => setG(Object.assign({}, plan, plan.type === 'mixed' && !plan.women && !plan.men ? split(plan.size) : null))}>
+            <Icon name="calendar" size={20} />
+            <span className="col" style={{ flex: 1, textAlign: 'left' }}>
+              <span className="title15">{'Use ' + S.gp.name}</span>
+              <span>{groupLabel(plan) + ' · ' + (plan.under21 ? 'someone under 21' : 'all 21+')}</span>
+            </span>
+            <Icon name="chevron-right" size={20} />
+          </button>
+        ) : (
+          <div className="ga-note">
+            <Icon name="calendar" size={20} />
+            <span>Started a plan? It fills this in for you</span>
+          </div>
+        )}
         <Button variant="primary" size="lg" block onClick={() => save(g)}>
           {'Show nights for ' + groupLabel(g)}
         </Button>

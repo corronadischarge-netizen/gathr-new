@@ -1,9 +1,9 @@
 import { useEffect, useRef } from 'react';
 import { IMAGES_3D } from '../assets/images';
 import { TEST } from '../config';
-import { MO, WD } from '../data/dates';
-import { agePhrase, currentGroup, groupFromPlan, groupLabel, isSet } from '../data/group';
-import { homeItems } from '../data/homeData';
+import { MO, WD, todayTxt } from '../data/dates';
+import { agePhrase, groupLabel, isSet } from '../data/group';
+import { groupFor, homeItems, planInfo } from '../data/homeData';
 import { EVENTS, VENUES } from '../data/listings';
 import { gpVoted } from '../data/sample';
 import {
@@ -15,7 +15,7 @@ import {
   NightTile,
   Sticker,
   Stop,
-  TopBar,
+  IconButton,
   VenueCard
 } from '../design-system';
 import { addDays, homeWindow, now, weekdayOf } from '../lib/clock';
@@ -23,7 +23,7 @@ import { verdictSource, verdictText } from '../lib/door';
 import { heroPick, railFor, weekRails } from '../lib/homeRank';
 import { log } from '../lib/log';
 import { remoteOn } from '../services/remote';
-import { btnLabel } from '../ui/helpers';
+import { btnLabel, eyebrow, icon, meAvatar, stop, svgIcon } from '../ui/helpers';
 import { Tap } from '../ui/Tap';
 
 /* Home v3, built around the door (specs/home-door-first.md, section 3): who's going, the one night we're most
@@ -71,27 +71,29 @@ function bookLabel(e, n) {
   return e.price ? passes + ' · ₹' + (e.price * n).toLocaleString('en-IN') : passes;
 }
 
-/* GroupPill: the active plan when there is one, otherwise who you're going as */
-function groupPill(c, group) {
-  var S = c.S,
-    gp = S.groupOff ? null : S.gp,
-    faces = gp ? gp.members.map((n) => ({ name: n })) : [];
-  if (gp && gp.stage === 'booked' && EVENTS[gp.booked]) {
-    var b = EVENTS[gp.booked];
-    return {
-      state: 'plan-booked',
-      people: faces,
-      title: WD[new Date(b.iso).getDay()] + ' · ' + b.title,
-      line: "You're in · Show pass",
-      onOpen: () => c.go('pass')
-    };
-  }
-  if (gp && gp.stage === 'voting') {
-    var pg = groupFromPlan(gp);
+/* GroupPill: who you're going as, always a tap away (Shubh, 13 Oct: choosing the group belongs on the home, not only
+   in All nights). It shows only what you chose; a plan's group fills in only when you ask, in the sheet */
+/* Shubh's rule (13 Oct): a live plan (tonight or tomorrow) wins: it's time-sensitive, it rallies the group and it
+   turns into one booking for everyone. Otherwise who you're going as; otherwise "Who's going?" */
+function groupPill(c, group, pl) {
+  var S = c.S;
+  if (pl && pl.live) {
+    var gp = pl.gp,
+      faces = gp.members.map((n) => ({ name: n }));
+    if (gp.stage === 'booked' && EVENTS[gp.booked]) {
+      var b = EVENTS[gp.booked];
+      return {
+        state: 'plan-booked',
+        people: faces,
+        title: WD[new Date(b.iso).getDay()] + ' · ' + b.title,
+        line: "You're in · Show pass",
+        onOpen: () => c.go('pass')
+      };
+    }
     return {
       state: 'plan-vote',
       people: faces,
-      title: gp.name + ' · ' + groupLabel(pg) + ', ' + agePhrase(pg, S.age),
+      title: gp.name + ' · ' + groupLabel(group) + ', ' + agePhrase(group, S.age),
       line: Object.keys(gpVoted(gp, S.vote)).length + ' of ' + (gp.members.length + 1) + ' voted · closes ' + gp.deadline,
       onOpen: () => c.go('group')
     };
@@ -116,7 +118,7 @@ export function HomeDoor(p) {
     S = c.S,
     t = now(),
     w = homeWindow(t),
-    group = currentGroup(S),
+    group = groupFor(S, t),
     items = homeItems(S, t),
     allNights = (day, sound) => c.go('allnights', { anDay: day || null, anFilters: sound ? { sound: sound } : {} });
   var on = (day) => items.filter((it) => it.day === day && !it.over);
@@ -151,22 +153,48 @@ export function HomeDoor(p) {
   var unread =
     (S.inbox || []).filter((n) => !n.read_at && n.kind !== 'guest_list').length +
     (S.myGuestLists || []).filter((g) => (S.glSeen || []).indexOf(g.entryId) < 0).length;
+  /* the header, as on the previous home (Shubh, 13 Oct): your photo, the city to change, search and the bell;
+     then the date over one display line, with room to breathe */
+  var fresh = !S.notifSeen;
   var top = (
-    <TopBar
-      avatar={S.me.name || 'You'}
-      avatarImage={S.me.photo}
-      onAvatar={() => c.tab('you')}
-      title={'Pune · ' + shortDate(w.day)}
-      actions={[
-        ['search', 'Search', () => c.tab('search')],
-        [
-          'bell',
-          !S.notifSeen ? (unread ? 'Updates, ' + unread + ' new' : 'Updates, new') : 'Updates',
-          () => c.go('notifs', { notifSeen: true, glSeen: (S.myGuestLists || []).map((g) => g.entryId) }),
-          !S.notifSeen
-        ]
-      ]}
-    />
+    <>
+      <div className="rowc between px">
+        <div className="rowc">
+          <Tap onClick={() => c.tab('you')} aria-label="You" className="tap">
+            {meAvatar(S, 48)}
+          </Tap>
+          <button
+            type="button"
+            className="city-chip"
+            aria-label="City: Pune. See other cities"
+            onClick={() => c.set({ sheet: 'city' })}
+          >
+            {icon('map-pin', 16)}
+            Pune
+            {svgIcon(['M6 9l6 6 6-6'], 16)}
+          </button>
+        </div>
+        <div className="rowc" style={{ gap: 'var(--space-2)' }}>
+          <IconButton icon="search" label="Search" onClick={() => c.tab('search')} />
+          <span className={'bell' + (fresh ? ' is-new' : '')}>
+            <IconButton
+              icon="bell"
+              label={!fresh ? 'Updates' : unread ? 'Updates, ' + unread + ' new' : 'Updates, new'}
+              onClick={() => c.go('notifs', { notifSeen: true, glSeen: (S.myGuestLists || []).map((g) => g.entryId) })}
+            />
+            {fresh ? (
+              <i key={unread} className={'bell-count' + (unread ? '' : ' is-dot')} aria-hidden>
+                {unread ? (unread > 9 ? '9+' : unread) : null}
+              </i>
+            ) : null}
+          </span>
+        </div>
+      </div>
+      <div className="px home-intro">
+        {eyebrow(todayTxt())}
+        {stop('this week in pune', 'sm')}
+      </div>
+    </>
   );
 
   // loading: the pill, the hero card and two rails as skeletons. No spinners
@@ -270,7 +298,8 @@ export function HomeDoor(p) {
     .sort((a, b) => b[1] - a[1])
     .slice(0, 6);
 
-  var pill = groupPill(c, group),
+  var pl = planInfo(S, t),
+    pill = groupPill(c, group, pl),
     n = isSet(group) ? group.size : 1,
     hv = heroIt && verdictText(heroIt.verdict, group, 'pill'),
     hsrc = heroIt && verdictSource(heroIt.verdict),
@@ -282,6 +311,13 @@ export function HomeDoor(p) {
 
       <div className="px home-pill">
         <GroupPill {...pill} />
+        {pl && !pl.live ? (
+          // a plan for a later day: tonight stays "Going as", with a nudge to the plan (it doesn't change tonight's verdicts)
+          <button type="button" className="home-later-plan" onClick={() => c.go('group')}>
+            {pl.gp.name + (pl.gp.stage === 'booked' ? ' · booked' : ' · vote open')}
+            {icon('chevron-right', 16)}
+          </button>
+        ) : null}
       </div>
 
       <div key={sig} className={'col' + (swapped ? ' home-swap' : '')}>

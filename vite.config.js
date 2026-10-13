@@ -5,6 +5,9 @@ export default defineConfig({
   plugins: [react()],
   // Relative paths so the built app loads from any folder, including inside the iOS and Android apps
   base: './',
+  // the preview doesn't watch the specs folder (documents, not app code): a spec being saved or copied there was
+  // briefly locked by Windows and crashed the preview
+  server: { watch: { ignored: ['**/specs/**'] } },
   build: {
     outDir: 'dist',
     // Match Capacitor 7's oldest supported web views (iOS 14, Android Chrome 60+)

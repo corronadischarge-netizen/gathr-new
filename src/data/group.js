@@ -72,10 +72,9 @@ export function groupFromPlan(gp) {
   };
 }
 
-/* the group the home checks the door for: what you set in Going as wins; otherwise an active plan's group */
+/* the group the door is checked for: only what you chose in Going as (Shubh, 13 Oct). A plan's group isn't applied
+   by itself, so the home never shows a group you didn't pick; Going as can fill it in from your plan */
 export function currentGroup(S) {
   if (S.groupOff) return null; // ?group=none: the home as if nothing were set
-  if (isSet(S.group) && S.group.source === 'manual') return S.group;
-  if (S.gp && (S.gp.stage === 'voting' || S.gp.stage === 'booked')) return groupFromPlan(S.gp);
   return isSet(S.group) ? S.group : null;
 }

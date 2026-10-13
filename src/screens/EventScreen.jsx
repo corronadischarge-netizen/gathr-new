@@ -1,7 +1,7 @@
 import { APP_URL, CFG } from '../config';
-import { agePhrase, currentGroup, groupLabel, isSet } from '../data/group';
+import { agePhrase, groupLabel, isSet } from '../data/group';
 import { doorOf } from '../data/doorRules';
-import { homeItems } from '../data/homeData';
+import { groupFor, homeItems } from '../data/homeData';
 import { rupees } from '../data/format';
 import { EVENTS } from '../data/listings';
 import { Button, DoorVerdict, Icon, TonightSoFar, VenueHero } from '../design-system';
@@ -38,7 +38,7 @@ export function EventScreen(p) {
     v = c.ven,
     t = now(),
     saved = !!S.saved[e.id],
-    group = currentGroup(S),
+    group = groupFor(S, t),
     door = doorOf(e),
     verdict = getDoorVerdict(door, group, S.age, t),
     vt = verdictText(verdict, group, 'pill'),

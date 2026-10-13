@@ -1,13 +1,37 @@
 /* Home v3: the app's nights, prepared for the door verdict and the ranking (lib/door.js, lib/homeRank.js) */
 import { crowdLevel } from '../design-system/utils';
 import { getDoorVerdict } from '../lib/door';
-import { nightDay } from '../lib/clock';
+import { addDays, homeWindow, nightDay } from '../lib/clock';
 import { travelMins } from '../lib/distance';
-import { currentGroup } from './group';
+import { currentGroup, groupFromPlan } from './group';
 import { doorOf } from './doorRules';
 import { EVENTS, ORDER, VENUES, isPast } from './listings';
 import { AREA_LIST } from './options';
 import { FAMILY_TAG } from './taxonomy';
+
+/* Your plan and its day (Shubh, 13 Oct): the night it booked, or its soonest option still to come.
+   A plan for tonight or tomorrow is live: the home shows it, and its group is who's going.
+   A plan for a later day doesn't change tonight's verdicts. → { gp, day, live } or null */
+export function planInfo(S, t) {
+  var gp = S.groupOff ? null : S.gp;
+  if (!gp || (gp.stage !== 'voting' && gp.stage !== 'booked')) return null;
+  var ids = gp.stage === 'booked' ? [gp.booked] : gp.opts || [],
+    days = ids
+      .map((k) => EVENTS[k])
+      .filter((e) => e && !isPast(e))
+      .map((e) => nightDay(new Date(e.iso).getTime()))
+      .sort();
+  if (!days.length) return null;
+  var w = homeWindow(t),
+    live = days[0] <= addDays(w.day, 1);
+  return { gp: gp, day: days[0], live: live };
+}
+
+/* who the door is checked for: a live plan's group, otherwise what you chose in Going as */
+export function groupFor(S, t) {
+  var pl = planInfo(S, t);
+  return pl && pl.live ? groupFromPlan(pl.gp) : currentGroup(S);
+}
 
 /* the areas and sounds you picked (both live in S.nights) */
 export function pickedAreas(S) {
@@ -21,7 +45,7 @@ function pickedTags(S) {
 
 /* one item per upcoming night: its day, door verdict for the current group, crowd, travel time and price */
 export function homeItems(S, t) {
-  var group = currentGroup(S),
+  var group = groupFor(S, t),
     areas = pickedAreas(S),
     tags = pickedTags(S);
   return ORDER.map((k) => EVENTS[k])
