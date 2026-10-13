@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { useAxisLock } from '../hooks/useAxisLock';
+import { useLongPress } from '../hooks/useLongPress';
 import { usePullToRefresh } from '../hooks/usePullToRefresh';
 import { IMAGES_3D } from '../assets/images';
 import { TEST } from '../config';
@@ -22,6 +23,7 @@ import {
 } from '../design-system';
 import { addDays, homeWindow, nightDay, now, weekdayOf } from '../lib/clock';
 import { verdictSource, verdictText } from '../lib/door';
+import { closesText } from '../lib/plan';
 import { heroPick, railFor, weekRails } from '../lib/homeRank';
 import { log } from '../lib/log';
 import { ms, useFlip, useSwap } from '../lib/motion';
@@ -97,7 +99,12 @@ function groupPill(c, group, pl) {
       state: 'plan-vote',
       people: faces,
       title: gp.name + ' · ' + groupLabel(group) + ', ' + agePhrase(group, S.age),
-      line: Object.keys(gpVoted(gp, S.vote)).length + ' of ' + (gp.members.length + 1) + ' voted · closes ' + gp.deadline,
+      line:
+        gp.stage === 'voting'
+          ? Object.keys(gpVoted(gp, S.vote)).length + ' of ' + (gp.members.length + 1) + ' voted · ' + closesText(gp, now())
+          : gp.winner
+            ? 'Voting closed · book ' + EVENTS[gp.winner].title
+            : "Voting closed · it's a tie",
       onOpen: () => c.go('group')
     };
   }
@@ -169,6 +176,8 @@ export function HomeDoor(p) {
     flipBox = useRef(null),
     heroSwap = useSwap(hero ? hero.id : 'none');
   useFlip(flipBox, sig);
+  // long-press a tile: "Add to plan" (spec 6.7)
+  useLongPress(flipBox, (id) => c.addToPlan(id));
   // pull to refresh, and a sound tile showing its selected state for a moment before the screen moves on
   var ptrRoot = useRef(null),
     ptr = useRef(null),
@@ -214,7 +223,7 @@ export function HomeDoor(p) {
             <IconButton
               icon="bell"
               label={!fresh ? 'Updates' : unread ? 'Updates, ' + unread + ' new' : 'Updates, new'}
-              onClick={() => c.go('notifs', { notifSeen: true, glSeen: (S.myGuestLists || []).map((g) => g.entryId) })}
+              onClick={() => c.go('notifs', { glSeen: (S.myGuestLists || []).map((g) => g.entryId) })}
             />
             {fresh ? (
               <i key={unread} className={'bell-count' + (unread ? '' : ' is-dot')} aria-hidden>
@@ -492,7 +501,8 @@ export function HomeDoor(p) {
         {week.length ? (
           <div className="px">
             <section className="home-end">
-              <Sticker src={IMAGES_3D['disco-ball']} size={96} tilt={-8} bob />
+              {/* the screen's one bob; it rests while a sound tile is selected, since that tile's sticker bobs then */}
+              <Sticker src={IMAGES_3D['disco-ball']} size={96} tilt={-8} bob={!picked} />
               <h2 className="home-end-title">
                 {week.length + (week.length === 1 ? ' night this week' : ' nights this week')}
                 <Stop />

@@ -50,12 +50,20 @@ export function UpdateGroup(p) {
 }
 
 /* One update. kind: task (white button), chance (violet button), decide (Decline + Accept), info (a chevron).
-   App addition: onOpen makes the row itself tappable (info rows open what they're about). */
+   App additions: onOpen makes the row itself tappable (info rows open what they're about); done shows an accepted
+   row's tick in place of its buttons; leaving slides a declined row out (interactions spec 5); flip names the row
+   for the list's FLIP, so the rows below glide up into its place */
 export function Update(p) {
   var kind = p.kind || 'info';
   var meta = [p.meta, p.time].filter(Boolean).join(' · ');
   var end = null;
-  if (kind === 'task') {
+  if (p.done) {
+    end = (
+      <span className="g-up-done" aria-label="Done">
+        <Icon name="check" size={20} />
+      </span>
+    );
+  } else if (kind === 'task') {
     end = (
       <Button variant="primary" size="sm" onClick={p.onAction}>
         {p.action || 'Fix'}
@@ -84,7 +92,8 @@ export function Update(p) {
   var open = kind === 'info' && p.onOpen;
   return (
     <div
-      className={cx('g-up', kind === 'info' ? 'is-info' : 'is-needs', p.unread === false && 'is-read', open && 'is-open', p.className)}
+      className={cx('g-up', kind === 'info' ? 'is-info' : 'is-needs', p.unread === false && 'is-read', open && 'is-open', p.done && 'is-done', p.leaving && 'is-leaving', p.className)}
+      data-flip={p.flip}
       role="listitem"
       onClick={open ? p.onOpen : undefined}
       onKeyDown={

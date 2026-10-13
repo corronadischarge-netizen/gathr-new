@@ -2,6 +2,9 @@ import { blockedFor, priceTxt } from '../data/format';
 import { EVENTS, VENUES, upcoming } from '../data/listings';
 import { planLink } from '../data/sample';
 import { Button, Chip, IconButton } from '../design-system';
+import { now } from '../lib/clock';
+import { clockText, defaultDeadline, planStep } from '../lib/plan';
+import { shareToast } from '../lib/utils';
 import { Share } from '../services/share';
 import { eyebrow, i3, meta, note, stop, svgIcon, thumb } from '../ui/helpers';
 import { Tap } from '../ui/Tap';
@@ -10,6 +13,8 @@ export function NewPlan(p) {
   var c = p.ctx,
     S = c.S,
     d = S.draft || { opts: [], deadline: 'Thu 6 pm', name: 'Friday plan' };
+  // only nights that still exist (a link or an old draft can name one that's gone)
+  d = Object.assign({}, d, { opts: d.opts.filter((k) => EVENTS[k]) });
   function upd(x) {
     c.set({ draft: Object.assign({}, d, x) });
   }
@@ -17,13 +22,23 @@ export function NewPlan(p) {
     var o = d.opts.slice(),
       i = o.indexOf(k);
     if (i >= 0) o.splice(i, 1);
-    else if (o.length < 3) o.push(k);
+    else if (o.length < 4) o.push(k);
     else {
-      c.toast('Up to 3 options keeps the vote quick');
+      c.toast('Up to 4 nights keeps the vote quick');
       return;
     }
     upd({ opts: o });
   }
+  /* when the vote closes (spec 8): 8 pm or 2 h before the first night by default, or earlier */
+  var t = now(),
+    starts = d.opts.map((k) => new Date(EVENTS[k].iso).getTime()),
+    first = starts.length ? Math.min.apply(null, starts) : null,
+    dflt = defaultDeadline(starts, t),
+    choices = [dflt]
+      .concat(first ? [first - 4 * 3600000, first - 3600000] : [])
+      .filter((x, i, a) => x >= t + 30 * 60000 && (!first || x < first) && a.indexOf(x) === i)
+      .sort((a, b) => a - b),
+    at = choices.indexOf(d.deadlineAt) >= 0 ? d.deadlineAt : dflt;
   var pool = upcoming().filter((k) => !blockedFor(EVENTS[k], S.age));
   return (
     <div className="full col pad-top plan-new" style={{ gap: '40px', paddingTop: '52px' }}>
@@ -36,7 +51,7 @@ export function NewPlan(p) {
         {stop('start a plan')}
       </div>
       <div className="col" style={{ gap: '12px' }}>
-        <span className="g-section-title">Pick up to 3 nights</span>
+        <span className="g-section-title">Pick 2 to 4 nights</span>
         <div className="col" style={{ gap: '8px' }}>
           {pool.map((k) => {
             var e = EVENTS[k],
@@ -64,9 +79,9 @@ export function NewPlan(p) {
       <div className="col" style={{ gap: '12px' }}>
         <span className="g-section-title">Voting closes</span>
         <div className="wrap">
-          {['Tonight 10 pm', 'Thu 6 pm', 'Fri noon'].map((t) => (
-            <Chip key={t} icon="clock" selected={d.deadline === t} onClick={() => upd({ deadline: t })}>
-              {t}
+          {choices.map((x) => (
+            <Chip key={x} icon="clock" selected={at === x} onClick={() => upd({ deadlineAt: x })}>
+              {clockText(x, t)}
             </Chip>
           ))}
         </div>
@@ -126,17 +141,17 @@ export function NewPlan(p) {
           size="lg"
           block
           icon="share"
-          disabled={d.opts.length < 1}
+          disabled={d.opts.length < 2}
           onClick={() => {
             var votes = {};
             d.opts.forEach((k) => {
               votes[k] = [];
             });
-            c.set({
-              gp: {
+            // draft → share link → voting: the plan machine sets the deadline and opens the vote (spec 8)
+            var gp = planStep(
+              {
                 name: d.name,
                 opts: d.opts,
-                deadline: d.deadline,
                 votes: votes,
                 members: ['Zoya', 'Aman', 'Kavya', 'Kabir'],
                 // the group's make-up, for the door verdicts (5 with you: the 4 sample friends + you)
@@ -144,58 +159,36 @@ export function NewPlan(p) {
                 women: d.groupType === 'mixed' ? d.women || 0 : 0,
                 men: d.groupType === 'mixed' ? 5 - (d.women || 0) : 0,
                 under21: !!d.under21,
-                stage: 'voting',
+                stage: 'draft',
                 booked: null,
-                fresh: true
+                news: []
               },
-              vote: d.opts.length === 1 ? d.opts[0] : null,
-              stack: ['plans', 'group'],
-              dir: 'fwd'
-            });
-            Share.whatsapp(
+              'SHARE',
+              { deadlineAt: at },
+              t
+            );
+            gp.deadline = clockText(at, t);
+            c.set({ gp: gp, vote: null, draft: null, stack: ['plans', 'group'], dir: 'fwd' });
+            // the phone's own share sheet (WhatsApp is usually first)
+            Share.link(
+              d.name,
               'Where are we going? Vote on ' +
                 d.name +
                 ' by ' +
-                d.deadline +
+                gp.deadline +
                 ':\n' +
-                d.opts.map((k) => '· ' + EVENTS[k].title + ' (' + EVENTS[k].date + ')').join('\n') +
-                '\n' +
-                planLink({ opts: d.opts, name: d.name, deadline: d.deadline }, S.me.name)
+                d.opts.map((k) => '· ' + EVENTS[k].title + ' (' + EVENTS[k].date + ')').join('\n'),
+              planLink({ opts: d.opts, name: d.name, deadline: gp.deadline }, S.me.name)
+            ).then(
+              (r) => {
+                var x = shareToast(r, 'Plan link');
+                if (x) c.toast(x);
+              },
+              () => c.toast('Couldn’t share. Try again')
             );
-            setTimeout(() => {
-              c.set((o) => {
-                if (
-                  !o.gp ||
-                  !o.gp.fresh ||
-                  o.gp.stage !== 'voting' ||
-                  o.stack[o.stack.length - 1] !== 'group'
-                )
-                  return {};
-                var v = Object.assign({}, o.gp.votes);
-                v[d.opts[0]] = (v[d.opts[0]] || []).concat('Zoya');
-                return { gp: Object.assign({}, o.gp, { votes: v }), toast: 'Zoya voted' };
-              });
-            }, 2200);
-            setTimeout(() => {
-              c.set((o) => {
-                if (
-                  !o.gp ||
-                  !o.gp.fresh ||
-                  o.gp.stage !== 'voting' ||
-                  o.stack[o.stack.length - 1] !== 'group'
-                )
-                  return {};
-                var v = Object.assign({}, o.gp.votes),
-                  k = d.opts[d.opts.length - 1];
-                v[k] = (v[k] || []).concat('Aman');
-                return { gp: Object.assign({}, o.gp, { votes: v }), toast: 'Aman voted' };
-              });
-            }, 4600);
           }}
         >
-          {d.opts.length
-            ? 'Invite by WhatsApp · ' + d.opts.length + (d.opts.length === 1 ? ' night' : ' nights')
-            : 'Pick at least one night'}
+          {d.opts.length >= 2 ? 'Invite your group · ' + d.opts.length + ' nights' : 'Pick at least 2 nights'}
         </Button>
         {note('Friends open the link in their browser. No app needed to vote')}
       </div>

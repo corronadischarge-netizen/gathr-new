@@ -14,6 +14,16 @@ export const Auth = (() => {
     if (/network|fetch|load/i.test(m)) return 'No connection. Check your internet and try again';
     return m || 'Something went wrong. Try again';
   }
+  /* the Supabase session saved in this browser ("sb-<project>-auth-token", and its code verifier) */
+  function forgetSession() {
+    try {
+      Object.keys(localStorage)
+        .filter((k) => /^sb-.*-auth-token/.test(k))
+        .forEach((k) => localStorage.removeItem(k));
+    } catch (e) {
+      /* storage blocked: nothing saved to remove */
+    }
+  }
   function userOf(u) {
     if (!u) return null;
     var md = u.user_metadata || {};
@@ -98,11 +108,19 @@ export const Auth = (() => {
           () => null
         );
     },
+    /* Log out (interactions spec 6.13). The session saved on this phone goes first, whatever the network does:
+       Supabase keeps it when the server can't be reached, and the next start would sign the old person back in
+       with their name. Then the server is told, if it can be. */
     signOut: () => {
+      forgetSession();
       if (!live) return Promise.resolve();
       return sb()
-        .then((c) => c.auth.signOut())
-        .catch(() => {});
+        .then((c) => {
+          c.auth.stopAutoRefresh();
+          return c.auth.signOut({ scope: 'local' });
+        })
+        .catch(() => {})
+        .finally(forgetSession);
     }
   };
 })();

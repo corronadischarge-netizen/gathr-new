@@ -15,6 +15,10 @@ import { scrollToTop, useScrollMemory } from './hooks/useScrollMemory';
 import { PENDING_AFTER, POLL_EVERY, bookingStep, inFlight, requestId } from './lib/booking';
 import { rupees } from './data/format';
 import { haptic } from './lib/haptics';
+import { now } from './lib/clock';
+import { UNDO_FOR, planStep } from './lib/plan';
+import { PlanSync } from './services/plans';
+import { saveLists, savedLists } from './services/doorList';
 import { log } from './lib/log';
 import { ms, reducedMotion } from './lib/motion';
 import { optimistic } from './lib/optimistic';
@@ -72,7 +76,17 @@ const ANDROID = /Android/i.test(navigator.userAgent);
 
 /* Everything on this device that belongs to the person signed in. Logging out removes all of it
    (the "use it sideways" choice and unsent door check-ins aren't theirs, so they stay). */
-const PERSONAL_KEYS = ['gathr.me', 'gathr.state', 'gathr.resume', 'gathr.views'];
+const PERSONAL_KEYS = [
+  'gathr.me',
+  'gathr.state',
+  'gathr.resume',
+  'gathr.views',
+  'gathr.payLedger', // payments and their references
+  'gathr.guestReports', // day-after answers
+  'gathr.log', // what they tapped
+  'gathr.travel', // travel times from their areas
+  'gathr.door.lists' // their nights' downloaded guest lists
+];
 
 export function App() {
   /* a first visit: nobody signed in, nothing saved */
@@ -179,7 +193,13 @@ export function App() {
     'cityWant',
     'cityAsk',
     'energy',
-    'bk'
+    'bk',
+    'pastNights',
+    'pastHidden',
+    'dayAfter',
+    'upRead',
+    'recents',
+    'locAsked'
   ];
   (() => {
     var p = store('gathr.state');
@@ -188,6 +208,9 @@ export function App() {
         if (p[k] !== undefined) s0[k] = p[k];
       });
       if (s0.planned && (!EVENTS[s0.planned] || isPast(EVENTS[s0.planned]))) {
+        // the night is over: it moves to Past nights, and the day-after card asks how it went
+        if (EVENTS[s0.planned] && (s0.pastNights || []).indexOf(s0.planned) < 0)
+          s0.pastNights = [s0.planned].concat(s0.pastNights || []);
         s0.planned = null;
         s0.onList = false;
       }
@@ -203,6 +226,18 @@ export function App() {
     }
     if (s0.mode === 'host' && s0.org && s0.org.profile && s0.seen) s0.stack = ['hostdoor'];
     else s0.mode = 'guest';
+    /* the door's downloaded guest lists: there at once, even with no signal (spec 6.14). Check-ins still waiting
+       to send count as in */
+    if (Remote.remoteOn && s0.mode === 'host') {
+      var dl = savedLists();
+      s0.remoteGuests = {};
+      s0.remoteCheckins = {};
+      Object.keys(dl).forEach((id) => {
+        s0.remoteGuests[id] = dl[id].guests;
+        var have = (dl[id].checkins || []).map((x) => x.client_id);
+        s0.remoteCheckins[id] = (dl[id].checkins || []).concat(Door.waitingFor(id).filter((x) => have.indexOf(x.client_id) < 0));
+      });
+    }
     var m = /#(e|plan|pi)=([^&]+)(.*)$/.exec(location.hash);
     if (m) s0.mode = 'guest';
     // a promoter invite link: the invite, ready to sign in and accept
@@ -241,6 +276,7 @@ export function App() {
   const [S, setS] = useState(s0);
   var bk = useRef(s0.bk || null), // the booking, changed at once on every event (see bkSend)
     live = useRef(S), // the latest state, for answers that arrive later
+    refreshRef = useRef(() => {}),
     freeBusy = useRef(false),
     saving = useRef({});
   live.current = S;
@@ -489,15 +525,25 @@ export function App() {
     if (['hostdoor', 'hostguests', 'orgevent'].indexOf(hostScreen) < 0) return;
     var t = setInterval(refresh, 15000);
     return () => clearInterval(t);
-  }, [S.mode, hostScreen, S.feedAt, S.org]);
+  }, [S.mode, hostScreen, S.feedAt, S.org, S.doorAt]);
+  // every fresh copy of the door's lists is kept on the phone for offline scanning
+  useEffect(() => {
+    if (Remote.remoteOn && S.mode === 'host' && S.remoteGuests) saveLists(S.remoteGuests, S.remoteCheckins);
+  }, [S.remoteGuests, S.remoteCheckins]);
   /* check-ins waiting for signal go as soon as the phone is back online */
   useEffect(() => {
     if (!Remote.remoteOn) return;
     var door = { set: set, toast: toast };
     var go = () => Door.flush(door);
     go();
-    window.addEventListener('online', go);
-    return () => window.removeEventListener('online', go);
+    // back online: send what's waiting, fetch the door's lists again, and quietly refresh the nights (spec 2.6)
+    var back = () => {
+      go();
+      set({ doorAt: Date.now() });
+      refreshRef.current();
+    };
+    window.addEventListener('online', back);
+    return () => window.removeEventListener('online', back);
   }, []);
   useEffect(() => {
     if (scrTop() !== 'event') return;
@@ -528,7 +574,9 @@ export function App() {
      replaced (not merged), so their name, photo, bookings, lists and inbox can't linger. Without Supabase the
      organiser exists only on this phone, so it stays rather than being lost. */
   ctx.signOut = () => {
-    forgetPush().then(() => Auth.signOut());
+    // this phone stops getting their notifications (needs the session, so it goes first, for 3 s at most), then the
+    // session is removed from the phone whatever the network does
+    Promise.race([forgetPush(), new Promise((ok) => setTimeout(ok, 3000))]).then(() => Auth.signOut());
     PERSONAL_KEYS.forEach((k) => store(k, null));
     bk.current = null;
     if (Remote.remoteOn) {
@@ -557,6 +605,7 @@ export function App() {
      if the sync fails the heart goes back, with "That didn't go through. Try again · Retry". "Saved to Plans" shows
      only the first time ever; removing shows Undo */
   ctx.refresh = refresh;
+  refreshRef.current = refresh;
   ctx.toggleSave = (id) => {
     var was = !!S.saved[id];
     var flip = (on) =>
@@ -684,7 +733,7 @@ export function App() {
       payId: payId || null,
       myBookings: booking ? Object.assign({}, o.myBookings, { [b.ev]: booking }) : o.myBookings,
       credit: o.credit - (b.credit || 0) + earned,
-      gp: b.gpb ? Object.assign({}, o.gp, { stage: 'booked', booked: b.ev, fresh: false }) : o.gp,
+      gp: b.gpb ? planStep(o.gp, 'SUCCESS', {}, now()) || Object.assign({}, o.gp, { stage: 'booked', booked: b.ev, fresh: false }) : o.gp,
       gpBook: null
     }));
     // closed the sheet while it was paying: the answer still arrives, as a toast with the way to the pass
@@ -726,6 +775,61 @@ export function App() {
       document.removeEventListener('visibilitychange', back);
     };
   }, [S.bk && S.bk.state, S.bk && S.bk.rid]);
+  /* the others' votes: no live connection yet (services/plans.js says what the backend needs), so while a plan is
+     open the app asks for news every few seconds. New votes update the bars in place; a toast says who, if you're
+     looking at the plan. Each piece of news also lands in Updates (gp.news) */
+  var gpStage = S.gp && S.gp.stage;
+  useEffect(() => {
+    if (gpStage !== 'voting' && gpStage !== 'closed') return;
+    var busy = false;
+    function pull() {
+      if (busy || document.visibilityState === 'hidden') return;
+      busy = true;
+      PlanSync.pull(live.current.gp, now())
+        .then((x) => {
+          busy = false;
+          if (!x) return;
+          var g = live.current.gp,
+            news = [];
+          if (x.votes) {
+            Object.keys(x.votes).forEach((k) =>
+              x.votes[k].filter((n) => (g.votes[k] || []).indexOf(n) < 0).forEach((n) => news.push({ who: n, text: n + ' voted for ' + EVENTS[k].title, to: 'group' }))
+            );
+            ctx.planSend('REMOTE', { votes: x.votes });
+          }
+          (x.leave || []).forEach((n) => {
+            if (ctx.planSend('LEAVE', { who: n })) news.push({ who: n, text: n + ' left ' + g.name, to: 'group' });
+          });
+          if (!news.length) return;
+          var stamp = now();
+          set((o) => ({
+            gp: o.gp && Object.assign({}, o.gp, { news: news.map((n, i) => Object.assign({ id: stamp + '-' + i, at: stamp }, n)).concat(o.gp.news || []).slice(0, 20) }),
+            notifSeen: false
+          }));
+          var top = live.current.stack[live.current.stack.length - 1];
+          if (top === 'group') toast(news.length > 1 ? news.length + ' new votes' : news[0].text.replace(/ for .*$/, ''));
+        })
+        .catch(() => (busy = false));
+    }
+    pull();
+    var t = setInterval(pull, PlanSync.POLL);
+    document.addEventListener('visibilitychange', pull);
+    return () => {
+      clearInterval(t);
+      document.removeEventListener('visibilitychange', pull);
+    };
+  }, [gpStage]);
+  /* at the deadline the vote closes by itself: the top night wins; a tie waits for the planner's pick */
+  var gpDeadline = S.gp && S.gp.stage === 'voting' && S.gp.deadlineAt;
+  useEffect(() => {
+    if (!gpDeadline) return;
+    var t = setTimeout(() => {
+      if (!ctx.planSend('CLOSE')) return;
+      var g = live.current.gp;
+      toast(g.winner ? 'Voting closed · ' + EVENTS[g.winner].title + ' won' : "Voting closed · it's a tie, pick the night");
+    }, Math.max(0, gpDeadline - now()));
+    return () => clearTimeout(t);
+  }, [gpDeadline]);
   // opened mid-payment after a restart: rejoin the same payment (same request id, so no second charge)
   useEffect(() => {
     if (inFlight(bk.current) && bk.current.state === 'paying' && !Pay.live) charge(bk.current);
@@ -738,7 +842,83 @@ export function App() {
     }
     if (S.busy) return;
     if (S.sheet === 'list' && bk.current && !inFlight(bk.current)) bkSend('CLOSE');
+    if (S.sheet === 'list' && S.gp && S.gp.stage === 'booking') ctx.planSend('BACK');
     set({ sheet: null, stopAsk: false });
+  };
+
+  /* a past night leaves Plans at once, with Undo (interactions spec 6.10) */
+  ctx.removePast = (id) => {
+    set((o) => ({ pastHidden: (o.pastHidden || []).concat(id) }));
+    toast('Removed from Plans', {
+      label: 'Undo',
+      run: () => set((o) => ({ pastHidden: (o.pastHidden || []).filter((k) => k !== id), toast: null }))
+    });
+  };
+
+  /* ---------- the group plan (interactions spec 6.7, 8) ----------
+     Every change goes through the plan machine (lib/plan.js); one that the plan's stage doesn't accept does nothing */
+  ctx.planSend = (ev, d) => {
+    var x = planStep(live.current.gp, ev, Object.assign({ me: live.current.vote }, d), now());
+    if (!x) return false;
+    live.current = Object.assign({}, live.current, { gp: x });
+    set({ gp: x });
+    PlanSync.send(x, ev, d);
+    return true;
+  };
+  /* your vote: at once on screen (with the tap haptic from the card), sent in the background; if sending fails the
+     vote goes back and the toast offers Retry (spec 2.5) */
+  ctx.planVote = (id) => {
+    var was = live.current.vote;
+    if (!planStep(live.current.gp, 'VOTE', { id: id }, now())) return;
+    optimistic(ctx, {
+      apply: () => set({ vote: id }),
+      sync: () => PlanSync.send(live.current.gp, 'VOTE', { id: id }),
+      rollback: () => set({ vote: was })
+    });
+  };
+  /* the planner cancels: at once, with Undo for 5 s; the others are told only after that */
+  ctx.planCancel = () => {
+    if (!ctx.planSend('CANCEL')) return;
+    set((o) => ({ stack: o.stack.length > 1 ? o.stack.slice(0, -1) : o.stack, dir: 'back' }));
+    toast('Plan cancelled', {
+      label: 'Undo',
+      run: () => {
+        set({ toast: null });
+        if (!ctx.planSend('UNDO')) toast('Too late to undo');
+      }
+    });
+    setTimeout(() => {
+      var g = live.current.gp;
+      if (g && g.stage === 'cancelled') log('plan_cancel_notified', { plan: g.name });
+    }, UNDO_FOR + 100);
+  };
+  /* close the vote and book: the winner's booking sheet with a pass for everyone in; a tie waits for your pick */
+  ctx.planBook = () => {
+    var g = live.current.gp;
+    if (g.stage === 'voting') ctx.planSend('CLOSE');
+    g = live.current.gp;
+    if (g.stage !== 'closed' || !g.winner) return;
+    ctx.planSend('BOOK');
+    var e = EVENTS[g.winner];
+    set({
+      guests: g.members.length + 1,
+      gpBook: g.winner,
+      cur: g.winner,
+      stack: live.current.stack.concat('event'),
+      sheet: e.age >= 21 && !live.current.age ? 'age' : 'list',
+      after: 'list',
+      dir: 'fwd'
+    });
+  };
+  /* "Add to plan" from a home tile (long-press): the night joins a new plan's picks */
+  ctx.addToPlan = (id) => {
+    var d = live.current.draft || { opts: [], name: 'Night out' },
+      opts = d.opts.indexOf(id) >= 0 ? d.opts : d.opts.concat(id).slice(-4);
+    set({ draft: Object.assign({}, d, { opts: opts }) });
+    toast('Added to a plan · ' + opts.length + (opts.length === 1 ? ' night' : ' nights'), {
+      label: 'Open',
+      run: () => go('newplan', { toast: null })
+    });
   };
   var screens = {
     hostdoor: HostDoor,

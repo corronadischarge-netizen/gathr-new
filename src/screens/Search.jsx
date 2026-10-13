@@ -1,13 +1,42 @@
+import { useEffect, useRef, useState } from 'react';
 import { blockedFor, priceTxt } from '../data/format';
+import { AREA_LIST } from '../data/options';
 import { EVENTS, VENUES, upcoming } from '../data/listings';
 import { Badge, Button, Chip, SearchField } from '../design-system';
-import { i3, meta, sec, thumb } from '../ui/helpers';
+import { i3, icon, meta, sec, thumb } from '../ui/helpers';
 import { Tap } from '../ui/Tap';
+
+/* Search (interactions spec 6.9): what you type shows at once; the results follow 250 ms after you stop typing.
+   Recent searches show when the field is focused and empty; Clear empties it and keeps the keyboard up */
+const WAIT = 250;
 
 export function Search(p) {
   var c = p.ctx,
     S = c.S,
     q = S.query.trim().toLowerCase();
+  const [text, setText] = useState(S.query);
+  const [focused, setFocused] = useState(false);
+  var field = useRef(null);
+  useEffect(() => {
+    if (text === S.query) return;
+    var t = setTimeout(() => c.set({ query: text }), WAIT);
+    return () => clearTimeout(t);
+  }, [text]);
+  function fill(v) {
+    setText(v);
+    c.set({ query: v });
+  }
+  // a search you acted on (opened a night, or pressed Enter) joins Recent, newest first, 5 at most
+  function remember() {
+    var v = text.trim();
+    if (!v) return;
+    c.set((o) => ({ recents: [v].concat((o.recents || []).filter((x) => x.toLowerCase() !== v.toLowerCase())).slice(0, 5) }));
+  }
+  function input() {
+    return field.current && field.current.querySelector('input');
+  }
+  var recents = (S.recents || []).slice(0, 5),
+    showRecents = focused && !text.trim() && recents.length;
   var res = upcoming()
     .map((k) => EVENTS[k])
     .filter((e) => {
@@ -34,13 +63,56 @@ export function Search(p) {
   ].filter((a) => !q || (a[0] + a[1]).toLowerCase().indexOf(q) >= 0);
   return (
     <div className="col" style={{ padding: '52px 0 140px', gap: '24px' }}>
-      <div className="px">
-        <SearchField
-          value={S.query}
-          onChange={(ev) => c.set({ query: ev.target.value })}
-          placeholder="Search nights, venues or artists"
-          aria-label="Search"
-        />
+      <div className="px col" style={{ gap: '8px' }}>
+        <div ref={field} className="rowc" style={{ gap: '8px' }}>
+          <div style={{ flexGrow: 1, minWidth: 0 }}>
+            <SearchField
+              value={text}
+              onChange={(ev) => setText(ev.target.value)}
+              onFocus={() => setFocused(true)}
+              onBlur={() => setFocused(false)}
+              onKeyDown={(ev) => {
+                if (ev.key === 'Enter') {
+                  fill(text);
+                  remember();
+                }
+              }}
+              placeholder="Search nights, venues or artists"
+              aria-label="Search"
+            />
+          </div>
+          {text ? (
+            <Button
+              variant="ghost"
+              size="sm"
+              onMouseDown={(ev) => ev.preventDefault()}
+              onClick={() => {
+                fill('');
+                var i = input();
+                if (i) i.focus();
+              }}
+            >
+              Clear
+            </Button>
+          ) : null}
+        </div>
+        {showRecents ? (
+          <div className="col search-recent" role="list" aria-label="Recent searches">
+            {recents.map((r) => (
+              <button
+                key={r}
+                type="button"
+                role="listitem"
+                className="search-recent-row"
+                onMouseDown={(ev) => ev.preventDefault()}
+                onClick={() => fill(r)}
+              >
+                {icon('clock', 20)}
+                <span>{r}</span>
+              </button>
+            ))}
+          </div>
+        ) : null}
       </div>
       <div className="hscroll">
         {[
@@ -69,7 +141,7 @@ export function Search(p) {
                 key={b[0]}
                 type="button"
                 className={'mood hue-' + b[2]}
-                onClick={() => c.set({ query: b[0] })}
+                onClick={() => fill(b[0])}
               >
                 {i3(b[1], 64, 'mood-ic')}
                 <span className="mood-lbl">{b[0]}</span>
@@ -88,7 +160,10 @@ export function Search(p) {
             var v = VENUES[e.venue];
             return (
               <Tap
-                onClick={() => c.openEvent(e.id)}
+                onClick={() => {
+                  remember();
+                  c.openEvent(e.id);
+                }}
                 key={e.id}
                 className="tap rowc"
                 style={{ gap: '12px', minHeight: '72px' }}
@@ -106,7 +181,18 @@ export function Search(p) {
             );
           })
         ) : (
-          <p className="body muted">{'No nights match "' + S.query + '". Try a venue, genre or day.'}</p>
+          <div className="col" style={{ gap: '12px' }}>
+            <p className="body muted" style={{ margin: 0 }}>
+              {'Nothing for ‘' + S.query.trim() + '’. Try an artist or an area'}
+            </p>
+            <div className="wrap">
+              {['Twin Strings'].concat(AREA_LIST.slice(0, 4)).map((x) => (
+                <Chip key={x} icon={x === 'Twin Strings' ? 'music-2' : 'map-pin'} onClick={() => fill(x)}>
+                  {x}
+                </Chip>
+              ))}
+            </div>
+          </div>
         )}
       </div>
       {artists.length ? (

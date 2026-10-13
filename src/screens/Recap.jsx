@@ -1,11 +1,14 @@
+import { DayAfterCard } from '../cards/DayAfterCard';
 import { RateNightCard } from '../cards/RateNightCard';
 import { EVENTS, VENUES, upcoming } from '../data/listings';
 import { Bloom, Button, IconButton, Wordmark } from '../design-system';
 import { i3, stop } from '../ui/helpers';
 
 export function Recap(p) {
+  // the night it's about: the one you opened from Plans or Updates, else your last night
   var c = p.ctx,
-    e = c.plan || c.ev;
+    S = c.S,
+    e = EVENTS[S.recapId] || EVENTS[(S.pastNights || [])[0]] || c.plan || c.ev;
   var nx = upcoming().filter((k) => k !== e.id)[0];
   return (
     <div className="full col" style={{ padding: '52px 16px 24px', gap: '20px' }}>
@@ -22,7 +25,8 @@ export function Recap(p) {
         </span>
         {stop(['your night,', <br key="b" />, 'wrapped'])}
       </div>
-      <RateNightCard ctx={c} e={e} />
+      {/* one card at a time (spec 6.12): the day-after questions first, then the rating and follow card */}
+      {((S.dayAfter || {})[e.id] || {}).done ? <RateNightCard ctx={c} e={e} /> : <DayAfterCard key={e.id} ctx={c} e={e} />}
       <div className="rel bottom-stack" style={{ alignItems: 'stretch' }}>
         <Button variant="primary" size="lg" block icon="share" onClick={() => c.go('wrapped')}>
           See your month, wrapped

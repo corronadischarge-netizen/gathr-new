@@ -528,10 +528,6 @@ button.ev-hero-img { border: 0; padding: 0; margin: 0; width: 100%; cursor: zoom
 .mode-switch { display: flex; align-items: center; gap: 12px; width: 100%; padding: 12px 16px 12px 12px; border: 0; border-radius: 20px; background: var(--surface); box-shadow: inset 0 0 0 1px var(--line); color: var(--ink); font: inherit; cursor: pointer; }
 .mode-switch:focus-visible { outline: 2px solid transparent; box-shadow: var(--focus-ring); }
 .mode-ic { width: 48px; height: 48px; border-radius: 30%; display: grid; place-items: center; background: var(--night-800); flex: none; }
-.scan-cta { display: flex; align-items: center; gap: 16px; width: 100%; min-height: 88px; padding: 16px 20px; border: 0; border-radius: 24px; background: var(--night-50); color: var(--night-950); cursor: pointer; font: inherit; }
-.scan-cta:focus-visible { outline: 2px solid transparent; box-shadow: var(--focus-ring); }
-.scan-cta-ic { width: 56px; height: 56px; border-radius: 18px; display: grid; place-items: center; background: color-mix(in srgb, var(--night-950) 8%, transparent); flex: none; }
-.scan-cta-t { font: 700 20px/24px var(--font-display); letter-spacing: -0.02em; }
 .scanner { position: absolute; inset: 0; z-index: 30; background: var(--night-950); overflow: hidden; }
 .scan-video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
 .scan-top { position: absolute; left: 16px; right: 16px; top: 52px; padding: 10px 10px 10px 16px; border-radius: 20px; background: color-mix(in srgb, var(--night-950) 80%, transparent); -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); }
@@ -752,3 +748,34 @@ html.is-sideways .upright-skip { margin-top: 16px; min-height: 44px; padding: 0 
 .ev3-pin { position: sticky; bottom: 0; z-index: 5; padding: var(--space-12) var(--space-4) calc(var(--space-4) + env(safe-area-inset-bottom, 0px)); background: linear-gradient(180deg, transparent, color-mix(in srgb, var(--night-950) 80%, transparent) 55%, var(--bg)); opacity: 0; transform: translateY(var(--space-4)); pointer-events: none; transition: opacity var(--dur-base) var(--ease-standard), transform var(--dur-base) var(--ease-standard); }
 .ev3-pin.is-on { opacity: 1; transform: none; pointer-events: auto; }
 .ev3 .g-vh2-media { will-change: transform; }
+/* group plan: the voters' faces sit at the end of each night's bar (yours moves when you change your vote) */
+.vote-row { gap: var(--space-2); }
+.vote-row .vote-bar { flex: 1; min-width: 0; }
+.vote-faces { display: flex; flex: none; min-height: 24px; }
+.vote-face + .vote-face { margin-left: calc(var(--space-2) * -1); }
+.vote-face .g-avatar { box-shadow: 0 0 0 2px var(--night-900); }
+/* Plans (interactions 6.10): a past night slides left to remove; "Remove" waits underneath */
+.swipe-row { position: relative; overflow: hidden; border-radius: var(--radius-md); }
+.swipe-under { position: absolute; inset: 0; display: flex; align-items: center; justify-content: flex-end; gap: var(--space-2); padding: 0 var(--space-4); background: var(--night-900); color: var(--red-300); font-size: 13px; font-weight: 600; }
+.swipe-top { position: relative; background: var(--bg); touch-action: pan-y; }
+.swipe-top.is-dragging { will-change: transform; }
+.past-row { gap: var(--space-3); min-height: 72px; }
+/* the day-after card (interactions 6.12): one question at a time, a small tick on the answer, then it closes itself */
+.da-card { padding: var(--space-5); gap: var(--space-4); }
+.da-step { gap: var(--space-3); }
+.da-pick { display: inline-flex; align-items: center; gap: var(--space-1); }
+.da-tick { display: inline-grid; place-items: center; animation: tag-pop var(--motion-slow) var(--ease-settle) both; }
+.da-skip { align-self: flex-start; min-height: 44px; color: var(--ink-muted); }
+.da-card.is-gone { opacity: 0; transition: opacity var(--dur-base) var(--ease-exit); }
+@media (prefers-reduced-motion: reduce) { .da-tick { animation-name: g-fade; animation-duration: var(--dur-fast); } }
+/* search (interactions 6.9): recent searches under the field while it's focused and empty */
+.search-recent { gap: 0; }
+.search-recent-row { all: unset; box-sizing: border-box; display: flex; align-items: center; gap: var(--space-3); min-height: 44px; color: var(--ink-muted); font-size: 15px; line-height: 20px; cursor: pointer; }
+.search-recent-row span { color: var(--ink); }
+.search-recent-row:focus-visible { box-shadow: var(--focus-ring); border-radius: var(--radius-sm); }
+/* map (interactions 6.8): while you pan, the venue sheet drops to its peek (title showing); a tap brings it back */
+.map-slot.is-peek { transform: translateY(calc(100% - var(--space-24))); transition: transform var(--dur-slow) var(--ease-standard); }
+.map-slot:not(.is-peek):not(.dragging):not(.settling) { transition: transform var(--dur-slow) var(--ease-standard); }
+/* the scanner (interactions 6.14): tapping the camera view moves on to the next guest */
+.scan-tap { all: unset; position: absolute; inset: 0; z-index: 1; cursor: pointer; }
+.scan-top, .scan-bottom { z-index: 2; }

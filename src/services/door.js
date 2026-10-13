@@ -139,6 +139,13 @@ export function undo(c, eventId, rows) {
   );
 }
 
+/* this night's check-ins still waiting to send (shown as in, at once) */
+export function waitingFor(eventId) {
+  return outbox()
+    .filter((x) => x.event_id === eventId)
+    .map((x) => Object.assign({ waiting: true }, x));
+}
+
 export function waitingCount() {
   return outbox().length;
 }

@@ -1,6 +1,6 @@
 import { useRef, useState } from 'react';
+import { DoorListLine } from '../components/DoorListLine';
 import { HostBar } from '../components/HostBar';
-import { SCAN_IC } from '../components/HostTabBar';
 import { NightPicker } from '../components/NightPicker';
 import { ScanResult } from '../components/ScanResult';
 import { hostCur, hostNights } from '../data/hostNights';
@@ -9,7 +9,7 @@ import { orgStats, passCount } from '../data/organisers';
 import { Button } from '../design-system';
 import { checkPass } from '../lib/passQr';
 import { OrgIntro } from './OrgIntro';
-import { eyebrow, fav, i3, meta, stop, svgIcon } from '../ui/helpers';
+import { eyebrow, fav, i3, meta, stop } from '../ui/helpers';
 
 /* Door: pick tonight's night, scan or type a code, see who's in */
 export function HostDoor(p) {
@@ -62,6 +62,8 @@ export function HostDoor(p) {
           {meta(
             inP.length + ' of ' + st.guests.length + ' bookings in' + (st.sample ? ' · sample bookings' : '')
           )}
+          {/* where scans are checked, and what's waiting to send (works offline) */}
+          <DoorListLine ctx={c} id={id} />
         </div>
       ) : (
         <div className="g-card card col empty-card">
@@ -74,15 +76,13 @@ export function HostDoor(p) {
         </div>
       )}
       {e ? (
-        <button type="button" className="scan-cta" onClick={() => c.set({ scanning: true, hostNight: id })}>
-          <span className="scan-cta-ic">{svgIcon(SCAN_IC, 24)}</span>
-          <span className="col" style={{ gap: '2px', textAlign: 'left' }}>
-            <span className="scan-cta-t">Scan a pass</span>
-            <span className="meta" style={{ color: 'color-mix(in srgb, var(--night-950) 70%, transparent)' }}>
-              Point the camera at the guest’s QR
-            </span>
-          </span>
-        </button>
+        /* the door's main button: the design system's Button, yellow in host mode (.g-host), not a one-off card */
+        <div className="col" style={{ gap: '8px' }}>
+          <Button variant="brand" size="lg" block icon="scan-line" onClick={() => c.set({ scanning: true, hostNight: id })}>
+            Scan a pass
+          </Button>
+          {meta('Point the camera at the guest’s QR')}
+        </div>
       ) : null}
       {e ? (
         <div className="col" style={{ gap: '8px' }}>

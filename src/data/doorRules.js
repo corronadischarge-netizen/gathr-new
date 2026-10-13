@@ -1,3 +1,5 @@
+import { reportCount } from '../services/guestReports';
+
 /* Door rules for every night, in one shape (home spec 5.2), for getDoorVerdict().
    Listed nights (District, Sort My Scene) only publish an age limit and sometimes a dress line; the rest below is
    SAMPLE data (sample: true) until gathr calls venues or guests answer, and screens label it "Sample data".
@@ -67,5 +69,7 @@ export function doorOf(e) {
   d.dress = e.dress || null;
   var s = SAMPLE[e.id];
   if (s) Object.assign(d, s, { dress: s.dress || d.dress, sample: true });
+  // your day-after answer counts toward "From {n} guests" (spec 6.12)
+  if (d.source === 'guests') d.guestAnswers += reportCount(e.id);
   return d;
 }

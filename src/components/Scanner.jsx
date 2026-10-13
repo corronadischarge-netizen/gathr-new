@@ -7,6 +7,9 @@ import { Button, IconButton } from '../design-system';
 import { useDialog } from '../hooks/useDialog';
 import { checkPass } from '../lib/passQr';
 import { meta } from '../ui/helpers';
+import { DoorListLine } from './DoorListLine';
+
+const HOLD = 2000;
 
 /* full-screen camera: BarcodeDetector where the phone has it, jsQR everywhere else */
 export function Scanner(p) {
@@ -20,9 +23,20 @@ export function Scanner(p) {
     es = useState(null),
     err = es[0],
     setErr = es[1];
+  /* a result stays until the next pass is scanned or the camera view is tapped, never less than 2 s (spec 6.14).
+     One waiting on "Let them in" stays until door staff answer it, so nobody is skipped by accident */
   var busy = useRef(false),
-    resRef = useRef(null);
+    resRef = useRef(null),
+    last = useRef({ txt: null, at: 0 });
   resRef.current = res;
+  function holding() {
+    var r = resRef.current;
+    return !!r && (r.admit || Date.now() - last.current.at < HOLD);
+  }
+  function clear() {
+    setRes(null);
+    last.current.at = Date.now(); // the pass still in front of the camera isn't read again straight away
+  }
   var sRef = useRef(S);
   sRef.current = S;
   useEffect(() => {
@@ -62,13 +76,15 @@ export function Scanner(p) {
           function tick() {
             if (stop) return;
             timer = setTimeout(tick, 180);
-            if (resRef.current || busy.current || !v.videoWidth) return;
+            if (holding() || busy.current || !v.videoWidth) return;
             busy.current = true;
             var found = (txt) => {
               busy.current = false;
-              if (txt && !resRef.current) {
-                setRes(checkPass(sRef.current, id, txt));
-              }
+              if (!txt) return;
+              // the same pass, still in frame, isn't read twice in a row within the hold
+              if (txt === last.current.txt && Date.now() - last.current.at < HOLD) return;
+              last.current = { txt: txt, at: Date.now() };
+              setRes(checkPass(sRef.current, id, txt));
             };
             if (det) {
               det.detect(v).then(
@@ -119,6 +135,10 @@ export function Scanner(p) {
       <video ref={vid} className="scan-video" playsInline muted aria-hidden />
       {/* the result fills the screen in its colour, so it reads from across the door */}
       <div className={'scan-wash' + (res ? ' tone-' + res.tone : '')} aria-hidden />
+      {res && !res.admit ? (
+        // a tap anywhere on the camera view: next guest
+        <button type="button" className="scan-tap" aria-label="Next guest" onClick={clear} />
+      ) : null}
       <div className="scan-frame" aria-hidden>
         <i />
         <i />
@@ -129,6 +149,7 @@ export function Scanner(p) {
         <div className="col" style={{ gap: '2px' }}>
           <span className="title15">Scan a pass</span>
           {meta(e ? e.title + ' · ' + e.date : '')}
+          <DoorListLine ctx={c} id={id} />
         </div>
         <IconButton
           icon="x"
@@ -146,7 +167,7 @@ export function Scanner(p) {
             </Button>
           </div>
         ) : res ? (
-          <ScanResult ctx={c} id={id} res={res} onDone={() => setRes(null)} />
+          <ScanResult ctx={c} id={id} res={res} onDone={clear} />
         ) : (
           <p className="scan-hint" aria-live="polite">
             Hold the pass inside the frame. It scans on its own

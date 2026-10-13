@@ -3,10 +3,11 @@ import maplibregl from 'maplibre-gl';
 import { IMAGES_3D } from '../assets/images';
 import { bookLabel, priceTxt } from '../data/format';
 import { EVENTS, VENUES, upcoming } from '../data/listings';
-import { ActionBar, CrowdMeter, SearchField, Sheet } from '../design-system';
+import { ActionBar, Chip, CrowdMeter, SearchField, Sheet } from '../design-system';
 import { CROWD, fmtNum } from '../design-system/utils';
 import { useSheetExit } from '../hooks/useSheetExit';
-import { ms } from '../lib/motion';
+import { ms, reducedMotion } from '../lib/motion';
+import { AREA_LIST } from '../data/options';
 import { token } from '../lib/utils';
 import { Share } from '../services/share';
 import { i3, icon, meta, note, rowIcon, sampleTag, svgIcon, thumb } from '../ui/helpers';
@@ -19,6 +20,11 @@ function pinCrowd(x, html) {
     return html ? '<i style="background:var(--crowd-' + x.crowd + ')"></i>' + word : word;
   }
   return x.booked != null ? fmtNum(x.booked) + ' booked' : '';
+}
+
+/* how long a map move takes: dur-slow for a pin (spec 6.8), instant with reduced motion */
+function dur(k) {
+  return reducedMotion() ? 0 : ms(k);
 }
 
 function pinHtml(x, sel, count) {
@@ -58,6 +64,9 @@ export function MapScreen(p) {
     hitsRef = useRef(null); // the venues matching the search (null: no search), for pins drawn later
   setRef.current = c.set;
   const [failed, setFailed] = useState(false);
+  const [peek, setPeek] = useState(false);
+  var peekRef = useRef(setPeek),
+    opener = useRef(null);
   /* search stays on the map: venues by name or area. Matching pins stay lit, the rest fade. */
   const [q, setQ] = useState('');
   var qq = q.trim().toLowerCase(),
@@ -201,6 +210,8 @@ export function MapScreen(p) {
           if (!one._on) {
             one.addTo(m);
             one._on = true;
+            // MapLibre names a marker "Map marker" as it's added; a screen reader should hear the venue and its crowd
+            one.getElement().setAttribute('aria-label', VENUES[g.ks[0]].name + ', ' + pinCrowd(VENUES[g.ks[0]]));
           }
           return;
         }
@@ -231,7 +242,7 @@ export function MapScreen(p) {
               g.ks.length
             ),
             () => {
-              m.fitBounds(b, { padding: 120, maxZoom: 16, duration: ms('--motion-slower') });
+              m.fitBounds(b, { padding: 120, maxZoom: 16, duration: dur('--motion-slower') });
             },
             (same ? areas[0] + ', ' : '') + g.ks.length + ' venues. Zoom in'
           ),
@@ -240,6 +251,7 @@ export function MapScreen(p) {
           .setLngLat([lng / g.ks.length, lat / g.ks.length])
           .addTo(m);
         cm.getElement().style.zIndex = 5;
+        cm.getElement().setAttribute('aria-label', (same ? areas[0] + ', ' : '') + g.ks.length + ' venues. Zoom in');
         cm._ks = g.ks;
         clusters.push(cm);
       });
@@ -257,6 +269,8 @@ export function MapScreen(p) {
     m.on('click', () => {
       setRef.current({ mapSel: null });
     });
+    // panning the map drops the venue sheet to its peek, so the map can be seen; tapping the sheet brings it back
+    m.on('dragstart', () => peekRef.current(true));
     sync();
     mr.current = { m: m, mk: mk, dim: dim };
     var t = setTimeout(() => {
@@ -286,9 +300,21 @@ export function MapScreen(p) {
         center: [x.lng, x.lat],
         zoom: Math.max(r.m.getZoom(), 15),
         offset: [0, -170],
-        duration: ms('--motion-slower')
+        duration: dur('--motion-slow')
       });
     }
+    setPeek(false);
+    /* like every sheet (spec 4): focus moves to the venue sheet's title, and back to its pin when it closes */
+    if (S.mapSel) {
+      opener.current = r.mk[S.mapSel] && r.mk[S.mapSel].getElement();
+      var t = setTimeout(() => {
+        var h = slot.current && slot.current.querySelector('.g-sheet-title');
+        if (h) h.focus({ preventScroll: true });
+      }, 0);
+      return () => clearTimeout(t);
+    }
+    if (opener.current && opener.current.isConnected) opener.current.focus({ preventScroll: true });
+    opener.current = null;
   }, [S.mapSel]);
   hitsRef.current = qq ? hits : null;
   useEffect(() => {
@@ -307,12 +333,12 @@ export function MapScreen(p) {
     var b = new maplibregl.LngLatBounds();
     ks.forEach((k) => b.extend([VENUES[k].lng, VENUES[k].lat]));
     c.set({ mapSel: null });
-    r.m.fitBounds(b, { padding: { top: 140, bottom: 150, left: 60, right: 70 }, maxZoom: 16, duration: ms('--motion-slower') });
+    r.m.fitBounds(b, { padding: { top: 140, bottom: 150, left: 60, right: 70 }, maxZoom: 16, duration: dur('--motion-slower') });
   }
   function zoom(d) {
     var r = mr.current;
     if (!r) return;
-    if (d) r.m.easeTo({ zoom: r.m.getZoom() + d, duration: 250 });
+    if (d) r.m.easeTo({ zoom: r.m.getZoom() + d, duration: dur('--motion-normal') });
     else {
       var b = new maplibregl.LngLatBounds();
       Object.keys(VENUES).forEach((k) => {
@@ -320,22 +346,48 @@ export function MapScreen(p) {
       });
       r.m.fitBounds(b, {
         padding: { top: 130, bottom: 150, left: 40, right: 70 },
-        duration: ms('--motion-slower')
+        duration: dur('--motion-slower')
       });
     }
   }
+  /* Locate me (spec 6.8): the first time, a line says why before the phone asks for permission; after that (or once
+     it's allowed) it goes straight to you */
   function locate() {
     var r = mr.current;
     if (!r || !navigator.geolocation) {
       c.toast('Location isn’t available on this device');
       return;
     }
+    if (S.locAsked) return findMe();
+    var ask = () =>
+      c.toast('We use your location only to centre the map on you', {
+        label: 'Allow',
+        run: () => {
+          c.set({ toast: null, locAsked: true });
+          findMe();
+        }
+      });
+    if (navigator.permissions && navigator.permissions.query)
+      navigator.permissions.query({ name: 'geolocation' }).then(
+        (st) => {
+          if (st.state === 'granted') {
+            c.set({ locAsked: true });
+            findMe();
+          } else ask();
+        },
+        ask
+      );
+    else ask();
+  }
+  function findMe() {
+    var r = mr.current;
+    if (!r) return;
     navigator.geolocation.getCurrentPosition(
       (pos) => {
         r.m.flyTo({
           center: [pos.coords.longitude, pos.coords.latitude],
           zoom: 14,
-          duration: ms('--motion-slower')
+          duration: dur('--motion-slow')
         });
         c.toast('Showing where you are');
       },
@@ -393,18 +445,16 @@ export function MapScreen(p) {
             </button>
           ))}
           {!hits.length ? (
+            /* nothing here: it stays on the map (spec 6.8) and offers areas to search instead */
             <div className="col map-res-none">
-              {meta('No venues called “' + q.trim() + '” on the map.')}
-              <button
-                type="button"
-                className="link-btn"
-                onClick={() => {
-                  c.set({ query: q.trim() });
-                  c.tab('search');
-                }}
-              >
-                Search nights and artists instead
-              </button>
+              {meta('No venues called “' + q.trim() + '” on the map. Try an area')}
+              <div className="wrap">
+                {AREA_LIST.slice(0, 4).map((a) => (
+                  <Chip key={a} icon="map-pin" onClick={() => setQ(a)}>
+                    {a}
+                  </Chip>
+                ))}
+              </div>
             </div>
           ) : null}
         </div>
@@ -430,7 +480,17 @@ export function MapScreen(p) {
         </div>
       ) : null}
       {v ? (
-        <div ref={slot} className="sheet-slot rise" style={{ zIndex: 20 }}>
+        <div
+          ref={slot}
+          className={'sheet-slot rise map-slot' + (peek ? ' is-peek' : '')}
+          style={{ zIndex: 20 }}
+          onClickCapture={(ev) => {
+            // a peeking sheet comes back up on a tap, rather than acting on what's under the finger
+            if (!peek) return;
+            ev.stopPropagation();
+            setPeek(false);
+          }}
+        >
           <Sheet
             title={v.name}
             subtitle={v.area + ' · ' + evs.length + (evs.length === 1 ? ' night' : ' nights') + ' listed'}

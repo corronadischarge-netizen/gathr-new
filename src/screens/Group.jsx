@@ -1,45 +1,56 @@
-import { useLayoutEffect, useRef } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { BookedNightCard } from '../cards/BookedNightCard';
 import { VoteOptionCard } from '../cards/VoteOptionCard';
 import { EVENTS, VENUES } from '../data/listings';
-import { gpVoted, gpWinner, planLink } from '../data/sample';
-import { Button, IconButton } from '../design-system';
-import { ms, phoneScale, reducedMotion } from '../lib/motion';
+import { gpVoted, planLink } from '../data/sample';
+import { Button, Chip, IconButton } from '../design-system';
+import { now } from '../lib/clock';
+import { ms, phoneScale, reducedMotion, useFlip, useSwap } from '../lib/motion';
+import { closesText, leaders, tally } from '../lib/plan';
 import { shareToast } from '../lib/utils';
 import { Share } from '../services/share';
 import { eyebrow, fav, i3, meta, note, statusChip, stop } from '../ui/helpers';
 
-/* The group plan: vote → book → everyone paid → on the way → home */
+/* The group plan (interactions spec 6.7, 8): vote → close → book → everyone's in. Every change goes through the plan
+   machine (ctx.planSend); the others' votes arrive by polling (services/plans.js) and update the bars in place */
 export function Group(p) {
   var c = p.ctx,
     S = c.S,
     gp = S.gp;
-  if (!gp)
+  // the countdown is text ("closes 8 pm", "closes in 20 min"); it's redrawn every 30 s, never ticking seconds
+  const [, tick] = useState(0);
+  useEffect(() => {
+    var t = setInterval(() => tick((n) => n + 1), 30000);
+    return () => clearInterval(t);
+  }, []);
+  if (!gp || gp.stage === 'cancelled')
     return (
-      <div
-        className="full col pad-top center-col"
-        style={{ gap: '16px', paddingTop: '120px', textAlign: 'center' }}
-      >
+      <div className="full col pad-top center-col" style={{ gap: '16px', paddingTop: '120px', textAlign: 'center' }}>
         {i3('champagne', 110)}
         {stop('no plan yet')}
-        <Button
-          variant="primary"
-          onClick={() => c.go('newplan', { draft: { opts: [], deadline: 'Thu 6 pm', name: 'Friday plan' } })}
-        >
+        <Button variant="primary" onClick={() => c.go('newplan', { draft: { opts: [], name: 'Friday plan' } })}>
           Start a group plan
         </Button>
       </div>
     );
   var who = gpVoted(gp, S.vote),
     all = ['Riya'].concat(gp.members),
-    voted = all.filter((n) => who[n]).length;
-  var win = gpWinner(gp, S.vote),
-    booked = gp.stage === 'booked',
-    be = booked ? EVENTS[gp.booked] : null;
-  var memberStatus = (n) => {
-    if (!booked) return who[n] ? statusChip('Voted', 'ok') : statusChip('Waiting', 'wait');
-    return n === 'Riya' ? statusChip('Booked', 'ok') : statusChip('Has pass', 'ok');
-  };
+    voted = all.filter((n) => who[n]).length,
+    t = now(),
+    stage = gp.stage,
+    voting = stage === 'voting',
+    booked = stage === 'booked',
+    deciding = stage === 'closed' || stage === 'booking',
+    top = leaders(gp, S.vote),
+    win = deciding ? gp.winner : top[0] || gp.opts[0],
+    be = booked ? EVENTS[gp.booked] : null,
+    we = win ? EVENTS[win] : null;
+  var memberStatus = (n) => (!booked ? (who[n] ? ['Voted', 'ok'] : ['Waiting', 'wait']) : n === 'Riya' ? ['Booked', 'ok'] : ['Has pass', 'ok']);
+  var line = booked
+    ? gp.name + ' · booked'
+    : voting
+      ? gp.name + ' · voting ' + closesText(gp, t)
+      : gp.name + ' · voting closed';
   return (
     <div className="full col pad-top" style={{ gap: '22px', paddingTop: '52px' }}>
       <div className="rowc between">
@@ -51,15 +62,16 @@ export function Group(p) {
           onClick={() =>
             Share.link(gp.name, 'Vote on ' + gp.name + ' with me on gathr', planLink(gp, S.me.name)).then(
               (r) => {
-                var t = shareToast(r, 'Plan link');
-                if (t) c.toast(t);
-              }
+                var x = shareToast(r, 'Plan link');
+                if (x) c.toast(x);
+              },
+              () => c.toast('Couldn’t share. Try again')
             )
           }
         />
       </div>
       <div>
-        {eyebrow(booked ? gp.name + ' · booked' : gp.name + ' · voting closes ' + gp.deadline)}
+        {eyebrow(line)}
         {stop(booked ? 'we’re going to ' + VENUES[be.venue].name.toLowerCase() : 'where are we going')}
       </div>
       <div className="col" style={{ gap: '10px' }}>
@@ -75,7 +87,7 @@ export function Group(p) {
               <span className="meta" style={{ color: 'var(--ink)' }}>
                 {n === 'Riya' ? 'You' : n}
               </span>
-              {memberStatus(n)}
+              <Status s={memberStatus(n)} />
             </div>
           ))}
         </div>
@@ -88,62 +100,75 @@ export function Group(p) {
           </Button>
         </div>
       ) : (
-        <VoteList winner={win}>
+        <VoteList winner={win} sig={JSON.stringify(tally(gp, S.vote))}>
           {gp.opts.map((k) => (
-            <VoteOptionCard key={k} ctx={c} id={k} winner={win} groupSize={all.length} />
+            <VoteOptionCard key={k} ctx={c} id={k} winner={win} groupSize={all.length} open={voting} />
           ))}
         </VoteList>
       )}
-      {!booked
+      {deciding && gp.tied ? (
+        /* a tie: the planner picks from the tied nights */
+        <div className="col" style={{ gap: '10px' }}>
+          <span className="title15">It's a tie. Pick the night</span>
+          <div className="wrap" role="radiogroup" aria-label="Pick the night">
+            {gp.tied.map((k) => (
+              <Chip key={k} role="radio" aria-pressed={undefined} aria-checked={false} onClick={() => c.planSend('PICK', { id: k })}>
+                {EVENTS[k].title}
+              </Chip>
+            ))}
+          </div>
+        </div>
+      ) : null}
+      {voting
         ? meta(
             S.vote
-              ? 'You voted. Close the vote now or wait for ' +
-                  gp.deadline +
-                  '. You book once, and everyone gets a pass'
+              ? 'You voted. Close the vote now or wait till it ' + closesText(gp, t) + '. You book once, and everyone gets a pass'
               : 'Tap a night to vote. Friends and votes are sample data'
           )
-        : note('Friends are sample data')}
+        : booked
+          ? note('Friends are sample data')
+          : null}
       {!booked ? (
         <div className="bottom-stack" style={{ alignItems: 'stretch' }}>
-          <Button
-            variant="subtle"
-            block
-            icon="share"
-            onClick={() => {
-              var left = all.filter((n) => !who[n] && n !== 'Riya');
-              Share.whatsapp(
-                (left.length ? left.join(', ') + ': ' : '') +
-                  'vote on ' +
-                  gp.name +
-                  ' before ' +
-                  gp.deadline +
-                  '. Takes 5 seconds, no app needed.\n' +
+          {voting ? (
+            <Button
+              variant="subtle"
+              block
+              icon="share"
+              onClick={() => {
+                var left = all.filter((n) => !who[n] && n !== 'Riya');
+                Share.link(
+                  gp.name,
+                  (left.length ? left.join(', ') + ': ' : '') +
+                    'vote on ' +
+                    gp.name +
+                    ' before it ' +
+                    closesText(gp, t) +
+                    '. Takes 5 seconds, no app needed',
                   planLink(gp, S.me.name)
-              );
-            }}
-          >
-            Remind who hasn’t voted
-          </Button>
-          <Button
-            variant="primary"
-            size="lg"
-            block
-            disabled={!S.vote}
-            onClick={() =>
-              c.set({
-                guests: all.length,
-                gpBook: win,
-                cur: win,
-                stack: S.stack.concat('event'),
-                sheet: EVENTS[win].age >= 21 && !S.age ? 'age' : 'list',
-                after: 'list',
-                dir: 'fwd'
-              })
-            }
-          >
-            {S.vote
-              ? 'Close vote · book ' + VENUES[EVENTS[win].venue].name + ' for ' + all.length
-              : 'Vote to close the plan'}
+                ).then(
+                  (r) => {
+                    var x = shareToast(r, 'Plan link');
+                    if (x) c.toast(x);
+                  },
+                  () => c.toast('Couldn’t share. Try again')
+                );
+              }}
+            >
+              Remind who hasn’t voted
+            </Button>
+          ) : null}
+          {voting ? (
+            <Button variant="primary" size="lg" block disabled={!S.vote} onClick={c.planBook}>
+              {S.vote && we ? 'Close vote · book ' + VENUES[we.venue].name + ' for ' + all.length : 'Vote to close the plan'}
+            </Button>
+          ) : gp.winner ? (
+            <Button variant="primary" size="lg" block icon="ticket" onClick={c.planBook}>
+              {'Book ' + all.length + ' passes · ' + VENUES[we.venue].name}
+            </Button>
+          ) : null}
+          <Button variant="ghost" onClick={c.planCancel}>
+            Cancel plan
           </Button>
         </div>
       ) : null}
@@ -151,12 +176,23 @@ export function Group(p) {
   );
 }
 
-/* The nights up for the vote. When a different night takes the lead, the "Leading" badge travels from the
-   old card to the new one (in a layer above the cards, which would otherwise clip it). */
+/* a member's status: a new one cross-fades in place (spec 6.7) */
+function Status(p) {
+  var n = useSwap(p.s[0]);
+  return (
+    <span key={n} className={n ? 'g-swap' : undefined}>
+      {statusChip(p.s[0], p.s[1])}
+    </span>
+  );
+}
+
+/* The nights up for the vote. Faces glide from one bar to another when a vote changes (FLIP); when a different night
+   takes the lead, the "Leading" badge travels from the old card to the new one (in a layer above the cards). */
 function VoteList(p) {
   var box = useRef(null),
     layer = useRef(null),
     last = useRef(null);
+  useFlip(box, p.sig);
   useLayoutEffect(() => {
     var el = box.current && box.current.querySelector('.vote-lead');
     if (!el) {
@@ -166,21 +202,18 @@ function VoteList(p) {
     var b = box.current.getBoundingClientRect(),
       r = el.getBoundingClientRect(),
       k = phoneScale(),
-      now = { x: (r.left - b.left) / k, y: (r.top - b.top) / k, id: p.winner },
+      at = { x: (r.left - b.left) / k, y: (r.top - b.top) / k, id: p.winner },
       prev = last.current;
-    last.current = now;
-    if (!prev || prev.id === now.id || reducedMotion() || !el.animate) return;
+    last.current = at;
+    if (!prev || prev.id === at.id || reducedMotion() || !el.animate) return;
     var fly = el.cloneNode(true);
     fly.className += ' vote-lead-fly';
-    fly.style.left = now.x + 'px';
-    fly.style.top = now.y + 'px';
+    fly.style.left = at.x + 'px';
+    fly.style.top = at.y + 'px';
     layer.current.appendChild(fly);
     el.style.visibility = 'hidden';
     var a = fly.animate(
-      [
-        { transform: 'translate(' + (prev.x - now.x) + 'px, ' + (prev.y - now.y) + 'px)' },
-        { transform: 'none' }
-      ],
+      [{ transform: 'translate(' + (prev.x - at.x) + 'px, ' + (prev.y - at.y) + 'px)' }, { transform: 'none' }],
       { duration: ms('--motion-slow'), easing: 'cubic-bezier(0.2, 0, 0, 1)' }
     );
     a.onfinish = a.oncancel = () => {

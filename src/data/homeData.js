@@ -15,8 +15,8 @@ import { FAMILY_TAG } from './taxonomy';
    A plan for a later day doesn't change tonight's verdicts. → { gp, day, live } or null */
 export function planInfo(S, t) {
   var gp = S.groupOff ? null : S.gp;
-  if (!gp || (gp.stage !== 'voting' && gp.stage !== 'booked')) return null;
-  var ids = gp.stage === 'booked' ? [gp.booked] : gp.opts || [],
+  if (!gp || ['voting', 'closed', 'booking', 'booked'].indexOf(gp.stage) < 0) return null;
+  var ids = gp.stage === 'booked' ? [gp.booked] : gp.winner ? [gp.winner] : gp.opts || [],
     days = ids
       .map((k) => EVENTS[k])
       .filter((e) => e && !isPast(e))

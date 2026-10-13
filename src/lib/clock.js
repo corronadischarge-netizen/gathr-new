@@ -15,9 +15,11 @@ export function parseNow(search) {
 }
 
 const DEMO = typeof location === 'undefined' ? null : parseNow(location.search);
+const LOADED = Date.now();
 
+/* the demo clock starts at ?now= and runs on from there, so countdowns (a plan's vote) move like real ones */
 export function now() {
-  return DEMO != null ? DEMO : Date.now();
+  return DEMO != null ? DEMO + (Date.now() - LOADED) : Date.now();
 }
 
 export function isDemoClock() {

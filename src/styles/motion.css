@@ -196,10 +196,10 @@
 /* ---------- host mode and the door ----------
    Switching between going out and hosting is a slow, full-screen cross-fade (the old screen fades out on top,
    the new tab bar fades in), so the change of mode can't be missed. */
-.screen.nav-mode { animation: g-fade var(--motion-slow) var(--ease-standard); }
-.ghost-mode { animation: fade-out var(--motion-slow) var(--ease-standard) forwards; }
+.screen.nav-mode { animation: g-fade var(--motion-screen) var(--ease-standard); }
+.ghost-mode { animation: fade-out var(--motion-screen) var(--ease-standard) forwards; }
 .ghost-layer-mode { z-index: 1; }
-.tabwrap.mode-in { animation: g-fade var(--motion-slow) var(--ease-standard); }
+.tabwrap.mode-in { animation: g-fade var(--motion-screen) var(--ease-standard); }
 /* a scan result washes the whole camera view in its colour; the result card and top bar stay dark and readable */
 .scan-wash { position: absolute; inset: 0; opacity: 0; pointer-events: none; transition: opacity var(--motion-normal) var(--ease-standard); }
 .scan-wash.tone-green { background-color: var(--green-300); opacity: 0.85; }
@@ -250,3 +250,13 @@
 /* a cross-fade when something's words or state change (DoorVerdict, GroupPill, the hero): opacity only, dur-base */
 .g-swap { animation: g-fade var(--motion-normal) var(--ease-standard); }
 @media (prefers-reduced-motion: reduce) { .g-swap { animation-duration: var(--dur-fast); } }
+
+/* first run (interactions 6.1): the welcome's step indicator fills to the new step over dur-slow (transform only) */
+.welcome .g-pager-seg { position: relative; overflow: hidden; }
+.welcome .g-pager-seg.is-active { background: var(--night-700); }
+.welcome .g-pager-seg.is-active::after { content: ""; position: absolute; inset: 0; border-radius: inherit; background: var(--ink); transform: scaleX(0); transform-origin: left; animation: fill var(--motion-slow) var(--ease-standard) forwards; }
+@media (prefers-reduced-motion: reduce) { .welcome .g-pager-seg.is-active::after { animation: none; transform: none; } }
+/* reduced motion: switching modes is a 120 ms fade */
+@media (prefers-reduced-motion: reduce) {
+  .screen.nav-mode, .ghost-mode, .tabwrap.mode-in { animation-duration: var(--dur-fast) !important; }
+}

@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { Button } from '../design-system';
+import { useOnline } from '../hooks/useOnline';
 import { haptic } from '../lib/haptics';
 import { useMachine } from '../lib/machine';
 import { replay } from '../lib/motion';
@@ -38,6 +39,7 @@ export function AuthForm(p) {
   }, [wait]);
   // after maxTries wrong codes (booking: 3) the box locks and the way forward is a new code
   var spent = !!p.maxTries && (F.tries || 0) >= p.maxTries;
+  var online = useOnline(); // offline: the code can't be sent or checked; the buttons say so (spec 2.6)
   var okE = okEmail(F.email),
     okC = /^\d{6,8}$/.test(F.code.trim());
   function send() {
@@ -159,7 +161,7 @@ export function AuthForm(p) {
               </span>
             ) : null}
           </div>
-          <Button variant="primary" size={btnSize} block disabled={!okE} busy={busy} onClick={send}>
+          <Button variant="primary" size={btnSize} block disabled={!okE || !online} busy={busy} onClick={send}>
             {busy ? 'Sending code' : 'Send me a code'}
           </Button>
         </div>
@@ -228,7 +230,7 @@ export function AuthForm(p) {
               size={btnSize}
               block
               icon={p.payIcon ? 'ticket' : null}
-              disabled={!okC}
+              disabled={!okC || !online}
               busy={busy}
               onClick={() => verify()}
             >
@@ -237,6 +239,11 @@ export function AuthForm(p) {
           )}
         </div>
       )}
+      {!online ? (
+        <p className="meta" style={{ margin: 0 }}>
+          Offline · you can sign in once you’re connected
+        </p>
+      ) : null}
       {F.err ? (
         <p id={p.id + '-msg'} className="meta err-txt" role="alert" style={{ margin: 0 }}>
           {F.err}

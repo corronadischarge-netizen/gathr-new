@@ -5,6 +5,7 @@ import { CitySheet } from './CitySheet';
 import { ConfirmSheet } from './ConfirmSheet';
 import { FriendsSheet } from './FriendsSheet';
 import { GoingAsSheet } from './GoingAsSheet';
+import { PastMenuSheet } from './PastMenuSheet';
 import { PosterLayer } from './PosterLayer';
 import { ReportSheet } from './ReportSheet';
 import { RulesSheet } from './RulesSheet';
@@ -19,7 +20,8 @@ const SHEETS = {
   report: ReportSheet,
   cancel: ConfirmSheet,
   logout: ConfirmSheet,
-  goingas: GoingAsSheet
+  goingas: GoingAsSheet,
+  pastmenu: PastMenuSheet
 };
 
 /* The dimmed layer that holds whichever bottom sheet is open */

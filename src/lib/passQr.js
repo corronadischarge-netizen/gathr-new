@@ -126,7 +126,7 @@ export function checkPass(S, id, raw) {
         ' · ' +
         passes +
         (passes === 1 ? ' pass' : ' passes') +
-        '. Lists sync across phones once gathr is online.',
+        '. Lists sync across phones once gathr is online',
       walkin: { name: 'Guest ' + code, passes: passes, code: code, booked: 'Scanned at the door' },
       admit: true
     };

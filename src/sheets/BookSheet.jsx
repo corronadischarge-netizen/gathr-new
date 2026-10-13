@@ -1,4 +1,5 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { useOnline } from '../hooks/useOnline';
 import { AuthForm } from '../components/AuthForm';
 import { Switch } from '../components/Switch';
 import { rupees } from '../data/format';
@@ -33,6 +34,7 @@ export function BookSheet(p) {
   const [party, setParty] = useState({ couples: 1, stags: 0, girls: 0 });
   const [hitMax, setHitMax] = useState(false); // tried to go past the host's limit: say why
   const [freeing, setFreeing] = useState(false); // a free booking is on its way (in-flight guard)
+  var online = useOnline(); // offline: Pay and the guest list wait, and say why (spec 2.6)
   var partyErr =
     e.stag === 'groups' && party.stags > 0 && !party.couples && !party.girls
       ? 'This night is couples and mixed groups only. Add a couple or a girl'
@@ -151,7 +153,7 @@ export function BookSheet(p) {
   }
   /* Pay: signed out, the sheet slides to sign-in first; free nights skip paying; otherwise the app pays, once */
   function payTap() {
-    if (partyErr || n < 1 || moving || st === 'blocked') return;
+    if (partyErr || n < 1 || moving || st === 'blocked' || !online) return;
     if (!S.signedIn) {
       c.bkSend('PAY_SIGNED_OUT');
       return;
@@ -286,7 +288,7 @@ export function BookSheet(p) {
               )}
               {S.signedIn && chosen ? (
                 entry ? (
-                  <Button variant="primary" size="lg" block icon="ticket" busy={claiming} onClick={claim}>
+                  <Button variant="primary" size="lg" block icon="ticket" busy={claiming} disabled={!online} onClick={claim}>
                     {claiming ? 'Getting your passes' : entry.bookingId ? 'Show my passes' : 'Get free passes'}
                   </Button>
                 ) : (
@@ -444,6 +446,7 @@ export function BookSheet(p) {
                 </div>
               ) : null}
               {st === 'pending' ? meta("This can take a minute. You won't be charged twice") : null}
+              {!online && !moving ? meta('Offline · you can book once you’re connected') : null}
               {S.stopAsk && moving ? (
                 /* ✕ while paying: closing only hides the sheet; the bank's answer still arrives */
                 <div className="col bk-stop" role="alertdialog" aria-label="Stop paying?" style={{ gap: '8px' }}>
@@ -485,7 +488,7 @@ export function BookSheet(p) {
                   block
                   icon="ticket"
                   busy={moving || freeing}
-                  disabled={st === 'success' || !!partyErr || n < 1}
+                  disabled={st === 'success' || !!partyErr || n < 1 || (!online && !moving)}
                   onClick={payTap}
                 >
                   {st === 'paying'

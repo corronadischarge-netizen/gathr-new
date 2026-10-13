@@ -1,10 +1,12 @@
 import { priceTxt } from '../data/format';
 import { EVENTS, VENUES } from '../data/listings';
-import { Badge, CrowdMeter } from '../design-system';
+import { Avatar, Badge, CrowdMeter } from '../design-system';
 import { meta, thumb } from '../ui/helpers';
 import { Tap } from '../ui/Tap';
 
-/* Group plan: one night up for the vote, with its vote bar and who voted for it. Tap to vote. */
+/* Group plan: one night up for the vote, with its vote bar and who voted for it. Tap to vote (spec 6.7): the bar grows
+   to its new share (dur-slow), your face sits on the bar of your vote, and changing your vote moves the face (FLIP in
+   the list, by data-flip). p.open: votes can still change */
 export function VoteOptionCard(p) {
   var c = p.ctx,
     S = c.S,
@@ -17,7 +19,7 @@ export function VoteOptionCard(p) {
     lead = k === p.winner && names.length;
   return (
     <Tap
-      onClick={() => c.set({ vote: k })}
+      onClick={() => (p.open === false ? null : c.planVote(k))}
       className={'tap g-card card col vote-card' + (mine ? ' picked' : '')}
       style={{ gap: '12px' }}
       aria-pressed={mine}
@@ -34,8 +36,17 @@ export function VoteOptionCard(p) {
           </Badge>
         ) : null}
       </div>
-      <div className="vote-bar">
-        <i style={{ transform: 'translateX(' + ((names.length / p.groupSize) * 100 - 100) + '%)' }} />
+      <div className="rowc vote-row">
+        <div className="vote-bar">
+          <i style={{ transform: 'translateX(' + ((names.length / p.groupSize) * 100 - 100) + '%)' }} />
+        </div>
+        <span className="vote-faces" aria-hidden="true">
+          {names.map((n) => (
+            <span key={n} data-flip={'face-' + n} className="vote-face">
+              <Avatar name={n === 'Riya' ? S.me.name || 'Riya' : n} image={n === 'Riya' ? S.me.photo : undefined} size={24} />
+            </span>
+          ))}
+        </span>
       </div>
       <div className="rowc between">
         <CrowdMeter booked={v.booked} cap={v.cap} level={v.crowd} compact />

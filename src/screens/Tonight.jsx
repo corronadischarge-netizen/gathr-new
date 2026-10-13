@@ -68,7 +68,7 @@ export function Tonight(p) {
               icon="bell"
               label={!fresh ? 'Updates' : unread ? 'Updates, ' + unread + ' new' : 'Updates, new'}
               onClick={() =>
-                c.go('notifs', { notifSeen: true, glSeen: (S.myGuestLists || []).map((g) => g.entryId) })
+                c.go('notifs', { glSeen: (S.myGuestLists || []).map((g) => g.entryId) })
               }
             />
             {fresh ? (

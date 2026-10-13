@@ -602,3 +602,11 @@ body { margin: 0; font-family: var(--font-sans); background: var(--bg); color: v
 .g-media-photo.is-ready { opacity: 1; }
 .g-cm-seg { transform-origin: 50% 100%; } /* the bars grow up from their base on first view */
 .g-rail-scroll { overscroll-behavior-x: contain; } /* a rail swiped to its end never pulls the browser back */
+/* Update app additions (interactions spec 5): an accepted row's tick, and a declined row sliding out */
+.g-up-done { width: 40px; height: 40px; border-radius: var(--radius-full); display: grid; place-items: center; background: color-mix(in srgb, var(--green-300) 18%, transparent); color: var(--green-100); animation: tag-pop var(--motion-slow) var(--ease-settle) both; }
+.g-up.is-leaving { pointer-events: none; animation: g-up-leave var(--motion-slow) var(--ease-exit) forwards; }
+@keyframes g-up-leave { to { opacity: 0; transform: translateX(calc(var(--space-6) * -1)); } }
+@media (prefers-reduced-motion: reduce) {
+  .g-up-done { animation-name: g-fade; animation-duration: var(--dur-fast); }
+  .g-up.is-leaving { animation: fade-out var(--dur-fast) linear forwards; }
+}
