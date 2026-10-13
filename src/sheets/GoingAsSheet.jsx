@@ -1,6 +1,7 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { currentGroup, groupFromPlan, groupLabel } from '../data/group';
 import { Button, Chip, Icon, IconButton, Sheet } from '../design-system';
+import { haptic } from '../lib/haptics';
 import { log } from '../lib/log';
 
 /* Going as (home spec section 6, board 04): who's going tonight, so every night's door rules are checked for the
@@ -13,7 +14,21 @@ const TYPES = [
   ['mixed', 'Mixed group', 'users']
 ];
 
+/* a stepper (interactions spec 5): the number rolls up or down over dur-fast with a tap haptic; at a limit nothing
+   changes and the phone gives a warning buzz (the buttons stay tappable, so the limit is felt, not just greyed out) */
 function Stepper(p) {
+  var last = useRef(p.value),
+    dir = p.value > last.current ? 'roll-up' : p.value < last.current ? 'roll-down' : '';
+  last.current = p.value;
+  function step(d) {
+    var n = p.value + d;
+    if (n < p.min || n > p.max) {
+      haptic.warning();
+      return;
+    }
+    haptic.tap();
+    p.onChange(n);
+  }
   return (
     <div className="ga-step">
       <span className="col">
@@ -21,11 +36,13 @@ function Stepper(p) {
         {p.sub ? <span className="meta">{p.sub}</span> : null}
       </span>
       <span className="ga-step-ctl">
-        <IconButton icon="minus" label={'Fewer ' + p.label.toLowerCase()} variant="solid" size={44} disabled={p.value <= p.min} onClick={() => p.onChange(p.value - 1)} />
+        <IconButton icon="minus" label={'Fewer ' + p.label.toLowerCase()} variant="solid" size={44} onClick={() => step(-1)} />
         <span className="ga-step-n" aria-live="polite">
-          {p.value}
+          <span key={p.value} className={dir}>
+            {p.value}
+          </span>
         </span>
-        <IconButton icon="plus" label={'More ' + p.label.toLowerCase()} variant="solid" size={44} disabled={p.value >= p.max} onClick={() => p.onChange(p.value + 1)} />
+        <IconButton icon="plus" label={'More ' + p.label.toLowerCase()} variant="solid" size={44} onClick={() => step(1)} />
       </span>
     </div>
   );
@@ -59,6 +76,8 @@ export function GoingAsSheet(p) {
   function save(next) {
     log('going_as_save', { type: next.type, size: next.size, under21: !!next.under21 });
     c.set({ group: Object.assign({}, next, { source: 'manual' }), sheet: null });
+    // the sheet closes, the home re-sorts under it, and a toast says what changed (interactions spec 6.2)
+    c.toast('Showing nights for ' + groupLabel(next));
   }
   var count = g.type !== 'solo' && g.type !== 'couple';
   // an active plan's group, offered as a one-tap fill

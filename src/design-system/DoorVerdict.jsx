@@ -1,5 +1,6 @@
 import { formatSource } from '../lib/door';
 import { now } from '../lib/clock';
+import { useSwap } from '../lib/motion';
 import { Button } from './Button';
 import { Icon } from './Icon';
 import { TagPill } from './TagPill';
@@ -12,10 +13,12 @@ const TONE = { yes: 'go', if: 'light', unknown: 'dark', no: 'dark' };
    look 'pill' (hero card, event page: TagPill + source or "Ask the venue") or 'line' (tiles and rows: icon 16 + words) */
 export function DoorVerdict(p) {
   var state = p.state || 'unknown',
-    icon = p.icon || ICON[state];
+    icon = p.icon || ICON[state],
+    // when the group changes, the icon and words cross-fade together (interactions spec 5); never colour alone
+    swap = useSwap(state + '|' + p.text);
   if (p.look === 'line')
     return (
-      <span className={cx('g-dv', 'g-dv-line', 'is-' + state, p.className)}>
+      <span key={swap} className={cx('g-dv', 'g-dv-line', 'is-' + state, swap && 'g-swap', p.className)}>
         <Icon name={icon} size={16} />
         <span className="g-dv-text">
           <span className="g-sr">Door: </span>
@@ -25,7 +28,7 @@ export function DoorVerdict(p) {
     );
   var src = p.showSource === false ? null : formatSource(p.source, now());
   return (
-    <div className={cx('g-dv', 'g-dv-pill', 'is-' + state, p.className)}>
+    <div key={swap} className={cx('g-dv', 'g-dv-pill', 'is-' + state, swap && 'g-swap', p.className)}>
       <TagPill tone={TONE[state]} icon={icon} className="g-dv-tag">
         <span className="g-sr">Door: </span>
         {p.text}

@@ -2,7 +2,7 @@
    styles/motion.css (which point at the design system's tempo tokens), so code and CSS stay in step.
    Rules it enforces: only transform and opacity animate; reduced motion turns movement into nothing or a
    120 ms fade; nothing here ever blocks a tap. */
-import { useLayoutEffect, useRef } from 'react';
+import { useEffect, useLayoutEffect, useRef } from 'react';
 
 export function reducedMotion() {
   return !!(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches);
@@ -101,4 +101,50 @@ export function useFlip(ref, sig) {
 export function phoneScale() {
   var ph = document.querySelector('.phone');
   return ph ? ph.getBoundingClientRect().width / ph.offsetWidth || 1 : 1;
+}
+
+/* How many times a value has changed since the component appeared. Use it as a React key on the part that should
+   cross-fade (with className "g-swap" once it's above 0), so a change replays a dur-base fade and first paint doesn't */
+export function useSwap(value) {
+  var last = useRef(value),
+    n = useRef(0);
+  if (last.current !== value) {
+    last.current = value;
+    n.current += 1;
+  }
+  return n.current;
+}
+
+/* A one-time reveal when something first comes into view (interactions spec 5: the crowd bars fill left to right,
+   the Booked so far dots light from the bottom), all inside dur-slow, then static. With reduced motion it's just
+   shown. selector picks the parts; data-o on them sets the order (default: page order); maxStagger in ms */
+export function useRevealOnce(ref, selector, frames, maxStagger) {
+  useEffect(() => {
+    var root = ref.current;
+    if (!root || reducedMotion() || typeof IntersectionObserver === 'undefined') return;
+    var els = Array.prototype.slice.call(root.querySelectorAll(selector));
+    if (!els.length) return;
+    if (els[0].hasAttribute('data-o')) els.sort((a, b) => +a.getAttribute('data-o') - +b.getAttribute('data-o'));
+    els.forEach((el) => (el.style.opacity = '0'));
+    var total = ms('--dur-slow'),
+      each = ms('--dur-fast'),
+      step = els.length > 1 ? Math.min(maxStagger || Infinity, (total - each) / (els.length - 1)) : 0;
+    var io = new IntersectionObserver(
+      (es) => {
+        if (!es.some((x) => x.isIntersecting)) return;
+        io.disconnect();
+        els.forEach((el, i) => {
+          el.style.opacity = '';
+          if (el.animate)
+            el.animate(frames, { duration: each, delay: i * step, easing: EASE.enter, fill: 'backwards' });
+        });
+      },
+      { threshold: 0.4 }
+    );
+    io.observe(root);
+    return () => {
+      io.disconnect();
+      els.forEach((el) => (el.style.opacity = ''));
+    };
+  }, []);
 }

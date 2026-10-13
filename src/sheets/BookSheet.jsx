@@ -47,6 +47,7 @@ export function BookSheet(p) {
      That's how the night's stag rule and promoter pay work. Listed nights keep a simple pass count. */
   var dbNight = remoteOn && e.remote && !gpb;
   const [party, setParty] = useState({ couples: 1, stags: 0, girls: 0 });
+  const [hitMax, setHitMax] = useState(false); // tried to go past the host's limit: say why
   var partyErr =
     e.stag === 'groups' && party.stags > 0 && !party.couples && !party.girls
       ? 'This night is couples and mixed groups only. Add a couple or a girl'
@@ -354,8 +355,13 @@ export function BookSheet(p) {
                 type="button"
                 className="g-ibtn g-ibtn-solid step"
                 aria-label="One fewer pass"
-                disabled={n <= 1 || !!S.busy}
-                onClick={() => c.set({ guests: Math.max(1, n - 1) })}
+                disabled={!!S.busy}
+                onClick={() => {
+                  // at a limit nothing changes and the phone gives a warning buzz (interactions spec 5)
+                  if (n <= 1) return haptic.warning();
+                  haptic.tap();
+                  c.set({ guests: n - 1 });
+                }}
               >
                 {svgIcon(['M5 12h14'])}
               </button>
@@ -371,8 +377,15 @@ export function BookSheet(p) {
                 type="button"
                 className="g-ibtn g-ibtn-solid step"
                 aria-label="One more pass"
-                disabled={n >= maxPasses || !!S.busy}
-                onClick={() => c.set({ guests: Math.min(maxPasses, n + 1) })}
+                disabled={!!S.busy}
+                onClick={() => {
+                  if (n >= maxPasses) {
+                    setHitMax(true);
+                    return haptic.warning();
+                  }
+                  haptic.tap();
+                  c.set({ guests: n + 1 });
+                }}
               >
                 {svgIcon(['M5 12h14', 'M12 5v14'])}
               </button>
@@ -382,7 +395,7 @@ export function BookSheet(p) {
       )}
       {guestMode ? null : (
         <>
-          {capped ? meta('Max ' + maxPasses + ' passes per booking') : null}
+          {capped || hitMax ? meta('Max ' + maxPasses + ' passes per booking') : null}
           {condition ? (
             <p className="bk-cond" style={{ margin: 0 }}>
               {condition + ". Make sure everyone's sorted"}

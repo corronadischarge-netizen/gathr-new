@@ -238,3 +238,7 @@
 /* a busy button (in-flight guard): no press, no hover change; it doesn't look disabled, it's working */
 .g-btn.is-busy { cursor: progress; }
 .g-btn.is-busy:active { scale: none; }
+
+/* a cross-fade when something's words or state change (DoorVerdict, GroupPill, the hero): opacity only, dur-base */
+.g-swap { animation: g-fade var(--motion-normal) var(--ease-standard); }
+@media (prefers-reduced-motion: reduce) { .g-swap { animation-duration: var(--dur-fast); } }

@@ -1,3 +1,4 @@
+import { useSwap } from '../lib/motion';
 import { Avatar } from './Avatar';
 import { Icon } from './Icon';
 import { cx } from './utils';
@@ -6,7 +7,9 @@ import { cx } from './utils';
    state: plan-vote | plan-booked | group-set | group-unset. Solid, never glass, never violet (it isn't a selection) */
 export function GroupPill(p) {
   var unset = p.state === 'group-unset',
-    people = (p.people || []).slice(0, 4);
+    people = (p.people || []).slice(0, 4),
+    // a new state (or a vote count ticking up) cross-fades its faces and words; the pill itself stays put
+    swap = useSwap(p.state + '|' + p.title + '|' + p.line);
   return (
     <button
       type="button"
@@ -14,7 +17,7 @@ export function GroupPill(p) {
       onClick={p.onOpen}
       aria-label={[p.title, p.line].filter(Boolean).join('. ')}
     >
-      <span className="g-gp-faces" aria-hidden="true">
+      <span key={'f' + swap} className={cx('g-gp-faces', swap && 'g-swap')} aria-hidden="true">
         {unset ? (
           <span className="g-gp-you">
             <Icon name="user" size={20} />
@@ -23,7 +26,7 @@ export function GroupPill(p) {
           people.map((x, i) => <Avatar key={x.name + i} name={x.name} image={x.image} size={32} className="g-gp-face" />)
         )}
       </span>
-      <span className="g-gp-copy" aria-hidden="true">
+      <span key={'c' + swap} className={cx('g-gp-copy', swap && 'g-swap')} aria-hidden="true">
         <span className="g-gp-title">{p.title}</span>
         {p.line ? <span className="g-gp-line">{p.line}</span> : null}
       </span>

@@ -852,3 +852,40 @@ export function decideKind(id, added) {
       .then(ok)
   );
 }
+
+/* ---------------------------------------------------------------- saved nights (the heart), synced across phones
+   Until the saved_nights migration is applied, the table is missing: then saves stay on the phone only, with no
+   error shown (savesLive tells the app which). Both calls are safe to repeat. */
+var savesMissing = false;
+function missingTable(e) {
+  var code = (e && e.code) || '';
+  return code === '42P01' || code === 'PGRST205' || /saved_nights/.test((e && e.message) || '');
+}
+function savesCall(run) {
+  if (savesMissing) return Promise.resolve(null);
+  return db()
+    .then(run)
+    .catch((e) => {
+      if (missingTable(e)) {
+        savesMissing = true;
+        return null;
+      }
+      throw e;
+    });
+}
+export function savesLive() {
+  return remoteOn && !savesMissing;
+}
+export function pullSaves() {
+  return savesCall((c) => c.from('saved_nights').select('night_id').then(ok)).then((rows) =>
+    rows ? rows.map((r) => r.night_id) : null
+  );
+}
+export function saveNight(id) {
+  return savesCall((c) =>
+    c.from('saved_nights').upsert({ night_id: id }, { onConflict: 'user_id,night_id', ignoreDuplicates: true }).then(ok)
+  );
+}
+export function unsaveNight(id) {
+  return savesCall((c) => c.from('saved_nights').delete().eq('night_id', id).then(ok));
+}

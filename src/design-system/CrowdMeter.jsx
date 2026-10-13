@@ -1,3 +1,5 @@
+import { useRef } from 'react';
+import { useRevealOnce } from '../lib/motion';
 import { CrowdBlock } from './CrowdBlock';
 import { Icon } from './Icon';
 import { CROWD, LEVELS, crowdLevel, cx, fmtNum } from './utils';
@@ -5,6 +7,9 @@ import { CROWD, LEVELS, crowdLevel, cx, fmtNum } from './utils';
 /* Booked so far. Give booked + cap and the level is worked out; level alone works when there's no bookings data.
    row (default): five bars, the word and the line. widget: the 60-dot card, with the trust line when `updated` is set */
 export function CrowdMeter(p) {
+  // the bars fill to the level once, left to right, the first time they're seen; then they stay put
+  var box = useRef(null);
+  useRevealOnce(box, '.g-cm-seg.is-on', [{ transform: 'scaleY(0)' }, { transform: 'none' }]);
   var lv = crowdLevel(p.booked, p.cap) || (CROWD[p.level] ? p.level : 'quiet'),
     c = CROWD[lv];
   if (p.variant === 'widget') {
@@ -29,6 +34,7 @@ export function CrowdMeter(p) {
   var line = p.line || c.line;
   return (
     <div
+      ref={box}
       className={cx('g-cm', 'g-crowd', 'g-cm-' + lv, p.glass && 'is-glass', p.compact && 'is-compact', p.className)}
       role="img"
       aria-label={'Booked so far: ' + c.label + '. ' + line}

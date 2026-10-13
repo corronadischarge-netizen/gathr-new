@@ -13,6 +13,7 @@ import { useSheetExit } from './hooks/useSheetExit';
 import { useScreenTransition } from './hooks/useScreenTransition';
 import { scrollToTop, useScrollMemory } from './hooks/useScrollMemory';
 import { ms, reducedMotion } from './lib/motion';
+import { optimistic } from './lib/optimistic';
 import { cleanCode } from './lib/promoterInvite';
 import { store } from './lib/utils';
 import { TABS } from './navigation';
@@ -140,6 +141,9 @@ export function App() {
   var PERSIST = [
     'saved',
     'group',
+    'savedOnce',
+    'anFilters',
+    'anOpen',
     'planned',
     'onList',
     'guests',
@@ -248,13 +252,16 @@ export function App() {
   }
   /* fetch the live feed again (tap the Tonight tab at the top); quiet: the home updates in place */
   function refresh() {
-    if (!Remote.remoteOn) return;
-    Remote.pullFeed()
+    // demo mode has nothing to fetch: a short wait so a pull-to-refresh still reads as done
+    if (!Remote.remoteOn) return new Promise((r) => setTimeout(r, 500));
+    return Remote.pullFeed()
       .then((feed) => {
         setRemoteFeed(feed);
         set({ feedAt: Date.now(), feedFailed: false });
       })
-      .catch(() => {});
+      .catch(() => {
+        if (!navigator.onLine) toast("You're offline. Showing what we had");
+      });
   }
   /* a short message near the bottom (Toast); it closes itself after 2.4 s, or 5 s with an action (Undo) */
   function toast(t, action) {
@@ -325,6 +332,13 @@ export function App() {
           notifSeen: l.some((g) => (o.glSeen || []).indexOf(g.entryId) < 0) ? false : o.notifSeen
         }))
       )
+      .catch(() => {});
+    // your saves follow you too: what's on the server joins what's on this phone
+    Remote.pullSaves()
+      .then((ids) => {
+        if (ids && ids.length)
+          set((o) => ({ saved: Object.assign({}, o.saved, Object.fromEntries(ids.map((k) => [k, 1]))) }));
+      })
       .catch(() => {});
     // your bookings for gathr nights follow you to any phone; the newest upcoming one is your plan
     feedReady
@@ -520,22 +534,38 @@ export function App() {
     set({ mode: 'guest', stack: ['you'], sheet: null, dir: 'mode', scanning: false });
     toast('Back to going out');
   };
+  /* the heart (interactions spec 2.5, 5): it fills at once and syncs in the background when you're signed in;
+     if the sync fails the heart goes back, with "That didn't go through. Try again · Retry". "Saved to Plans" shows
+     only the first time ever; removing shows Undo */
+  ctx.refresh = refresh;
   ctx.toggleSave = (id) => {
     var was = !!S.saved[id];
-    set((o) => {
-      var x = Object.assign({}, o.saved);
-      if (x[id]) delete x[id];
-      else x[id] = 1;
-      return { saved: x };
+    var flip = (on) =>
+      set((o) => {
+        var x = Object.assign({}, o.saved);
+        if (on) x[id] = 1;
+        else delete x[id];
+        return { saved: x };
+      });
+    var live = S.signedIn && Remote.savesLive();
+    optimistic(ctx, {
+      apply: () => flip(!was),
+      sync: () => (live ? (was ? Remote.unsaveNight(id) : Remote.saveNight(id)) : null),
+      rollback: () => flip(was)
     });
     if (was)
       toast('Removed from Plans', {
         label: 'Undo',
         run: () => {
-          set((o) => ({ saved: Object.assign({}, o.saved, { [id]: 1 }), toast: null }));
+          set({ toast: null });
+          flip(true);
+          if (live) Remote.saveNight(id).catch(() => {});
         }
       });
-    else toast('Saved to Plans');
+    else if (!S.savedOnce) {
+      set({ savedOnce: true });
+      toast('Saved to Plans');
+    }
   };
   var screens = {
     hostdoor: HostDoor,
@@ -611,6 +641,8 @@ export function App() {
       if (!S.busy) set({ sheet: null });
     } else if (S.scanning) set({ scanning: false });
     else if (scr === 'map' && S.mapSel) set({ mapSel: null });
+    // an expanded section closes before the screen does (All nights: "Not for your group")
+    else if (scr === 'allnights' && S.anOpen && Object.values(S.anOpen).some(Boolean)) set({ anOpen: {} });
     else if (S.stack.length > 1) back();
     else if (scr === 'welcome' && S.wstep > 0) set({ wstep: S.wstep - 1 });
     else if (TABS.indexOf(scr) > 0) tab('tonight');

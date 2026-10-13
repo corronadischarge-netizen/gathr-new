@@ -725,3 +725,15 @@ html.is-sideways .upright-skip { margin-top: 16px; min-height: 44px; padding: 0 
 .ev3-bar { position: absolute; left: 0; right: 0; top: 0; padding: var(--space-11) var(--space-4) 0; opacity: 0; pointer-events: none; transition: opacity var(--dur-base) var(--ease-standard); }
 .ev3-bar.is-on { opacity: 1; pointer-events: auto; }
 .ev3-bar .g-topbar-title { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+/* pull to refresh (interactions spec 6.2): a small spinner under the header; the content never moves */
+.ptr-slot { position: relative; height: 0; z-index: 3; }
+.ptr { position: absolute; left: 50%; top: calc(var(--space-2) * -1); width: 36px; height: 36px; margin-left: -18px; display: grid; place-items: center; border-radius: var(--radius-full); background: var(--night-800); color: var(--ink); opacity: 0; pointer-events: none; }
+.ptr.is-spinning { animation: ptr-spin 800ms linear infinite; }
+@keyframes ptr-spin { from { rotate: 0deg; } to { rotate: 360deg; } }
+.screen { overscroll-behavior-y: contain; } /* the browser's own pull-to-reload never fires inside the app */
+/* "Not for your group · n" expanding in place (interactions spec 5): the chevron turns 90 degrees, rows slide in */
+.an-chev { transition: transform var(--dur-slow) var(--ease-standard); }
+.an-notfor.is-open .an-chev { transform: rotate(90deg); }
+.an-out { animation: an-out-in var(--dur-slow) var(--ease-enter); }
+@keyframes an-out-in { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) { .an-out { animation: g-fade var(--dur-fast); } }

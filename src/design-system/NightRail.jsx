@@ -1,4 +1,5 @@
 import { Children, useEffect, useRef } from 'react';
+import { useAxisLock } from '../hooks/useAxisLock';
 import { Button } from './Button';
 import { Icon } from './Icon';
 import { cx } from './utils';
@@ -9,7 +10,9 @@ import { cx } from './utils';
 export function NightRail(p) {
   var tiles = Children.toArray(p.children).filter(Boolean),
     box = useRef(null),
-    far = useRef(-1);
+    far = useRef(-1),
+    row = useRef(null);
+  useAxisLock(row); // a sideways swipe never scrolls the page, and vice versa (locks after 10px)
   useEffect(() => {
     if (!p.onView || !box.current || typeof IntersectionObserver === 'undefined') return;
     var io = new IntersectionObserver(
@@ -48,6 +51,7 @@ export function NightRail(p) {
         ) : null}
       </div>
       <div
+        ref={row}
         className="g-rail-scroll"
         role="list"
         aria-label={p.title + ', ' + (p.total || tiles.length) + ' nights'}
@@ -55,7 +59,7 @@ export function NightRail(p) {
         onScroll={scrolled}
       >
         {tiles.map((t, i) => (
-          <div key={t.key || i} role="listitem" className="g-rail-item">
+          <div key={t.key || i} role="listitem" className="g-rail-item" data-flip={t.key || i}>
             {t}
           </div>
         ))}

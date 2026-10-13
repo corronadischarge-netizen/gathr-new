@@ -1,4 +1,6 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { useAxisLock } from '../hooks/useAxisLock';
+import { usePullToRefresh } from '../hooks/usePullToRefresh';
 import { IMAGES_3D } from '../assets/images';
 import { TEST } from '../config';
 import { MO, WD, todayTxt } from '../data/dates';
@@ -22,6 +24,7 @@ import { addDays, homeWindow, now, weekdayOf } from '../lib/clock';
 import { verdictSource, verdictText } from '../lib/door';
 import { heroPick, railFor, weekRails } from '../lib/homeRank';
 import { log } from '../lib/log';
+import { ms, useFlip, useSwap } from '../lib/motion';
 import { remoteOn } from '../services/remote';
 import { btnLabel, eyebrow, icon, meAvatar, stop, svgIcon } from '../ui/helpers';
 import { Tap } from '../ui/Tap';
@@ -113,10 +116,22 @@ function groupPill(c, group, pl) {
   };
 }
 
+/* the time the home is about: taken when it opens, and again when you come back to the app, never while you're
+   looking (the 2 am roll-over waits for the next visit; interactions spec 6.2) */
+function useSeenTime() {
+  const [t, setT] = useState(now);
+  useEffect(() => {
+    var f = () => document.visibilityState === 'visible' && setT(now());
+    document.addEventListener('visibilitychange', f);
+    return () => document.removeEventListener('visibilitychange', f);
+  }, []);
+  return t;
+}
+
 export function HomeDoor(p) {
   var c = p.ctx,
     S = c.S,
-    t = now(),
+    t = useSeenTime(),
     w = homeWindow(t),
     group = groupFor(S, t),
     items = homeItems(S, t),
@@ -138,11 +153,20 @@ export function HomeDoor(p) {
   var week = [];
   for (var i = 0; i < 7; i++) week = week.concat(on(addDays(w.day, i)));
 
-  // logging (section 10): the home once, the hero whenever it changes; Going as cross-fades the home (200 ms)
+  /* changing who's going (interactions spec 6.2): nothing is redrawn wholesale. The hero cross-fades to its new night,
+     every verdict cross-fades (DoorVerdict), and tiles glide to their new places in the rails (FLIP, dur-slow) */
   var sig = JSON.stringify(group || null),
-    lastSig = useRef(sig),
-    swapped = lastSig.current !== sig;
-  lastSig.current = sig;
+    flipBox = useRef(null),
+    heroSwap = useSwap(hero ? hero.id : 'none');
+  useFlip(flipBox, sig);
+  // pull to refresh, and a sound tile showing its selected state for a moment before the screen moves on
+  var ptrRoot = useRef(null),
+    ptr = useRef(null),
+    moods = useRef(null);
+  usePullToRefresh(ptrRoot, ptr, () => c.refresh());
+  useAxisLock(moods);
+  const [picked, setPicked] = useState(null);
+  // logging (section 10): the home once, the hero whenever it changes
   useEffect(() => {
     log('home_view', { layout: 'door-first' });
   }, []);
@@ -193,6 +217,12 @@ export function HomeDoor(p) {
       <div className="px home-intro">
         {eyebrow(todayTxt())}
         {stop('this week in pune', 'sm')}
+      </div>
+      {/* pull to refresh: the spinner waits here, under the headline, over the gap above the group pill, hidden until you pull */}
+      <div className="ptr-slot" ref={ptrRoot} aria-hidden="true">
+        <span ref={ptr} className="ptr">
+          {icon('refresh-cw', 20)}
+        </span>
       </div>
     </>
   );
@@ -320,7 +350,7 @@ export function HomeDoor(p) {
         ) : null}
       </div>
 
-      <div key={sig} className={'col' + (swapped ? ' home-swap' : '')}>
+      <div ref={flipBox} className="col">
         {!week.length ? (
           // the whole week is empty (copy library)
           <div className="px home-hero">
@@ -332,7 +362,11 @@ export function HomeDoor(p) {
             </div>
           </div>
         ) : hero ? (
-          <section className="px col home-hero" aria-label={'Best for your group ' + heroWhen}>
+          <section
+            key={'hero' + heroSwap}
+            className={'px col home-hero' + (heroSwap ? ' g-swap' : '')}
+            aria-label={'Best for your group ' + heroWhen}
+          >
             <div className="rowc between">
               <h2 className="g-section-title home-title">{'Best for your group ' + heroWhen}</h2>
               {heroIt.sample ? <span className="home-sample">Sample data</span> : null}
@@ -421,7 +455,7 @@ export function HomeDoor(p) {
                 Pick a sound, see the week
               </p>
             </div>
-            <div className="home-moods">
+            <div className="home-moods" ref={moods}>
               {sounds.map((x) => (
                 <MoodTile
                   key={x[0][0]}
@@ -431,9 +465,11 @@ export function HomeDoor(p) {
                   stickerSize={64}
                   action={x[1] + ' this week'}
                   className="home-mood"
+                  selected={picked === x[0][0]}
                   onClick={() => {
                     log('mood_tap', { sound: x[0][0] });
-                    allNights(null, x[0][0]);
+                    setPicked(x[0][0]);
+                    setTimeout(() => allNights(null, x[0][0]), ms('--motion-normal'));
                   }}
                 />
               ))}

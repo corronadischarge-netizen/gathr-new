@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { MO, WD } from '../data/dates';
 import { agePhrase, groupLabel, isSet } from '../data/group';
 import { groupFor, homeItems } from '../data/homeData';
@@ -30,7 +30,7 @@ export function AllNights(p) {
     w = homeWindow(t),
     group = groupFor(S, t),
     f = S.anFilters || {},
-    [open, setOpen] = useState({});
+    open = S.anOpen || {};
   var all = homeItems(S, t).filter((it) => !it.over && it.day >= w.day);
   function keep(it) {
     var e = EVENTS[it.id];
@@ -86,7 +86,8 @@ export function AllNights(p) {
       <div className="an-head px">
         <IconButton icon="arrow-left" label="Back" variant="solid" onClick={c.back} />
         <div className="col an-title">
-          <h1 className="g-section-title">{'All nights · ' + all.length}</h1>
+          {/* the count follows the filters as they change (interactions spec 6.3) */}
+          <h1 className="g-section-title">{'All nights · ' + shown.length}</h1>
           <span className="meta">
             {isSet(group) ? 'Going as ' + groupLabel(group) + ' · ' + agePhrase(group, S.age) : 'Going as you'}
           </span>
@@ -108,7 +109,19 @@ export function AllNights(p) {
           </Chip>
         ))}
         {any ? (
-          <Chip icon="x" onClick={() => c.set({ anFilters: {} })} aria-pressed={undefined}>
+          <Chip
+            icon="x"
+            aria-pressed={undefined}
+            onClick={() => {
+              // clearing resets at once, with Undo (undo, don't ask: spec 1)
+              var was = f;
+              c.set({ anFilters: {} });
+              c.toast('Filters cleared', {
+                label: 'Undo',
+                run: () => c.set({ anFilters: was, toast: null })
+              });
+            }}
+          >
             Clear
           </Chip>
         ) : null}
@@ -129,20 +142,25 @@ export function AllNights(p) {
               <div className="px col">
                 {fits.map(row)}
                 {out.length ? (
-                  open[day] ? (
-                    out.map(row)
-                  ) : (
-                    <button type="button" className="an-notfor" onClick={() => {
-                        log('not_for_you_expand', { day: day });
-                        setOpen(Object.assign({}, open, { [day]: true }));
-                      }}>
+                  <>
+                    {/* expands in place: the chevron turns 90 degrees and the rows slide in (dur-slow); remembered per day */}
+                    <button
+                      type="button"
+                      className={'an-notfor' + (open[day] ? ' is-open' : '')}
+                      aria-expanded={!!open[day]}
+                      onClick={() => {
+                        if (!open[day]) log('not_for_you_expand', { day: day });
+                        c.set({ anOpen: Object.assign({}, open, { [day]: !open[day] }) });
+                      }}
+                    >
                       <span className="col">
                         <span className="title15">{'Not for your group · ' + out.length}</span>
                         <span className="meta">{out[0].verdict.reasons[0]}</span>
                       </span>
-                      <Icon name="chevron-down" size={20} />
+                      <Icon name="chevron-right" size={20} className="an-chev" />
                     </button>
-                  )
+                    {open[day] ? <div className="an-out">{out.map(row)}</div> : null}
+                  </>
                 ) : null}
               </div>
             </section>
