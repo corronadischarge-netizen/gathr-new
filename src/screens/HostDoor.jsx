@@ -76,9 +76,9 @@ export function HostDoor(p) {
         </div>
       )}
       {e ? (
-        /* the door's main button: the design system's Button, yellow in host mode (.g-host), not a one-off card */
+        /* the door's scan button: the design system's Button, quiet (subtle) so the night's numbers lead (Shubh, 14 Oct) */
         <div className="col" style={{ gap: '8px' }}>
-          <Button variant="brand" size="lg" block icon="scan-line" onClick={() => c.set({ scanning: true, hostNight: id })}>
+          <Button variant="subtle" size="lg" block icon="scan-line" onClick={() => c.set({ scanning: true, hostNight: id })}>
             Scan a pass
           </Button>
           {meta('Point the camera at the guest’s QR')}
