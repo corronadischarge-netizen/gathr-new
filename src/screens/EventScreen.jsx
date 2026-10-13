@@ -1,10 +1,11 @@
+import { useEffect, useRef, useState } from 'react';
 import { APP_URL, CFG } from '../config';
 import { agePhrase, groupLabel, isSet } from '../data/group';
 import { doorOf } from '../data/doorRules';
 import { groupFor, homeItems } from '../data/homeData';
 import { rupees } from '../data/format';
 import { EVENTS } from '../data/listings';
-import { Button, DoorVerdict, Icon, TonightSoFar, VenueHero } from '../design-system';
+import { Button, DoorVerdict, Icon, TonightSoFar, TopBar, VenueHero } from '../design-system';
 import { homeWindow, now } from '../lib/clock';
 import { doorRows, getDoorVerdict, verdictSource, verdictText } from '../lib/door';
 import { heroPick } from '../lib/homeRank';
@@ -74,8 +75,35 @@ export function EventScreen(p) {
     tryNight = pick && EVENTS[pick.id];
   }
 
+  /* the top bar: clear over the photo; once the photo has scrolled under it, a glass bar fades in (spec 3, 6.4) */
+  var root = useRef(null),
+    bar = useRef(null);
+  const [glass, setGlass] = useState(false);
+  useEffect(() => {
+    var scr = root.current && root.current.closest('.screen');
+    if (!scr) return;
+    var onScroll = () => setGlass(scr.scrollTop > 280); // the photo is 380 tall; its buttons sit 52 to 100 from the top
+    onScroll();
+    scr.addEventListener('scroll', onScroll, { passive: true });
+    return () => scr.removeEventListener('scroll', onScroll);
+  }, []);
+  useEffect(() => {
+    if (bar.current) bar.current.inert = !glass; // hidden: can't be tapped or focused
+  }, [glass]);
+
   return (
-    <div className="col ev3">
+    <div className="col ev3" ref={root}>
+      <div className="ev3-bar-slot">
+        <div ref={bar} className={'ev3-bar' + (glass ? ' is-on' : '')} aria-hidden={glass ? undefined : 'true'}>
+          <TopBar
+            glass
+            back
+            onBack={c.back}
+            title={e.title}
+            actions={[['heart', saved ? 'Saved' : 'Save', () => c.toggleSave(e.id), false, saved]]}
+          />
+        </div>
+      </div>
       <div
         onClick={(ev) => {
           var l = btnLabel(ev);

@@ -17,6 +17,7 @@
   --motion-exit: calc(var(--dur-slow) * 0.8); /* a sheet closing */
   --motion-slower: 450ms; /* the booking tick drawing itself (spec 7) */
   --motion-step: var(--dur-fast); /* a number rolling to its next value */
+  --motion-tab: 460ms; /* the TabBar pill sliding to the new tab, with a slight spring (TabBar README) */
   --motion-pop: var(--dur-base); /* the heart filling when you save */
   /* easing (proposed release 24 tokens, defined once here until the design system has them) */
   --ease-standard: cubic-bezier(0.2, 0, 0, 1); /* things moving on screen */
@@ -73,13 +74,13 @@
 @keyframes g-fade { from { opacity: 0; } to { opacity: 1; } }
 /* edge swipe: a thin strip along the left edge (inside the 16px gutter) that only catches sideways drags */
 .edge-swipe { position: absolute; left: 0; top: 0; bottom: 0; width: 16px; z-index: 2; touch-action: pan-y; }
-.screen.under { pointer-events: none; transform: translateX(-20%); opacity: 0.4; }
+.screen.under { pointer-events: none; transform: translateX(-30%); opacity: 0.4; }
 
 /* ---------- tab bar: the active disc slides to the new tab (green in host mode) ---------- */
 .g-tabbar { position: relative; }
 .g-tabbar .g-tab { position: relative; z-index: 1; }
 .g-tabbar .g-tab.is-active { background: transparent; }
-.g-tab-ind { position: absolute; left: 0; top: 0; border-radius: var(--radius-full); background: var(--brand); pointer-events: none; transition: transform var(--motion-normal) var(--ease-standard); }
+.g-tab-ind { position: absolute; left: 0; top: 0; border-radius: var(--radius-full); background: var(--brand); pointer-events: none; transition: transform var(--motion-tab) var(--ease-settle); } /* the TabBar README: slides with a slight spring */
 
 /* ---------- sheets, poster, toasts ---------- */
 /* Sheets slide up in 300ms as the scrim fades in; closing, a frozen copy slides down in 200ms (useSheetExit),

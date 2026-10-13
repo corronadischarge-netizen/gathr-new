@@ -1,4 +1,5 @@
 import { useRef } from 'react';
+import { ms } from '../lib/motion';
 
 /* Swipe from the left edge to go back. The screen follows the finger, with the previous screen waiting
    underneath. Let go past about a third of the width (or flick) and you go back; otherwise it snaps back.
@@ -27,7 +28,7 @@ export function useEdgeSwipe(o) {
     }
     if (u) {
       u.style.transition = tr;
-      u.style.transform = 'translateX(' + -0.2 * (W - d) + 'px)';
+      u.style.transform = 'translateX(' + -0.3 * (W - d) + 'px)'; // the screen underneath waits 30% to the left
       u.style.opacity = String(0.4 + 0.6 * (d / W));
     }
   }
@@ -87,7 +88,7 @@ export function useEdgeSwipe(o) {
           reset();
           opt.current.onCancel();
         }
-      }, 250);
+      }, ms('--motion-back'));
     },
     onPointerCancel: () => {
       var s = st.current;
@@ -97,7 +98,7 @@ export function useEdgeSwipe(o) {
         setTimeout(() => {
           reset();
           opt.current.onCancel();
-        }, 250);
+        }, ms('--motion-back'));
       }
     }
   };

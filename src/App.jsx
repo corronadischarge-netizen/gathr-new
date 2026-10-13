@@ -11,6 +11,8 @@ import { TabBar, Toast } from './design-system';
 import { useEdgeSwipe } from './hooks/useEdgeSwipe';
 import { useSheetExit } from './hooks/useSheetExit';
 import { useScreenTransition } from './hooks/useScreenTransition';
+import { scrollToTop, useScrollMemory } from './hooks/useScrollMemory';
+import { ms, reducedMotion } from './lib/motion';
 import { cleanCode } from './lib/promoterInvite';
 import { store } from './lib/utils';
 import { TABS } from './navigation';
@@ -235,7 +237,24 @@ export function App() {
     }));
   }
   function tab(t) {
+    // the tab you're on: scroll to the top; already at the top of Tonight, refresh (interactions spec 3)
+    if (S.stack.length === 1 && S.stack[0] === t && !S.sheet) {
+      var el = screenRef.current;
+      if (el && el.scrollTop > 4) scrollToTop(el, ms('--motion-slow'), reducedMotion());
+      else if (t === 'tonight') refresh();
+      return;
+    }
     set({ stack: [t], sheet: null, dir: 'tab', seen: true });
+  }
+  /* fetch the live feed again (tap the Tonight tab at the top); quiet: the home updates in place */
+  function refresh() {
+    if (!Remote.remoteOn) return;
+    Remote.pullFeed()
+      .then((feed) => {
+        setRemoteFeed(feed);
+        set({ feedAt: Date.now(), feedFailed: false });
+      })
+      .catch(() => {});
   }
   /* a short message near the bottom (Toast); it closes itself after 2.4 s, or 5 s with an action (Undo) */
   function toast(t, action) {
@@ -564,6 +583,8 @@ export function App() {
     underRef = useRef(null),
     phoneRef = useRef(null);
   useScreenTransition(scrKey, S.dir, screenRef, ghostRef);
+  // every screen keeps its scroll: back, swipe and tab changes return to where you were
+  useScrollMemory(S.stack.join('>') + (scr === 'event' || scr === 'venue' ? ':' + S.cur : ''), S.dir, screenRef);
   var sheetRef = useRef(null),
     sheetExitRef = useRef(null);
   useSheetExit(S.sheet, sheetRef, sheetExitRef);
@@ -611,6 +632,34 @@ export function App() {
       gone = true;
       if (handle) handle.remove();
     };
+  }, []);
+  /* In a browser (not the installed app), Android's back is the browser's back. The app keeps one spare history
+     entry, so a back press runs the same steps as the app's back (sheet first, then the screen, then home) and only
+     leaves from the home (interactions spec 3) */
+  useEffect(() => {
+    var C = window.Capacitor;
+    if (C && C.isNativePlatform && C.isNativePlatform()) return;
+    var leaving = false;
+    try {
+      history.pushState({ gathr: 1 }, '');
+    } catch (e) {
+      return;
+    }
+    function onPop() {
+      if (leaving) return;
+      hwBack.current({
+        minimizeApp: () => {
+          leaving = true;
+          history.back(); // at the home with nothing open: the browser goes back for real
+        }
+      });
+      if (!leaving)
+        try {
+          history.pushState({ gathr: 1 }, '');
+        } catch (e) {}
+    }
+    window.addEventListener('popstate', onPop);
+    return () => window.removeEventListener('popstate', onPop);
   }, []);
   /* offline: the home keeps the nights it had, and says so once (home v3 3.9) */
   useEffect(() => {

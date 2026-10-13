@@ -95,7 +95,7 @@ body { margin: 0; background: var(--night-950); overflow: hidden; }
 /* component size tweaks (from the canvas) */
 .g-feature { min-height: 164px; }
 .g-ecard { height: 300px; }
-.g-sheet { max-height: 780px; overflow-y: auto; overflow-x: hidden; overscroll-behavior: contain; }
+.g-sheet { max-height: min(760px, 90dvh); overflow-y: auto; overflow-x: hidden; overscroll-behavior: contain; } /* content up to 90% of the screen; taller content scrolls inside (spec 4) */
 /* two buttons side by side, equal width; a long label shortens with … instead of pushing the sheet wider */
 .btn-pair { display: flex; gap: 8px; min-width: 0; }
 .btn-pair > * { flex: 1 1 0; min-width: 0; }
@@ -719,3 +719,9 @@ html.is-sideways .upright-skip { margin-top: 16px; min-height: 44px; padding: 0 
 /* a plan for a later day, under the group pill (Shubh, 13 Oct) */
 .home-later-plan { all: unset; box-sizing: border-box; display: inline-flex; align-items: center; gap: var(--space-1); min-height: 44px; margin-top: var(--space-1); padding: 0 var(--space-4); color: var(--ink-muted); font-size: 13px; line-height: 18px; cursor: pointer; }
 .home-later-plan:focus-visible { box-shadow: var(--focus-ring); border-radius: var(--radius-sm); }
+.g-sheet-title:focus { outline: none; box-shadow: none; } /* focused on open for screen readers; it is not a control, so no ring */
+/* event page: the glass top bar that fades in once the photo has scrolled under it (interactions spec 3, 6.4) */
+.ev3-bar-slot { position: sticky; top: 0; height: 0; z-index: 6; }
+.ev3-bar { position: absolute; left: 0; right: 0; top: 0; padding: var(--space-11) var(--space-4) 0; opacity: 0; pointer-events: none; transition: opacity var(--dur-base) var(--ease-standard); }
+.ev3-bar.is-on { opacity: 1; pointer-events: auto; }
+.ev3-bar .g-topbar-title { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }

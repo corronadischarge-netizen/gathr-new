@@ -18,7 +18,13 @@ export function useDialog(ref, open, close) {
     }
     var t = setTimeout(() => {
       if (!root || root.contains(document.activeElement)) return;
-      var f = root.querySelector('input:not([disabled])') || items()[0];
+      // a sheet's title first (spec 4: a screen reader starts at the title, and no keyboard pops up unasked);
+      // a field marked data-autofocus wins; other dialogs fall back to their first field or control
+      var f =
+        root.querySelector('[data-autofocus]') ||
+        root.querySelector('.g-sheet-title') ||
+        root.querySelector('input:not([disabled])') ||
+        items()[0];
       if (f) f.focus({ preventScroll: true });
     }, 60);
     function key(ev) {
