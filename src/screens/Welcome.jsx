@@ -143,7 +143,7 @@ export function Welcome(p) {
           <span className="title15">Friday plan</span>
           {meta('4 of 5 voted · closes Thu 6 pm')}
           <div className="vote-bar" style={{ marginTop: '4px' }}>
-            <i style={{ width: '60%' }} />
+            <i style={{ transform: 'translateX(-40%)' }} />
           </div>
           <div className="plan-crew" style={{ marginTop: '6px' }}>
             {['Zoya', 'Aman', 'Kavya', 'Kabir'].map((n) => fav(n, 32))}

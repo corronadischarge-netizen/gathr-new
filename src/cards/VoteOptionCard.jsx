@@ -35,7 +35,7 @@ export function VoteOptionCard(p) {
         ) : null}
       </div>
       <div className="vote-bar">
-        <i style={{ width: (names.length / p.groupSize) * 100 + '%' }} />
+        <i style={{ transform: 'translateX(' + ((names.length / p.groupSize) * 100 - 100) + '%)' }} />
       </div>
       <div className="rowc between">
         <CrowdMeter booked={v.booked} cap={v.cap} level={v.crowd} compact />

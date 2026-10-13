@@ -4,33 +4,33 @@
    - The only looping motion is the 3D stickers bobbing (±4px, slow). Nothing pulses, breathes, glows or shimmers.
    - Direct feedback (press, select) is under 200ms; functional motion never passes 500ms.
    - Animation never blocks input: nothing here sets pointer-events, so a person can always tap, go back or scroll.
-   - Enter slower, exit faster (a sheet opens in 300ms and closes in 200ms).
+   - Enter slower, exit faster (exit = 0.8 x enter).
    All timings come from the tokens below; no other file sets durations or curves. */
 :root {
-  --motion-fast: 100ms; /* press, toggle */
-  --motion-normal: 200ms; /* chip select, sheet close, fades */
-  --motion-slow: 300ms; /* screen slide, sheet open */
-  --motion-slower: 450ms; /* booking tick, celebration */
-  --motion-step: 150ms; /* a number rolling to its next value */
-  --motion-pop: 250ms; /* the heart filling when you save */
-  --motion-back: 250ms; /* going back: the reverse of a 300ms push, a little faster */
-  --ease-standard: cubic-bezier(0.2, 0, 0, 1);
-  --ease-enter: cubic-bezier(0, 0, 0.2, 1);
-  --ease-exit: cubic-bezier(0.4, 0, 1, 1);
+  /* the design system tempo tokens (tokens.css): presses 120, chips and tabs 200, sheets and cards 320, screens 360.
+     Leaving is faster than arriving: exit = 0.8 x enter (interactions spec 2.1) */
+  --motion-fast: var(--dur-fast); /* press, toggle */
+  --motion-normal: var(--dur-base); /* chip select, cross-fades, toast */
+  --motion-slow: var(--dur-slow); /* sheet open, cards entering, list re-sorts */
+  --motion-screen: var(--dur-screen); /* screen push and pop, tab cross-fade */
+  --motion-back: calc(var(--dur-screen) * 0.8); /* going back: the reverse of a push, faster */
+  --motion-exit: calc(var(--dur-slow) * 0.8); /* a sheet closing */
+  --motion-slower: 450ms; /* the booking tick drawing itself (spec 7) */
+  --motion-step: var(--dur-fast); /* a number rolling to its next value */
+  --motion-pop: var(--dur-base); /* the heart filling when you save */
+  /* easing (proposed release 24 tokens, defined once here until the design system has them) */
+  --ease-standard: cubic-bezier(0.2, 0, 0, 1); /* things moving on screen */
+  --ease-enter: cubic-bezier(0, 0, 0, 1); /* things arriving: sheets, toasts, screens in */
+  --ease-exit: cubic-bezier(0.3, 0, 1, 1); /* things leaving */
   --ease-settle: cubic-bezier(0.3, 1.4, 0.5, 1); /* a small overshoot, for things that land: stickers, the heart */
-  --press-scale: 0.97;
-  --press-scale-card: 0.98;
+  --press-scale: 0.96; /* buttons, chips, icon buttons */
+  --press-scale-card: 0.98; /* cards and tiles */
 }
 
 /* ---------- press, disabled, focus: every tappable thing ---------- */
 :where(button, [role='button'], a[href]) {
   -webkit-tap-highlight-color: transparent;
-  transition:
-    scale var(--motion-fast) var(--ease-standard),
-    background-color var(--motion-normal) var(--ease-standard),
-    color var(--motion-normal) var(--ease-standard),
-    box-shadow var(--motion-normal) var(--ease-standard),
-    opacity var(--motion-normal) var(--ease-standard);
+  transition: scale var(--motion-fast) var(--ease-standard), opacity var(--motion-normal) var(--ease-standard);
 }
 /* scale (not transform) so a press never fights a component's own transform */
 :is(button, [role='button']):not(:disabled, [aria-disabled='true'], .tap, .vpin-wrap):active { scale: var(--press-scale); }
@@ -59,15 +59,15 @@
 .ghost-layer:empty { display: none; }
 .ghost-layer-back { z-index: 1; } /* going back, the old screen leaves on top */
 .screen.ghost { overflow: hidden; }
-.screen.nav-fwd { animation: nav-fwd var(--motion-slow) var(--ease-enter); }
+.screen.nav-fwd { animation: nav-fwd var(--motion-screen) var(--ease-enter); }
 .screen.nav-back { animation: nav-back var(--motion-back) var(--ease-standard); }
-.screen.nav-tab { animation: g-fade var(--motion-normal) var(--ease-standard); }
-.ghost-fwd { animation: shift-dim var(--motion-slow) var(--ease-enter) forwards; }
+.screen.nav-tab { animation: g-fade var(--motion-screen) var(--ease-standard); }
+.ghost-fwd { animation: shift-dim var(--motion-screen) var(--ease-enter) forwards; }
 .ghost-back { animation: slide-off var(--motion-back) var(--ease-exit) forwards; }
-.ghost-tab { animation: fade-out var(--motion-normal) var(--ease-standard) forwards; }
+.ghost-tab { animation: fade-out var(--motion-screen) var(--ease-standard) forwards; }
 @keyframes nav-fwd { from { transform: translateX(100%); } to { transform: none; } }
-@keyframes nav-back { from { transform: translateX(-20%); opacity: 0.4; } to { transform: none; opacity: 1; } }
-@keyframes shift-dim { to { transform: translateX(-20%); opacity: 0.4; } }
+@keyframes nav-back { from { transform: translateX(-30%); opacity: 0.4; } to { transform: none; opacity: 1; } }
+@keyframes shift-dim { to { transform: translateX(-30%); opacity: 0.4; } }
 @keyframes slide-off { to { transform: translateX(100%); } }
 @keyframes fade-out { to { opacity: 0; } }
 @keyframes g-fade { from { opacity: 0; } to { opacity: 1; } }
@@ -90,7 +90,7 @@
 .sheet-exit { position: absolute; inset: 0; z-index: 6; pointer-events: none; }
 .sheet-exit:empty { display: none; }
 .sheet-leaving .overlay, .sheet-leaving.poster-layer { animation: fade-out var(--motion-normal) var(--ease-exit) forwards; }
-.sheet-leaving .sheet-slot, .sheet-slot.sheet-leaving { animation: sheet-out var(--motion-normal) var(--ease-exit) forwards; }
+.sheet-leaving .sheet-slot, .sheet-slot.sheet-leaving { animation: sheet-out var(--motion-exit) var(--ease-exit) forwards; }
 @keyframes sheet-out { to { transform: translateY(100%); } }
 .g-sheet-head, .g-grabber { touch-action: none; cursor: grab; -webkit-user-select: none; user-select: none; }
 .g-grabber { position: relative; }
@@ -101,10 +101,10 @@
 .poster-layer { animation: g-fade var(--motion-slow) var(--ease-standard); }
 .poster-img { transform-origin: center; }
 /* a changed verdict ("Who gets in") cross-fades to its new words and colour */
-.g-badge { transition: background-color var(--motion-normal) var(--ease-standard), color var(--motion-normal) var(--ease-standard); }
+.g-badge { transition: none; }
 .swap-in { animation: g-fade var(--motion-normal) var(--ease-standard); }
 .g-toast { animation: toast-in var(--motion-normal) var(--ease-enter); }
-@keyframes toast-in { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
+@keyframes toast-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
 
 /* ---------- welcome: the night assembles (logo, posters, then what gathr tells you) ---------- */
 .w-in { animation: rise var(--motion-slower) var(--ease-enter) both; animation-delay: var(--d, 0ms); }
@@ -119,7 +119,7 @@
 @keyframes step-from-right { from { opacity: 0; transform: translateX(48px); } to { opacity: 1; transform: none; } }
 @keyframes step-from-left { from { opacity: 0; transform: translateX(-48px); } to { opacity: 1; transform: none; } }
 /* the page dots: the active one stretches */
-.welcome .g-pager-seg { transition: flex-grow var(--motion-slow) var(--ease-standard), background-color var(--motion-slow) var(--ease-standard); }
+.welcome .g-pager-seg { transition: none; }
 .welcome .g-pager-seg.is-active { flex-grow: 2.4; }
 .fade-up { animation: rise var(--motion-slow) var(--ease-enter) both; animation-delay: var(--d, 0ms); }
 @keyframes rise { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
@@ -138,27 +138,27 @@
 @keyframes heart { 0%, 100% { transform: none; } 45% { transform: scale(1.15); } }
 /* mood and music tiles settle into violet (150ms); the music tile's sticker nudges up 2px */
 .mood {
-  transition: scale var(--motion-fast) var(--ease-standard), background-color var(--motion-step) var(--ease-standard), color var(--motion-step) var(--ease-standard), box-shadow var(--motion-step) var(--ease-standard);
+  transition: scale var(--motion-fast) var(--ease-standard);
   animation: tile-in var(--motion-slow) var(--ease-enter) both;
   animation-delay: var(--d, 0ms);
 }
 .mood-ic { transition: transform var(--motion-slow) var(--ease-settle); }
 .vibe-tile {
-  transition: scale var(--motion-fast) var(--ease-standard), background-color var(--motion-step) var(--ease-standard), color var(--motion-step) var(--ease-standard);
+  transition: scale var(--motion-fast) var(--ease-standard);
   animation: tile-in var(--motion-slow) var(--ease-enter) both;
   animation-delay: var(--d, 0ms);
 }
 .vibe-tile .i3 { transition: transform var(--motion-normal) var(--ease-settle); }
 .vibe-tile.on .i3 { transform: translateY(-2px) scale(1.14) rotate(-8deg); }
 @keyframes tile-in { from { opacity: 0; translate: 0 10px; } to { opacity: 1; translate: 0 0; } }
-.switch { transition: scale var(--motion-fast) var(--ease-standard), background-color var(--motion-normal) var(--ease-standard); }
+.switch { transition: scale var(--motion-fast) var(--ease-standard); }
 .switch span { transition: transform var(--motion-normal) var(--ease-standard); }
-.loc-btn { transition: scale var(--motion-fast) var(--ease-standard), box-shadow var(--motion-normal) var(--ease-standard); }
-.card { transition: scale var(--motion-fast) var(--ease-standard), box-shadow var(--motion-normal) var(--ease-standard), opacity var(--motion-normal) var(--ease-standard); }
+.loc-btn { transition: scale var(--motion-fast) var(--ease-standard); }
+.card { transition: scale var(--motion-fast) var(--ease-standard), opacity var(--motion-normal) var(--ease-standard); }
 /* map pins: the tapped one grows and turns violet with a white label; the last one shrinks back */
-.vpin-bub, .vpin-bub::after { transition: transform var(--motion-normal) var(--ease-standard), background-color var(--motion-normal) var(--ease-standard), box-shadow var(--motion-normal) var(--ease-standard); }
-.vpin-lbl { transition: background-color var(--motion-normal) var(--ease-standard); }
-.vpin-lbl b, .vpin-crowd { transition: color var(--motion-normal) var(--ease-standard); }
+.vpin-bub, .vpin-bub::after { transition: transform var(--motion-normal) var(--ease-standard); }
+.vpin-lbl { transition: none; }
+.vpin-lbl b, .vpin-crowd { transition: none; }
 /* the "Leading" badge travelling to a new leader */
 .vote-list { position: relative; }
 .vote-fly { position: absolute; inset: 0; pointer-events: none; z-index: 2; }
@@ -175,7 +175,7 @@
 /* a wrong code: three small shakes */
 .shake { animation: shake var(--motion-slower) var(--ease-standard); }
 @keyframes shake { 0%, 100% { translate: 0 0; } 16%, 50%, 84% { translate: -6px 0; } 33%, 67% { translate: 6px 0; } }
-.vote-bar i { transition: width var(--motion-slow) var(--ease-standard); }
+.vote-bar i { transition: transform var(--motion-slow) var(--ease-standard); }
 .ob-steps i.now::after { animation: fill var(--motion-slow) var(--motion-fast) var(--ease-standard) forwards; }
 @keyframes fill { to { transform: none; } }
 
@@ -194,7 +194,7 @@
 .ghost-layer-mode { z-index: 1; }
 .tabwrap.mode-in { animation: g-fade var(--motion-slow) var(--ease-standard); }
 /* a scan result washes the whole camera view in its colour; the result card and top bar stay dark and readable */
-.scan-wash { position: absolute; inset: 0; opacity: 0; pointer-events: none; transition: opacity var(--motion-normal) var(--ease-standard), background-color var(--motion-normal) var(--ease-standard); }
+.scan-wash { position: absolute; inset: 0; opacity: 0; pointer-events: none; transition: opacity var(--motion-normal) var(--ease-standard); }
 .scan-wash.tone-green { background-color: var(--green-300); opacity: 0.85; }
 .scan-wash.tone-amber { background-color: var(--yellow-300); opacity: 0.85; }
 .scan-wash.tone-red { background-color: var(--red-300); opacity: 0.85; }
@@ -202,19 +202,26 @@
 .row-in { animation: row-in var(--motion-slow) var(--ease-enter); }
 @keyframes row-in { from { opacity: 0; transform: translateY(-12px); } to { opacity: 1; transform: none; } }
 
-/* ---------- reduced motion: no slide, scale, bounce or bob. Only fades and instant changes. ---------- */
+/* (the reduced-motion rules are at the end of this file) */
 /* the bell: rings once when something new arrives, and the count pops in */
 .bell.is-new .g-ibtn svg { transform-origin: 50% 10%; animation: bell-ring var(--motion-slower) var(--ease-standard) 1; }
 @keyframes bell-ring { 0%, 100% { rotate: 0deg; } 20% { rotate: 14deg; } 45% { rotate: -10deg; } 70% { rotate: 6deg; } }
 .bell-count { animation: tag-pop var(--motion-pop) var(--ease-settle) both; }
 
+/* ---------- reduced motion (spec 0.5): every movement becomes instant or a 120 ms fade. Haptics stay. ---------- */
 @media (prefers-reduced-motion: reduce) {
+  /* safety net: any transition anywhere can only fade, at 120 ms; nothing slides, scales or grows */
+  *, *::before, *::after { transition-property: opacity !important; transition-duration: var(--dur-fast) !important; scroll-behavior: auto !important; }
   .ghost-fwd, .ghost-back { animation-name: fade-out !important; }
   .screen.under { transform: none; }
   .g-tab-ind, .tk-slot, .g-nt { transition: none; }
   .g-nt:active { transform: none; }
   .screen.nav-fwd, .screen.nav-back, .sheet-slot.rise, .g-toast, .w-in, .w-card, .w-tag, .w-3d, .w-fade, .fade-up,
   .mood, .vibe-tile, .celebrate .ok-tick, .celebrate .pass-ticket, .roll-up, .roll-down { animation-name: g-fade !important; }
+  /* the fades that replace movement take 120 ms */
+  .ghost-fwd, .ghost-back, .ghost-tab, .screen.nav-fwd, .screen.nav-back, .screen.nav-tab, .sheet-slot.rise, .g-toast, .w-in, .w-card, .w-tag, .w-3d, .w-fade, .fade-up,
+  .mood, .vibe-tile, .celebrate .ok-tick, .celebrate .pass-ticket, .roll-up, .roll-down, .w-next, .w-prev, .row-in,
+  .sheet-leaving .sheet-slot, .sheet-slot.sheet-leaving { animation-duration: var(--dur-fast) !important; }
   .sheet-leaving .sheet-slot, .sheet-slot.sheet-leaving { animation-name: fade-out !important; }
   .shake, .bell.is-new .g-ibtn svg, .bell-count { animation: none !important; }
   .sheet-slot.settling { transition: none; }
@@ -223,6 +230,10 @@
   .celebrate .ok-tick path, .ob-steps i.now::after { animation: none !important; stroke-dashoffset: 0; transform: none; }
   :is(button, [role='button'], .tap):active, .vpin-wrap:active .vpin { scale: none !important; }
   .w-next, .w-prev, .row-in { animation-name: g-fade !important; }
-  .welcome .g-pager-seg { transition: background-color var(--motion-normal) var(--ease-standard); }
+  .welcome .g-pager-seg { transition: none; }
   .mood-ic, .vibe-tile .i3, .vpin-bub, .vpin-bub::after, .switch span, .vote-bar i, .g-progress span { transition: none !important; }
 }
+
+/* a busy button (in-flight guard): no press, no hover change; it doesn't look disabled, it's working */
+.g-btn.is-busy { cursor: progress; }
+.g-btn.is-busy:active { scale: none; }

@@ -154,8 +154,8 @@ export function AuthForm(p) {
               </span>
             ) : null}
           </div>
-          <Button variant="primary" size={btnSize} block disabled={!okE || busy} onClick={send}>
-            {busy ? 'Sending…' : 'Send me a code'}
+          <Button variant="primary" size={btnSize} block disabled={!okE} busy={busy} onClick={send}>
+            {busy ? 'Sending code' : 'Send me a code'}
           </Button>
         </div>
       ) : (
@@ -216,7 +216,8 @@ export function AuthForm(p) {
             size={btnSize}
             block
             icon={p.payIcon ? 'ticket' : null}
-            disabled={!okC || busy}
+            disabled={!okC}
+            busy={busy}
             onClick={() => verify()}
           >
             {m.state === 'verifying' ? 'Checking…' : p.verifyLabel || 'Verify'}

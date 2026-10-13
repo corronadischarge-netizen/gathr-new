@@ -17,7 +17,7 @@ export function ScanResult(p) {
   // a guest list: tick who's actually here (everyone still outside, to start with)
   const [here, setHere] = useState(r.pick || []);
   useEffect(() => {
-    (BUZZ[r.tone] || haptic.select)();
+    (BUZZ[r.tone] || haptic.tap)();
     setHere(r.pick || []);
   }, [r]);
   function admit() {

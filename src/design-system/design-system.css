@@ -129,7 +129,7 @@ body { margin: 0; font-family: var(--font-sans); background: var(--bg); color: v
 
 /* ProgressBar (onboarding) */
 .g-progress { width: 188px; height: 4px; border-radius: var(--radius-full); background: var(--night-800); overflow: hidden; }
-.g-progress span { display: block; height: 100%; border-radius: inherit; background: var(--ink); transition: width var(--motion-slow) var(--ease-standard); }
+.g-progress span { display: block; height: 100%; border-radius: inherit; background: var(--ink); transition: transform var(--motion-slow) var(--ease-standard); }
 
 /* TopBar */
 .g-topbar { position: relative; z-index: 1; display: flex; align-items: center; gap: var(--space-3); padding: var(--space-2) var(--space-4); border-radius: var(--radius-full); }
@@ -302,7 +302,7 @@ body { margin: 0; font-family: var(--font-sans); background: var(--bg); color: v
 
 /* PageIndicator: thin segments under a hero carousel */
 .g-pager { display: flex; gap: var(--space-2); width: 100%; }
-.g-pager-seg { flex: 1; height: 3px; border-radius: var(--radius-full); background: var(--night-700); transition: background var(--motion-normal) var(--ease-standard); }
+.g-pager-seg { flex: 1; height: 3px; border-radius: var(--radius-full); background: var(--night-700); transition: none; }
 .g-pager-seg.is-active { background: var(--ink); }
 
 /* EventCard: image first, fades into black, one light CTA inside */
@@ -570,7 +570,7 @@ body { margin: 0; font-family: var(--font-sans); background: var(--bg); color: v
 .g-gp-chev { flex: none; color: var(--ink-muted); }
 
 /* MoodTile: pick a vibe or category. night-900 with a thin line; the object brings the colour; selected = flat violet (bundle.css) */
-.g-mood { all: unset; box-sizing: border-box; position: relative; display: flex; flex-direction: column; justify-content: flex-end; gap: var(--space-3); width: 168px; min-height: 212px; padding: var(--space-4); padding-top: 72px; border-radius: var(--radius-lg); background-color: var(--night-900); color: var(--ink); box-shadow: inset 0 0 0 1px var(--line); cursor: pointer; transition: transform var(--dur-base) ease-out, background-color var(--dur-base) ease-out; }
+.g-mood { all: unset; box-sizing: border-box; position: relative; display: flex; flex-direction: column; justify-content: flex-end; gap: var(--space-3); width: 168px; min-height: 212px; padding: var(--space-4); padding-top: 72px; border-radius: var(--radius-lg); background-color: var(--night-900); color: var(--ink); box-shadow: inset 0 0 0 1px var(--line); cursor: pointer; transition: transform var(--dur-base) ease-out; }
 .g-mood:active { transform: scale(.98); }
 .g-mood:focus-visible { box-shadow: var(--focus-ring); }
 .g-mood-sticker { position: absolute; top: -22px; right: 10px; }

@@ -12,7 +12,8 @@ export function ProgressBar(p) {
       aria-valuenow={step}
       aria-label={'Step ' + step + ' of ' + total}
     >
-      <span style={{ width: (step / total) * 100 + '%' }} />
+      {/* the fill slides in from the left (transform only), so its rounded end looks the same at any step */}
+      <span style={{ transform: 'translateX(' + ((step / total) * 100 - 100) + '%)' }} />
     </div>
   );
 }
