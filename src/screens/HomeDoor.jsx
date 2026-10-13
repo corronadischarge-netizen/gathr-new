@@ -6,7 +6,7 @@ import { TEST } from '../config';
 import { MO, WD, todayTxt } from '../data/dates';
 import { agePhrase, groupLabel, isSet } from '../data/group';
 import { groupFor, homeItems, planInfo } from '../data/homeData';
-import { EVENTS, VENUES } from '../data/listings';
+import { EVENTS, VENUES, isPast } from '../data/listings';
 import { gpVoted } from '../data/sample';
 import {
   Button,
@@ -20,7 +20,7 @@ import {
   IconButton,
   VenueCard
 } from '../design-system';
-import { addDays, homeWindow, now, weekdayOf } from '../lib/clock';
+import { addDays, homeWindow, nightDay, now, weekdayOf } from '../lib/clock';
 import { verdictSource, verdictText } from '../lib/door';
 import { heroPick, railFor, weekRails } from '../lib/homeRank';
 import { log } from '../lib/log';
@@ -101,6 +101,16 @@ function groupPill(c, group, pl) {
       onOpen: () => c.go('group')
     };
   }
+  /* your own booking for tonight or tomorrow (interactions spec 7: after booking, the pill says you're in) */
+  var mine = S.planned && EVENTS[S.planned];
+  if (mine && !isPast(mine) && nightDay(new Date(mine.iso).getTime()) <= addDays(homeWindow(now()).day, 1))
+    return {
+      state: 'plan-booked',
+      people: [{ name: S.me.name || 'You', image: S.me.photo }],
+      title: WD[new Date(mine.iso).getDay()] + ' · ' + mine.title,
+      line: (mine.rsvp ? "You're on the list" : "You're in") + ' · Show pass',
+      onOpen: () => c.go('pass')
+    };
   if (isSet(group))
     return {
       state: 'group-set',

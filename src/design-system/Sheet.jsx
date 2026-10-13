@@ -36,12 +36,12 @@ function scaleOf(slot) {
 }
 
 /* the grabber and header: pointer events (mouse and touch) */
-function useHandleDrag(onClose) {
+function useHandleDrag(onClose, fixed) {
   var st = useRef(null);
   var slotOf = (e) => e.currentTarget.closest('.sheet-slot');
   return {
     onPointerDown: (e) => {
-      if (e.target.closest('button') || (e.pointerType === 'mouse' && e.button !== 0)) return;
+      if (fixed.current || e.target.closest('button') || (e.pointerType === 'mouse' && e.button !== 0)) return;
       var slot = slotOf(e);
       if (!slot) return;
       st.current = { y: e.clientY, k: scaleOf(slot), d: 0, v: 0, t: e.timeStamp, on: false };
@@ -77,8 +77,12 @@ function useHandleDrag(onClose) {
   };
 }
 
+/* dismissible={false} (app addition, interactions spec 7): the sheet doesn't drag down while money is moving;
+   ✕ still works and the screen decides what it does (the booking sheet asks "Stop paying?") */
 export function Sheet(p) {
-  var drag = useHandleDrag(p.onClose),
+  var fixed = useRef(false);
+  fixed.current = p.dismissible === false;
+  var drag = useHandleDrag(p.onClose, fixed),
     box = useRef(null),
     close = useRef(p.onClose);
   close.current = p.onClose;
@@ -88,7 +92,7 @@ export function Sheet(p) {
     var s = null;
     /* the content: touch events, so a drag that starts at the top can stop the page from scrolling */
     function start(e) {
-      if (e.touches.length !== 1 || e.target.closest('.g-sheet-head, .g-grabber')) return;
+      if (fixed.current || e.touches.length !== 1 || e.target.closest('.g-sheet-head, .g-grabber')) return;
       s = { x: e.touches[0].clientX, y: e.touches[0].clientY, on: false, off: false, d: 0, v: 0, t: e.timeStamp };
     }
     function moveT(e) {

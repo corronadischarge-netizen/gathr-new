@@ -185,7 +185,13 @@
 .celebrate .ok-tick { animation: tag-pop var(--motion-slow) var(--ease-settle) both; }
 .celebrate .ok-tick path { stroke-dasharray: 24; animation: draw var(--motion-slower) var(--motion-fast) var(--ease-standard) both; }
 @keyframes draw { from { stroke-dashoffset: 24; } to { stroke-dashoffset: 0; } }
-.celebrate .pass-ticket { animation: rise var(--motion-slower) var(--motion-slow) var(--ease-enter) both; }
+/* the order (spec 7): the tick draws (450 ms) and the phone buzzes, "You're in" fades up, then the pass rises into
+   place and the wristband drops onto its corner. About 1.5 s in all, once per booking */
+.celebrate .pass-head .g-display { animation: g-fade var(--motion-normal) calc(var(--motion-fast) + var(--motion-slower)) var(--ease-standard) both; }
+.celebrate .pass-ticket { animation: pass-rise var(--motion-slower) calc(var(--motion-fast) + var(--motion-slower) + var(--motion-normal)) var(--ease-enter) both; }
+@keyframes pass-rise { from { opacity: 0; transform: translateY(var(--space-8)); } to { opacity: 1; transform: none; } }
+.celebrate .pass-band { animation: band-drop var(--motion-slow) calc(var(--motion-fast) + var(--motion-slower) * 2 + var(--motion-normal)) var(--ease-settle) both; }
+@keyframes band-drop { from { opacity: 0; transform: translateY(calc(var(--space-8) * -1)) scale(1.2); } to { opacity: 1; transform: none; } }
 
 /* ---------- host mode and the door ----------
    Switching between going out and hosting is a slow, full-screen cross-fade (the old screen fades out on top,
@@ -219,6 +225,8 @@
   .g-nt:active { transform: none; }
   .screen.nav-fwd, .screen.nav-back, .sheet-slot.rise, .g-toast, .w-in, .w-card, .w-tag, .w-3d, .w-fade, .fade-up,
   .mood, .vibe-tile, .celebrate .ok-tick, .celebrate .pass-ticket, .roll-up, .roll-down { animation-name: g-fade !important; }
+  /* booked: everything appears together with a 120 ms fade, no rise, no drop, no waiting */
+  .celebrate .pass-ticket, .celebrate .pass-band, .celebrate .pass-head .g-display { animation-name: g-fade !important; animation-duration: var(--dur-fast) !important; animation-delay: 0s !important; }
   /* the fades that replace movement take 120 ms */
   .ghost-fwd, .ghost-back, .ghost-tab, .screen.nav-fwd, .screen.nav-back, .screen.nav-tab, .sheet-slot.rise, .g-toast, .w-in, .w-card, .w-tag, .w-3d, .w-fade, .fade-up,
   .mood, .vibe-tile, .celebrate .ok-tick, .celebrate .pass-ticket, .roll-up, .roll-down, .w-next, .w-prev, .row-in,

@@ -737,3 +737,18 @@ html.is-sideways .upright-skip { margin-top: 16px; min-height: 44px; padding: 0 
 .an-out { animation: an-out-in var(--dur-slow) var(--ease-enter); }
 @keyframes an-out-in { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: none; } }
 @media (prefers-reduced-motion: reduce) { .an-out { animation: g-fade var(--dur-fast); } }
+
+/* the pass (interactions 6.6): the wristband sticker sits on the ticket's top corner */
+.pass-ticket { position: relative; display: inline-block; }
+.pass-band { position: absolute; top: calc(var(--space-6) * -1); right: calc(var(--space-6) * -1); rotate: 16deg; }
+.pass-head:focus { outline: none; }
+.pass-head:focus-visible { box-shadow: var(--focus-ring); border-radius: var(--radius-sm); }
+/* booking: the sign-in step and the passes share one sheet; Back returns with everything kept */
+.bk-pane { min-width: 0; }
+.bk-back { display: inline-flex; align-items: center; gap: var(--space-2); align-self: flex-start; min-height: 44px; color: var(--ink-muted); }
+.bk-stop { padding: var(--space-4); border-radius: var(--radius-md); background: var(--night-900); box-shadow: inset 0 0 0 1px var(--line); }
+/* event page (interactions 6.4): the booking button pins to the bottom once the hero's own has scrolled away, over the
+   functional fade; it fades and settles in over dur-base (reduced motion: the fade only) */
+.ev3-pin { position: sticky; bottom: 0; z-index: 5; padding: var(--space-12) var(--space-4) calc(var(--space-4) + env(safe-area-inset-bottom, 0px)); background: linear-gradient(180deg, transparent, color-mix(in srgb, var(--night-950) 80%, transparent) 55%, var(--bg)); opacity: 0; transform: translateY(var(--space-4)); pointer-events: none; transition: opacity var(--dur-base) var(--ease-standard), transform var(--dur-base) var(--ease-standard); }
+.ev3-pin.is-on { opacity: 1; transform: none; pointer-events: auto; }
+.ev3 .g-vh2-media { will-change: transform; }

@@ -3,9 +3,9 @@ import { priceTxt, rupees } from '../data/format';
 import { DOOR_OK, levelOf, nightsCount, passCode } from '../data/sample';
 import { Badge, Button, Ticket } from '../design-system';
 import { ticketProps } from '../lib/ticket';
-import { poss } from '../lib/utils';
+import { poss, shareToast } from '../lib/utils';
 import { Share } from '../services/share';
-import { meta } from '../ui/helpers';
+import { i3, meta } from '../ui/helpers';
 
 /* Pass: the night's ticket with its entry code, then the booking details and, for 2+ passes, sending friends theirs */
 export function PassCard(p) {
@@ -20,7 +20,11 @@ export function PassCard(p) {
   return (
     <>
       <div className="rowc" style={{ justifyContent: 'center', marginTop: '24px' }}>
-        <Ticket className="pass-ticket" {...ticketProps(S, e, S.guests)} />
+        {/* the wristband sits on the ticket's corner; right after booking it drops onto it (the screen's one sticker) */}
+        <span className="pass-ticket">
+          <Ticket {...ticketProps(S, e, S.guests)} />
+          {i3('wristband', 56, 'pass-band')}
+        </span>
       </div>
       <div className="g-card card col" style={{ marginTop: '24px', padding: '20px', gap: '12px' }}>
         <div className="rowc" style={{ gap: '8px', flexWrap: 'wrap' }}>
@@ -83,7 +87,9 @@ function GuestPasses(p) {
         block
         icon="share"
         onClick={() => {
-          Share.whatsapp(
+          // the phone's own share sheet (spec 7: "Share passes"), with a toast once they've gone
+          Share.link(
+            e.title,
             'I got you a pass for ' +
               e.title +
               ' at ' +
@@ -94,12 +100,16 @@ function GuestPasses(p) {
               e.time +
               '. Booking ' +
               passCode(S, e) +
-              ' is under my name, so we go in together. Bring your ID.\n' +
-              APP_URL +
-              '#e=' +
-              e.id
+              ' is under my name, so we go in together. Bring your ID',
+            APP_URL + '#e=' + e.id
+          ).then(
+            (r) => {
+              if (r === 'cancelled') return;
+              c.set({ sent: true });
+              c.toast(shareToast(r, 'Pass link') || (S.guests > 2 ? 'Passes shared' : 'Pass shared'));
+            },
+            () => c.toast('Couldn’t share. Try again')
           );
-          c.set({ sent: true });
         }}
       >
         {S.sent

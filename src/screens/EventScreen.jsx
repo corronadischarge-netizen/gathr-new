@@ -1,14 +1,12 @@
 import { useEffect, useRef, useState } from 'react';
-import { APP_URL, CFG } from '../config';
+import { APP_URL } from '../config';
 import { agePhrase, groupLabel, isSet } from '../data/group';
 import { doorOf } from '../data/doorRules';
-import { groupFor, homeItems } from '../data/homeData';
+import { groupFor, homeItems, tryInstead } from '../data/homeData';
 import { rupees } from '../data/format';
-import { EVENTS } from '../data/listings';
-import { Button, DoorVerdict, Icon, TonightSoFar, TopBar, VenueHero } from '../design-system';
-import { homeWindow, now } from '../lib/clock';
+import { ActionBar, DoorVerdict, Icon, TonightSoFar, TopBar, VenueHero } from '../design-system';
+import { now } from '../lib/clock';
 import { doorRows, getDoorVerdict, verdictSource, verdictText } from '../lib/door';
-import { heroPick } from '../lib/homeRank';
 import { log } from '../lib/log';
 import { shareToast } from '../lib/utils';
 import { Share } from '../services/share';
@@ -53,43 +51,49 @@ export function EventScreen(p) {
   function book() {
     c.set({ guests: n, sheet: e.age >= 21 && !S.age ? 'age' : 'list', after: 'list' });
   }
+  /* Ask the venue (spec 6.4): WhatsApp with the question written for you; to the venue's own number when we
+     have one, otherwise WhatsApp asks who to send it to */
   function ask() {
     log('verdict_ask_venue', { nightId: e.id });
-    // no venue numbers yet: the question goes to gathr, who calls the venue
-    Share.open(
-      'mailto:' +
-        CFG.contactEmail +
-        '?subject=' +
-        encodeURIComponent('Door rules for ' + e.title) +
-        '&body=' +
-        encodeURIComponent('Going as ' + groupLabel(group) + '. ' + verdict.reasons[0] + ' for ' + e.title + ' at ' + v.name + ', ' + e.date + '.')
-    );
+    var msg = 'Hi, is stag entry allowed tonight at ' + v.name + '? Asking via gathr';
+    if (v.whatsapp || v.phone) Share.whatsappTo(String(v.whatsapp || v.phone).replace(/D/g, '').slice(-10), msg);
+    else Share.whatsapp(msg);
+  }
+  function main() {
+    if (no && !onThis) return;
+    onThis ? c.go('pass') : book();
   }
 
   // not for this group: point to the best night that lets them in, that day or the next
-  var tryNight = null;
-  if (no) {
-    var items = homeItems(S, t).filter((x) => x.id !== e.id && x.verdict.state === 'yes'),
-      day = it ? it.day : homeWindow(t).day,
-      pick = heroPick(items, day) || heroPick(items, new Date(Date.parse(day) + 86400000).toISOString().slice(0, 10));
-    tryNight = pick && EVENTS[pick.id];
-  }
+  var tryNight = no ? tryInstead(S, e, t) : null;
 
   /* the top bar: clear over the photo; once the photo has scrolled under it, a glass bar fades in (spec 3, 6.4) */
   var root = useRef(null),
     bar = useRef(null);
   const [glass, setGlass] = useState(false);
+  const [pinned, setPinned] = useState(false);
   useEffect(() => {
     var scr = root.current && root.current.closest('.screen');
     if (!scr) return;
-    var onScroll = () => setGlass(scr.scrollTop > 280); // the photo is 380 tall; its buttons sit 52 to 100 from the top
+    var media = root.current.querySelector('.g-vh2-media'),
+      cta = root.current.querySelector('.g-vh2-cta');
+    var onScroll = () => {
+      var y = scr.scrollTop;
+      setGlass(y > 280); // the photo is 380 tall; its buttons sit 52 to 100 from the top
+      // the photo stays put while the card scrolls over it (no parallax, no zoom), then leaves with the page
+      if (media) media.style.transform = y > 0 ? 'translateY(' + Math.min(y, media.offsetHeight) + 'px)' : '';
+      // once the hero's own button has scrolled under the top bar, the same button pins to the bottom
+      if (cta) setPinned(y > cta.offsetTop + cta.offsetHeight - 100);
+    };
     onScroll();
     scr.addEventListener('scroll', onScroll, { passive: true });
     return () => scr.removeEventListener('scroll', onScroll);
   }, []);
+  var pin = useRef(null);
   useEffect(() => {
     if (bar.current) bar.current.inert = !glass; // hidden: can't be tapped or focused
-  }, [glass]);
+    if (pin.current) pin.current.inert = !pinned;
+  }, [glass, pinned]);
 
   return (
     <div className="col ev3" ref={root}>
@@ -109,7 +113,7 @@ export function EventScreen(p) {
           var l = btnLabel(ev);
           if (l === 'Back') c.back();
           else if (l === 'Save' || l === 'Saved') c.toggleSave(e.id);
-          else if (l === label && !no) onThis ? c.go('pass') : book();
+          else if (l === label) main();
         }}
       >
         <VenueHero
@@ -235,6 +239,18 @@ export function EventScreen(p) {
           ) : null}
         </div>
         <span className="home-sample">Sample data</span>
+      </div>
+      {/* the booking button, pinned once the hero's has scrolled away, over the functional fade */}
+      <div ref={pin} className={'ev3-pin' + (pinned ? ' is-on' : '')} aria-hidden={pinned ? undefined : 'true'}>
+        <ActionBar
+          main={{
+            label: label,
+            variant: onThis ? 'primary' : 'brand',
+            icon: no && !onThis ? 'lock' : 'ticket',
+            disabled: no && !onThis,
+            onClick: main
+          }}
+        />
       </div>
     </div>
   );

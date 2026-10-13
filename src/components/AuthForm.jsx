@@ -36,6 +36,8 @@ export function AuthForm(p) {
       clearTimeout(t);
     };
   }, [wait]);
+  // after maxTries wrong codes (booking: 3) the box locks and the way forward is a new code
+  var spent = !!p.maxTries && (F.tries || 0) >= p.maxTries;
   var okE = okEmail(F.email),
     okC = /^\d{6,8}$/.test(F.code.trim());
   function send() {
@@ -43,7 +45,8 @@ export function AuthForm(p) {
     if (!okE || !m.send(resend ? 'RESEND' : 'SEND', { err: null })) return;
     Auth.sendCode(F.email.trim().toLowerCase()).then(
       (r) => {
-        m.send('SENT', { code: '', demo: r.demoCode || null });
+        m.send('SENT', { code: '', demo: r.demoCode || null, tries: 0 });
+        p.onSent && p.onSent(resend);
         setWait(30);
         c.toast(r.demoCode ? 'Demo mode: your code is on screen' : 'Code sent to ' + F.email.trim());
       },
@@ -71,7 +74,9 @@ export function AuthForm(p) {
       },
       (e) => {
         // wrong code: shake, clear the box, keep the cursor in it, buzz
-        m.send('WRONG', { err: e.message, code: '' });
+        var tries = (F.tries || 0) + 1;
+        m.send('WRONG', { err: /match|invalid|incorrect/i.test(e.message) ? 'Wrong code. Try again' : e.message, code: '', tries: tries });
+        p.onWrong && p.onWrong(tries);
         replay(codeRow.current, 'shake');
         haptic.error();
         if (codeIn.current) codeIn.current.focus({ preventScroll: true });
@@ -182,7 +187,7 @@ export function AuthForm(p) {
                 value={F.code}
                 maxLength={12}
                 autoFocus
-                readOnly={m.state === 'verifying'}
+                readOnly={m.state === 'verifying' || spent}
                 aria-invalid={!!F.err}
                 aria-describedby={p.id + '-msg'}
                 onChange={(e) => typeCode(e.target.value)}
@@ -197,7 +202,9 @@ export function AuthForm(p) {
               type="button"
               className="link-btn"
               style={{ color: 'var(--ink-muted)' }}
-              onClick={() => m.send('CHANGE_EMAIL', { code: '', err: null, demo: null })}
+              onClick={() => {
+                if (m.send('CHANGE_EMAIL', { code: '', err: null, demo: null, tries: 0 })) p.onChangeEmail && p.onChangeEmail();
+              }}
             >
               Change email
             </button>
@@ -211,17 +218,23 @@ export function AuthForm(p) {
               {wait ? 'Resend in ' + wait + 's' : 'Resend code'}
             </button>
           </div>
-          <Button
-            variant="primary"
-            size={btnSize}
-            block
-            icon={p.payIcon ? 'ticket' : null}
-            disabled={!okC}
-            busy={busy}
-            onClick={() => verify()}
-          >
-            {m.state === 'verifying' ? 'Checking…' : p.verifyLabel || 'Verify'}
-          </Button>
+          {spent ? (
+            <Button variant="primary" size={btnSize} block busy={m.state === 'resending'} onClick={send}>
+              {m.state === 'resending' ? 'Sending code' : 'Send a new code'}
+            </Button>
+          ) : (
+            <Button
+              variant="primary"
+              size={btnSize}
+              block
+              icon={p.payIcon ? 'ticket' : null}
+              disabled={!okC}
+              busy={busy}
+              onClick={() => verify()}
+            >
+              {m.state === 'verifying' ? 'Checking' : p.verifyLabel || 'Verify'}
+            </Button>
+          )}
         </div>
       )}
       {F.err ? (

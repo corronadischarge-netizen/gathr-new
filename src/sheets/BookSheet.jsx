@@ -1,46 +1,30 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { AuthForm } from '../components/AuthForm';
 import { Switch } from '../components/Switch';
 import { rupees } from '../data/format';
 import { doorOf } from '../data/doorRules';
-import { groupFor } from '../data/homeData';
+import { groupFor, tryInstead } from '../data/homeData';
 import { isSet } from '../data/group';
+import { EVENTS } from '../data/listings';
 import { now } from '../lib/clock';
+import { MAX_TRIES, inFlight } from '../lib/booking';
 import { getDoorVerdict, verdictText } from '../lib/door';
 import { Button, Chip, Sheet } from '../design-system';
 import { haptic } from '../lib/haptics';
-import { useMachine } from '../lib/machine';
 import { poss } from '../lib/utils';
 import { Pay } from '../services/payments';
-import {
-  book as bookInDb,
-  claimGuestList,
-  pullEventLists,
-  pullMyGuestLists,
-  remoteOn,
-  sayError
-} from '../services/remote';
-import { meta, svgIcon } from '../ui/helpers';
+import { claimGuestList, pullEventLists, pullMyGuestLists, remoteOn, sayError } from '../services/remote';
+import { icon, meta, svgIcon } from '../ui/helpers';
 
-/* Booking runs as one line of steps: idle → sending code → code entry (both in AuthForm, first time only)
-   → paying → success or error. Paying can only start from ready or after an error, so a second tap
-   can never charge twice; an error keeps everything you chose and offers "Try again". */
-const PAY_FLOW = {
-  ready: { PAY: 'paying' },
-  paying: { PAID: 'success', FAIL: 'error' },
-  error: { PAY: 'paying' },
-  success: {}
-};
-
-/* One-sheet booking: guests, rules, price, pay (and phone, first time only) */
+/* One-sheet booking: guests, rules, price, pay (and sign-in, first time only).
+   It runs on the booking state machine (lib/booking.js, interactions spec 7), kept in the app's state (S.bk):
+   selecting → (codeSent → codeEntry →) selecting → paying → success | failed | pending, and blocked when the door
+   says no for this group. The sheet only shows the state and sends events; the app does the paying. */
 export function BookSheet(p) {
   var c = p.ctx,
     S = c.S,
     e = c.ev,
-    v = c.ven,
-    close = () => {
-      if (!S.busy) c.set({ sheet: null });
-    };
+    v = c.ven;
   var gpb = S.gp && S.gpBook === e.id,
     crew = gpb ? ['Riya'].concat(S.gp.members) : null;
   /* A night hosted on gathr is booked in the database, which needs the party: couples, guys and girls.
@@ -48,6 +32,7 @@ export function BookSheet(p) {
   var dbNight = remoteOn && e.remote && !gpb;
   const [party, setParty] = useState({ couples: 1, stags: 0, girls: 0 });
   const [hitMax, setHitMax] = useState(false); // tried to go past the host's limit: say why
+  const [freeing, setFreeing] = useState(false); // a free booking is on its way (in-flight guard)
   var partyErr =
     e.stag === 'groups' && party.stags > 0 && !party.couples && !party.girls
       ? 'This night is couples and mixed groups only. Add a couple or a girl'
@@ -83,8 +68,16 @@ export function BookSheet(p) {
     claimGuestList(e.id, chosen).then(
       (b) => {
         setClaiming(false);
-        c.set({ guests: b.passes });
-        done(null, Object.assign({}, b, { listOwner: entry.owner, plusOnes: entry.plusOnes }));
+        c.set((o) => ({
+          guests: b.passes,
+          celebrate: 'gl_' + b.id,
+          onList: true,
+          planned: e.id,
+          sheet: null,
+          stack: o.stack.concat('pass'),
+          dir: 'fwd',
+          myBookings: Object.assign({}, o.myBookings, { [e.id]: Object.assign({}, b, { listOwner: entry.owner, plusOnes: entry.plusOnes }) })
+        }));
       },
       (err) => {
         setClaiming(false);
@@ -93,18 +86,42 @@ export function BookSheet(p) {
       }
     );
   }
-  /* home v3 (5.8): the host's limit per booking, and the door's condition for this group */
-  var door = doorOf(e),
+
+  /* the door for this group (home v3 5.8): the host's limit per booking, the condition line, or a no */
+  var t = now(),
+    door = doorOf(e),
     maxPasses = door.maxPasses || 6,
-    group = groupFor(S, now()),
+    group = groupFor(S, t),
     capped = isSet(group) && group.size > maxPasses,
-    verdict = getDoorVerdict(door, group, S.age, now()),
+    verdict = getDoorVerdict(door, group, S.age, t),
+    no = verdict.state === 'no',
     condition = verdict.state === 'if' ? verdictText(verdict, group, 'line').text : null;
+
+  /* the machine: this night's booking, or another night's that is still paying */
+  var bk = S.bk && S.bk.ev === e.id ? S.bk : null,
+    st = bk ? bk.state : 'idle',
+    busyElsewhere = inFlight(S.bk) && S.bk.ev !== e.id ? EVENTS[S.bk.ev] : null,
+    moving = inFlight(bk),
+    auth = st === 'codeSent' || st === 'codeEntry';
+  useLayoutEffect(() => {
+    c.bkOpen(e.id, no);
+  }, []);
+  // the group changed while the sheet was open: a no blocks Pay, a yes unblocks it
+  useEffect(() => {
+    if ((st === 'selecting' || st === 'failed') && no) c.bkSend('BLOCK');
+    else if (st === 'blocked' && !no) c.bkSend('REGROUP');
+  }, [no, st]);
+  // the content slides to sign-in and back (spec 4: one sheet, content swaps with a horizontal slide)
+  var wasAuth = useRef(auth),
+    slide = auth !== wasAuth.current ? (auth ? 'w-next' : 'w-prev') : '';
+  useEffect(() => {
+    wasAuth.current = auth;
+  });
+
   var n = gpb ? crew.length : dbNight ? party.couples * 2 + party.stags + party.girls : S.guests,
     each = e.door ? 0 : e.price || 0,
     gross = each * n;
   const [useCredit, setUseCredit] = useState(false);
-  var pay = useMachine(PAY_FLOW, 'ready', { err: null });
   // the pass count rolls up or down to its new number, and the total rolls with it
   var lastN = useRef(n),
     rollDir = useRef('');
@@ -122,360 +139,378 @@ export function BookSheet(p) {
         ? 'Pay ' + rupees(total)
         : 'Book with credit'
       : 'Get on the list';
-  function done(payId, booking) {
-    var earned = n >= 3 && each && !(booking && booking.guests) ? 50 : 0;
-    c.set((o) => ({
-      busy: null,
-      celebrate: Date.now(), // the pass screen plays the booking tick only right after booking
-      onList: true,
-      planned: e.id,
-      guests: booking ? booking.passes : n,
-      sent: gpb,
-      sheet: null,
-      payId: payId || null,
-      myBookings: booking ? Object.assign({}, o.myBookings, { [e.id]: booking }) : o.myBookings,
-      credit: o.credit - credit + earned,
-      gp: gpb ? Object.assign({}, o.gp, { stage: 'booked', booked: e.id, fresh: false }) : o.gp,
-      gpBook: null
-    }));
-    haptic.success();
-    c.go('pass');
-    if (earned)
-      setTimeout(() => {
-        c.toast('+' + rupees(earned) + ' planner credit for booking your group');
-      }, 900);
+
+  /* passes: the number changes and the machine hears about it (selecting stays selecting; after a failed payment,
+     changing your passes starts again from selecting) */
+  function changed() {
+    if (st === 'failed' || st === 'selecting') c.bkSend('PASSES');
   }
-  /* after paying (or straight away for free and pay-at-door nights): a gathr night is booked in the database */
-  function finish(payId) {
-    if (!dbNight) {
-      pay.send('PAID');
-      done(payId);
+  function setGuests(k) {
+    c.set({ guests: k });
+    changed();
+  }
+  /* Pay: signed out, the sheet slides to sign-in first; free nights skip paying; otherwise the app pays, once */
+  function payTap() {
+    if (partyErr || n < 1 || moving || st === 'blocked') return;
+    if (!S.signedIn) {
+      c.bkSend('PAY_SIGNED_OUT');
       return;
     }
-    c.set({ busy: 'pay' });
-    bookInDb(e.id, party.couples, party.stags, party.girls, payId).then(
-      (b) => {
-        pay.send('PAID');
-        done(payId, b);
-      },
-      (err) => {
-        // with real payments this case needs a refund: the server-side payment check (planned) closes it
-        pay.send('FAIL', {
-          err:
-            sayError(err) +
-            (payId && !/^demo_/.test(payId)
-              ? ' Your payment reference is ' + payId + '; we’ll refund it'
-              : '')
-        });
-        c.set({ busy: null });
-        haptic.error();
-      }
-    );
-  }
-  function book() {
-    if (partyErr || n < 1) return;
-    if (!pay.send('PAY', { err: null })) return;
+    var info = {
+      n: n,
+      total: total,
+      credit: credit,
+      gpb: !!gpb,
+      party: party,
+      dbNight: !!dbNight,
+      title: e.title + ' · ' + n + (n === 1 ? ' pass' : ' passes')
+    };
     if (!total) {
-      finish(null);
+      if (freeing) return;
+      setFreeing(true);
+      c.bookFree(info).then(() => setFreeing(false));
       return;
     }
-    c.set({ busy: 'pay' });
-    Pay.charge({
-      amount: total,
-      title: e.title + ' · ' + n + (n === 1 ? ' pass' : ' passes'),
-      email: S.email,
-      phone: S.phone
-    }).then(
-      (r) => {
-        finish(r.id);
-      },
-      (err) => {
-        pay.send('FAIL', { err: err.message || 'The payment didn’t go through. You haven’t been charged' });
-        c.set({ busy: null });
-        haptic.error();
-      }
-    );
+    c.pay(info);
   }
+
+  var tryNight = no ? tryInstead(S, e, t) : null;
+
+  if (busyElsewhere)
+    return (
+      <Sheet title={e.title} subtitle={v.name + ' · ' + e.date + ' · ' + e.time} onClose={c.closeSheet}>
+        <p className="meta" style={{ margin: 0 }}>
+          {'Your booking for ' + busyElsewhere.title + ' is still going through'}
+        </p>
+        <Button variant="primary" size="lg" block onClick={() => c.set({ cur: S.bk.ev })}>
+          Show it
+        </Button>
+      </Sheet>
+    );
+
   return (
-    <Sheet title={e.title} subtitle={v.name + ' · ' + e.date + ' · ' + e.time} onClose={close}>
-      {dbNight && lists.length ? (
-        <div className="seg" role="radiogroup" aria-label="How you’re coming">
-          {[
-            ['buy', 'Buy passes'],
-            ['guest', 'Guest list']
-          ].map((t) => (
-            <button
-              key={t[0]}
-              type="button"
-              role="radio"
-              aria-checked={mode === t[0]}
-              className={mode === t[0] ? 'on' : ''}
-              onClick={() => setMode(t[0])}
-            >
-              {t[1]}
-            </button>
-          ))}
+    <Sheet
+      title={e.title}
+      subtitle={v.name + ' · ' + e.date + ' · ' + e.time}
+      onClose={c.closeSheet}
+      dismissible={!moving}
+    >
+      {auth ? (
+        /* sign in first (codeSent → codeEntry); everything chosen waits on the other side */
+        <div key="auth" className={'col bk-pane ' + slide} style={{ gap: '12px' }}>
+          <button type="button" className="link-btn bk-back" onClick={() => c.bkSend('BACK')}>
+            {icon('arrow-left', 20)}
+            <span>{'Back to your ' + (n === 1 ? 'pass' : 'passes')}</span>
+          </button>
+          <span className="title15">Sign in to keep your passes</span>
+          <AuthForm
+            ctx={c}
+            id="bk"
+            compact
+            payIcon
+            emailLabel="Email, for your passes and receipt"
+            verifyLabel="Verify"
+            maxTries={MAX_TRIES}
+            resume={{ cur: e.id, guests: n }}
+            onSent={(again) => c.bkSend(again ? 'RESEND' : 'CODE_SENT')}
+            onWrong={() => c.bkSend('WRONG')}
+            onChangeEmail={() => c.bkSend('CHANGE_EMAIL')}
+            onDone={() => c.bkSend('RIGHT')}
+          />
         </div>
-      ) : null}
-      {guestMode ? (
-        <div className="col" style={{ gap: '12px' }}>
-          <span className="title16">Whose guest list are you on?</span>
-          <div className="wrap" role="radiogroup" aria-label="Whose guest list">
-            {lists.map((l) => (
-              <Chip
-                key={l.listId}
-                role="radio"
-                aria-checked={chosen === l.listId}
-                selected={chosen === l.listId}
-                onClick={() => setPick(l.listId)}
-              >
-                {l.isHost ? l.owner + ' (host)' : l.owner}
-              </Chip>
-            ))}
-          </div>
-          {!S.signedIn ? (
-            <div className="col" style={{ gap: '8px' }}>
-              <span className="title15">Sign in to check the list</span>
-              {meta('Use the email the host or promoter added you with')}
-              <AuthForm
-                ctx={c}
-                id="gl"
-                compact
-                emailLabel="Your email"
-                onDone={() => setTimeout(refreshMine, 0)}
-              />
+      ) : (
+        <div key="main" className={'col bk-pane ' + slide} style={{ gap: '16px' }}>
+          {dbNight && lists.length ? (
+            <div className="seg" role="radiogroup" aria-label="How you’re coming">
+              {[
+                ['buy', 'Buy passes'],
+                ['guest', 'Guest list']
+              ].map((x) => (
+                <button
+                  key={x[0]}
+                  type="button"
+                  role="radio"
+                  aria-checked={mode === x[0]}
+                  className={mode === x[0] ? 'on' : ''}
+                  disabled={moving}
+                  onClick={() => setMode(x[0])}
+                >
+                  {x[1]}
+                </button>
+              ))}
             </div>
-          ) : !chosen ? (
-            meta('Pick whose list you’re on')
-          ) : entry ? (
-            <div className="g-card card col" style={{ gap: '6px', padding: '16px 18px' }}>
-              <span className="title16">{'You’re on ' + poss(chosenList.owner) + ' list'}</span>
-              {meta(['You'].concat(entry.plusOnes).join(', '))}
-              {meta(
-                'Free entry · ' +
-                  (1 + entry.plusOnes.length) +
-                  (entry.plusOnes.length ? ' passes' : ' pass') +
-                  ' · door rules still apply'
+          ) : null}
+          {guestMode ? (
+            <div className="col" style={{ gap: '12px' }}>
+              <span className="title16">Whose guest list are you on?</span>
+              <div className="wrap" role="radiogroup" aria-label="Whose guest list">
+                {lists.map((l) => (
+                  <Chip
+                    key={l.listId}
+                    role="radio"
+                    aria-checked={chosen === l.listId}
+                    selected={chosen === l.listId}
+                    onClick={() => setPick(l.listId)}
+                  >
+                    {l.isHost ? l.owner + ' (host)' : l.owner}
+                  </Chip>
+                ))}
+              </div>
+              {!S.signedIn ? (
+                <div className="col" style={{ gap: '8px' }}>
+                  <span className="title15">Sign in to check the list</span>
+                  {meta('Use the email the host or promoter added you with')}
+                  <AuthForm ctx={c} id="gl" compact emailLabel="Your email" onDone={() => setTimeout(refreshMine, 0)} />
+                </div>
+              ) : !chosen ? (
+                meta('Pick whose list you’re on')
+              ) : entry ? (
+                <div className="g-card card col" style={{ gap: '6px', padding: '16px 18px' }}>
+                  <span className="title16">{'You’re on ' + poss(chosenList.owner) + ' list'}</span>
+                  {meta(['You'].concat(entry.plusOnes).join(', '))}
+                  {meta(
+                    'Free entry · ' +
+                      (1 + entry.plusOnes.length) +
+                      (entry.plusOnes.length ? ' passes' : ' pass') +
+                      ' · door rules still apply'
+                  )}
+                </div>
+              ) : (
+                <p className="meta err-txt" role="alert" style={{ margin: 0 }}>
+                  {'You’re not on ' +
+                    (chosenList ? poss(chosenList.owner) : 'this') +
+                    ' list for this night. Ask them to add ' +
+                    (S.email || 'your email') +
+                    ', or buy a pass'}
+                </p>
               )}
+              {S.signedIn && chosen ? (
+                entry ? (
+                  <Button variant="primary" size="lg" block icon="ticket" busy={claiming} onClick={claim}>
+                    {claiming ? 'Getting your passes' : entry.bookingId ? 'Show my passes' : 'Get free passes'}
+                  </Button>
+                ) : (
+                  <Button variant="subtle" block onClick={() => setMode('buy')}>
+                    Buy passes instead
+                  </Button>
+                )
+              ) : null}
+            </div>
+          ) : dbNight ? (
+            <div className="col" style={{ gap: '4px' }}>
+              {[
+                ['couples', 'Couples', '2 passes each'],
+                ['stags', 'Guys', e.stag === 'none' ? 'No stag entry tonight' : 'Coming without a partner'],
+                ['girls', 'Girls', '1 pass each']
+              ].map((r) => {
+                var k = r[0],
+                  val = party[k],
+                  closed = k === 'stags' && e.stag === 'none',
+                  room = n + (k === 'couples' ? 2 : 1) <= 20;
+                return (
+                  <div key={k} className="rowc between party-row" style={{ gap: '12px' }}>
+                    <div className="col" style={{ gap: '2px' }}>
+                      <span className="title15">{r[1]}</span>
+                      {meta(r[2])}
+                    </div>
+                    <div className="rowc" style={{ gap: '16px' }}>
+                      <button
+                        type="button"
+                        className="g-ibtn g-ibtn-solid step"
+                        aria-label={'One fewer: ' + r[1]}
+                        disabled={moving}
+                        onClick={() => {
+                          if (val <= 0) return haptic.warning();
+                          haptic.tap();
+                          setParty(Object.assign({}, party, { [k]: val - 1 }));
+                          changed();
+                        }}
+                      >
+                        {svgIcon(['M5 12h14'])}
+                      </button>
+                      <span key={val} className={'step-n ' + roll} aria-live="polite" aria-label={val + ' ' + r[1]}>
+                        {val}
+                      </span>
+                      <button
+                        type="button"
+                        className="g-ibtn g-ibtn-solid step"
+                        aria-label={'One more: ' + r[1]}
+                        disabled={closed || moving}
+                        onClick={() => {
+                          if (!room) return haptic.warning();
+                          haptic.tap();
+                          setParty(Object.assign({}, party, { [k]: val + 1 }));
+                          changed();
+                        }}
+                      >
+                        {svgIcon(['M5 12h14', 'M12 5v14'])}
+                      </button>
+                    </div>
+                  </div>
+                );
+              })}
+              {meta(n + (n === 1 ? ' pass' : ' passes') + (n > 1 ? ' · send the others theirs after' : ''))}
+              {partyErr ? (
+                <p className="meta err-txt" role="alert" style={{ margin: 0 }}>
+                  {partyErr}
+                </p>
+              ) : null}
             </div>
           ) : (
-            <p className="meta err-txt" role="alert" style={{ margin: 0 }}>
-              {'You’re not on ' +
-                (chosenList ? poss(chosenList.owner) : 'this') +
-                ' list for this night. Ask them to add ' +
-                (S.email || 'your email') +
-                ', or buy a pass.'}
-            </p>
-          )}
-          {S.signedIn && chosen ? (
-            entry ? (
-              <Button variant="primary" size="lg" block icon="ticket" disabled={claiming} onClick={claim}>
-                {claiming ? 'Getting your passes…' : entry.bookingId ? 'Show my passes' : 'Get free passes'}
-              </Button>
-            ) : (
-              <Button variant="subtle" block onClick={() => setMode('buy')}>
-                Buy passes instead
-              </Button>
-            )
-          ) : null}
-        </div>
-      ) : null}
-      {guestMode ? null : dbNight ? (
-        <div className="col" style={{ gap: '4px' }}>
-          {[
-            ['couples', 'Couples', '2 passes each'],
-            ['stags', 'Guys', e.stag === 'none' ? 'No stag entry tonight' : 'Coming without a partner'],
-            ['girls', 'Girls', '1 pass each']
-          ].map((r) => {
-            var k = r[0],
-              val = party[k],
-              closed = k === 'stags' && e.stag === 'none',
-              room = n + (k === 'couples' ? 2 : 1) <= 20;
-            return (
-              <div key={k} className="rowc between party-row" style={{ gap: '12px' }}>
-                <div className="col" style={{ gap: '2px' }}>
-                  <span className="title15">{r[1]}</span>
-                  {meta(r[2])}
-                </div>
+            <div className="rowc between" style={{ gap: '12px' }}>
+              <div className="col" style={{ gap: '2px' }}>
+                <span className="title16">Passes</span>
+                {meta(gpb ? 'One each for your group' : n === 1 ? 'Just you' : 'You + ' + (n - 1) + ' · send theirs after')}
+              </div>
+              {gpb ? (
+                <span className="step-n">{n}</span>
+              ) : (
                 <div className="rowc" style={{ gap: '16px' }}>
                   <button
                     type="button"
                     className="g-ibtn g-ibtn-solid step"
-                    aria-label={'One fewer: ' + r[1]}
-                    disabled={val <= 0 || !!S.busy}
-                    onClick={() => setParty(Object.assign({}, party, { [k]: val - 1 }))}
+                    aria-label="One fewer pass"
+                    disabled={moving}
+                    onClick={() => {
+                      // at a limit nothing changes and the phone gives a warning buzz (interactions spec 5)
+                      if (n <= 1) return haptic.warning();
+                      haptic.tap();
+                      setGuests(n - 1);
+                    }}
                   >
                     {svgIcon(['M5 12h14'])}
                   </button>
-                  <span
-                    key={val}
-                    className={'step-n ' + roll}
-                    aria-live="polite"
-                    aria-label={val + ' ' + r[1]}
-                  >
-                    {val}
+                  <span key={n} className={'step-n ' + roll} aria-live="polite" aria-label={n + (n === 1 ? ' pass' : ' passes')}>
+                    {n}
                   </span>
                   <button
                     type="button"
                     className="g-ibtn g-ibtn-solid step"
-                    aria-label={'One more: ' + r[1]}
-                    disabled={closed || !room || !!S.busy}
-                    onClick={() => setParty(Object.assign({}, party, { [k]: val + 1 }))}
+                    aria-label="One more pass"
+                    disabled={moving}
+                    onClick={() => {
+                      if (n >= maxPasses) {
+                        setHitMax(true);
+                        return haptic.warning();
+                      }
+                      haptic.tap();
+                      setGuests(n + 1);
+                    }}
                   >
                     {svgIcon(['M5 12h14', 'M12 5v14'])}
                   </button>
                 </div>
-              </div>
-            );
-          })}
-          {meta(n + (n === 1 ? ' pass' : ' passes') + (n > 1 ? ' · send the others theirs after' : ''))}
-          {partyErr ? (
-            <p className="meta err-txt" role="alert" style={{ margin: 0 }}>
-              {partyErr}
-            </p>
-          ) : null}
-        </div>
-      ) : (
-        <div className="rowc between" style={{ gap: '12px' }}>
-          <div className="col" style={{ gap: '2px' }}>
-            <span className="title16">Passes</span>
-            {meta(
-              gpb
-                ? 'One each for your group'
-                : n === 1
-                  ? 'Just you'
-                  : 'You + ' + (n - 1) + ' · send theirs after'
-            )}
-          </div>
-          {gpb ? (
-            <span className="step-n">{n}</span>
-          ) : (
-            <div className="rowc" style={{ gap: '16px' }}>
-              <button
-                type="button"
-                className="g-ibtn g-ibtn-solid step"
-                aria-label="One fewer pass"
-                disabled={!!S.busy}
-                onClick={() => {
-                  // at a limit nothing changes and the phone gives a warning buzz (interactions spec 5)
-                  if (n <= 1) return haptic.warning();
-                  haptic.tap();
-                  c.set({ guests: n - 1 });
-                }}
-              >
-                {svgIcon(['M5 12h14'])}
-              </button>
-              <span
-                key={n}
-                className={'step-n ' + roll}
-                aria-live="polite"
-                aria-label={n + (n === 1 ? ' pass' : ' passes')}
-              >
-                {n}
-              </span>
-              <button
-                type="button"
-                className="g-ibtn g-ibtn-solid step"
-                aria-label="One more pass"
-                disabled={!!S.busy}
-                onClick={() => {
-                  if (n >= maxPasses) {
-                    setHitMax(true);
-                    return haptic.warning();
-                  }
-                  haptic.tap();
-                  c.set({ guests: n + 1 });
-                }}
-              >
-                {svgIcon(['M5 12h14', 'M12 5v14'])}
-              </button>
+              )}
             </div>
           )}
+          {guestMode ? null : (
+            <>
+              {capped || hitMax ? meta('Max ' + maxPasses + ' passes per booking') : null}
+              {condition ? (
+                <p className="bk-cond" style={{ margin: 0 }}>
+                  {condition + ". Make sure everyone's sorted"}
+                </p>
+              ) : null}
+              {e.door && e.price ? meta('Cover ' + rupees(e.price) + ' at the door') : null}
+              {each && S.credit > 0 && S.signedIn ? (
+                <div className="rowc between" style={{ gap: '12px' }}>
+                  <div className="col" style={{ gap: '2px' }}>
+                    <span className="title15">Use planner credit</span>
+                    {meta(rupees(S.credit) + ' available')}
+                  </div>
+                  <Switch
+                    on={useCredit}
+                    label="Use planner credit"
+                    onClick={() => {
+                      if (moving) return;
+                      setUseCredit(!useCredit);
+                      changed();
+                    }}
+                  />
+                </div>
+              ) : null}
+              <div className="rowc between total-row">
+                <span className="title15">
+                  {e.rsvp ? 'Free with RSVP' : each ? (credit ? 'Total after ' + rupees(credit) + ' credit' : 'Total') : 'Pay at the door'}
+                </span>
+                <span key={total} className={'price-big ' + roll}>
+                  {e.rsvp ? '₹0' : each ? rupees(total) : e.door && e.price ? rupees(e.price) + ' each' : 'Not listed'}
+                </span>
+              </div>
+              {st === 'failed' ? (
+                <div className="col pay-err" role="alert" style={{ gap: '2px' }}>
+                  <span className="meta err-txt">That didn't go through. Try again</span>
+                  {bk.err ? meta(bk.err) : null}
+                </div>
+              ) : null}
+              {st === 'pending' ? meta("This can take a minute. You won't be charged twice") : null}
+              {S.stopAsk && moving ? (
+                /* ✕ while paying: closing only hides the sheet; the bank's answer still arrives */
+                <div className="col bk-stop" role="alertdialog" aria-label="Stop paying?" style={{ gap: '8px' }}>
+                  <span className="title15">Stop paying?</span>
+                  {meta('Your bank may still take it. If it goes through, your pass shows up in Plans')}
+                  <Button variant="primary" size="lg" block onClick={() => c.set({ stopAsk: false })}>
+                    Keep paying
+                  </Button>
+                  <Button variant="ghost" block onClick={() => c.set({ sheet: null, stopAsk: false })}>
+                    Close
+                  </Button>
+                </div>
+              ) : st === 'blocked' ? (
+                /* the door says no for this group: Pay can't be tapped, the reason is on it, and another night is offered */
+                <div className="col" style={{ gap: '12px' }}>
+                  <Button variant="primary" size="lg" block icon="lock" disabled>
+                    {verdict.reasons[0] || 'Not for your group'}
+                  </Button>
+                  {tryNight ? (
+                    <button
+                      type="button"
+                      className="ev3-try"
+                      onClick={() => {
+                        c.bkSend('CLOSE');
+                        c.openEvent(tryNight.id);
+                      }}
+                    >
+                      <span>
+                        Try <b>{tryNight.title}</b>
+                      </span>
+                      {icon('chevron-right', 20)}
+                    </button>
+                  ) : null}
+                </div>
+              ) : (
+                <Button
+                  variant="primary"
+                  size="lg"
+                  block
+                  icon="ticket"
+                  busy={moving || freeing}
+                  disabled={st === 'success' || !!partyErr || n < 1}
+                  onClick={payTap}
+                >
+                  {st === 'paying'
+                    ? 'Paying'
+                    : st === 'pending'
+                      ? 'Checking with your bank'
+                      : freeing
+                        ? 'Saving your spot'
+                        : st === 'failed'
+                          ? 'Try again · ' + payLabel
+                          : payLabel}
+                </Button>
+              )}
+            </>
+          )}
+          <p className="note" style={{ textAlign: 'center' }}>
+            {guestMode
+              ? 'Guest-list passes are free and named · the venue’s door rules still apply'
+              : (e.rsvp || !each
+                  ? 'Your spot is saved on gathr · '
+                  : (Pay.live ? 'Secure payment by Razorpay · ' : 'Test payment · no money is taken · ') + 'no extra fees · ') +
+                'refunds follow the organiser’s policy'}
+          </p>
         </div>
       )}
-      {guestMode ? null : (
-        <>
-          {capped || hitMax ? meta('Max ' + maxPasses + ' passes per booking') : null}
-          {condition ? (
-            <p className="bk-cond" style={{ margin: 0 }}>
-              {condition + ". Make sure everyone's sorted"}
-            </p>
-          ) : null}
-          {e.door && e.price ? meta('Cover ' + rupees(e.price) + ' at the door') : null}
-          {each && S.credit > 0 && S.signedIn ? (
-            <div className="rowc between" style={{ gap: '12px' }}>
-              <div className="col" style={{ gap: '2px' }}>
-                <span className="title15">Use planner credit</span>
-                {meta(rupees(S.credit) + ' available')}
-              </div>
-              <Switch on={useCredit} label="Use planner credit" onClick={() => setUseCredit(!useCredit)} />
-            </div>
-          ) : null}
-          <div className="rowc between total-row">
-            <span className="title15">
-              {e.rsvp
-                ? 'Free with RSVP'
-                : each
-                  ? credit
-                    ? 'Total after ' + rupees(credit) + ' credit'
-                    : 'Total'
-                  : 'Pay at the door'}
-            </span>
-            <span key={total} className={'price-big ' + roll}>
-              {e.rsvp
-                ? '₹0'
-                : each
-                  ? rupees(total)
-                  : e.door && e.price
-                    ? rupees(e.price) + ' each'
-                    : 'Not listed'}
-            </span>
-          </div>
-          {pay.state === 'error' ? (
-            <p className="meta err-txt pay-err" role="alert" style={{ margin: 0 }}>
-              {pay.data.err + ' Your passes are still saved here, so you can try again.'}
-            </p>
-          ) : null}
-          {S.signedIn ? (
-            <Button
-              variant="primary"
-              size="lg"
-              block
-              icon="ticket"
-              disabled={pay.state === 'paying' || pay.state === 'success' || !!S.busy || !!partyErr || n < 1}
-              onClick={book}
-            >
-              {pay.state === 'paying'
-                ? 'Paying…'
-                : pay.state === 'error'
-                  ? 'Try again · ' + payLabel
-                  : payLabel}
-            </Button>
-          ) : (
-            <div className="col" style={{ gap: '8px' }}>
-              <span className="title15">Sign in to keep your passes</span>
-              <AuthForm
-                ctx={c}
-                id="bk"
-                compact
-                payIcon
-                emailLabel="Email, for your passes and receipt"
-                verifyLabel={'Verify · then ' + payLabel.charAt(0).toLowerCase() + payLabel.slice(1)}
-                resume={{ cur: e.id, guests: n }}
-                onDone={() => setTimeout(book, 0)}
-              />
-            </div>
-          )}
-        </>
-      )}
-      <p className="note" style={{ textAlign: 'center' }}>
-        {guestMode
-          ? 'Guest-list passes are free and named · the venue’s door rules still apply'
-          : (e.rsvp || !each
-              ? 'Your spot is saved on gathr · '
-              : (Pay.live ? 'Secure payment by Razorpay · ' : 'Demo payment · no money is taken · ') +
-                'no extra fees · ') + 'refunds follow the organiser’s policy'}
-      </p>
     </Sheet>
   );
 }

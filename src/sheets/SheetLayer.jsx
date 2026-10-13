@@ -26,9 +26,8 @@ const SHEETS = {
 export function SheetLayer(p) {
   var c = p.ctx,
     S = c.S;
-  var close = () => {
-    if (!S.busy) c.set({ sheet: null });
-  };
+  // ✕, the scrim and Escape all close the same way (the booking sheet asks "Stop paying?" while paying)
+  var close = () => c.closeSheet();
   var ref = p.hostRef; // App keeps this, so it can copy the sheet as it closes
   useDialog(ref, S.sheet, close);
   if (S.sheet === 'poster') return <PosterLayer ctx={c} close={close} layerRef={ref} />;

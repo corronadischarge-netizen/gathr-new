@@ -1,21 +1,42 @@
+import { useEffect, useRef } from 'react';
 import { PassCard } from '../cards/PassCard';
 import { VENUES } from '../data/listings';
 import { Button, IconButton } from '../design-system';
+import { haptic } from '../lib/haptics';
+import { ms } from '../lib/motion';
 import { eyebrow, stop } from '../ui/helpers';
 
 export function Pass(p) {
   var c = p.ctx,
     e = c.plan || c.ev,
     v = VENUES[e.venue];
-  // right after booking: the tick draws, then the pass rises and the wristband drops onto it
-  var fresh = c.S.celebrate && Date.now() - c.S.celebrate < 4000;
+  /* right after booking (interactions spec 7): the tick draws itself, the phone gives the success buzz, "You're in",
+     then the pass rises into place and the wristband drops onto it. It plays once: the booking's mark is cleared
+     as the pass opens, so coming back to the pass (or a restart) just shows it */
+  var fresh = useRef(!!c.S.celebrate),
+    head = useRef(null);
+  useEffect(() => {
+    if (!fresh.current) return;
+    c.set({ celebrate: null });
+    // focus goes to the result, so a screen reader says it straight away
+    if (head.current) head.current.focus({ preventScroll: true });
+    var t = setTimeout(() => haptic.success(), ms('--motion-fast') + ms('--motion-slower')); // as the tick finishes
+    return () => clearTimeout(t);
+  }, []);
+  var line = e.rsvp ? "you're on the list" : "you're in";
   return (
-    <div className={'full col pad-top' + (fresh ? ' celebrate' : '')} style={{ paddingTop: '52px' }}>
+    <div className={'full col pad-top' + (fresh.current ? ' celebrate' : '')} style={{ paddingTop: '52px' }}>
       <div className="rowc" style={{ justifyContent: 'flex-end' }}>
         <IconButton icon="x" label="Close" variant="solid" onClick={() => c.tab('plans')} />
       </div>
       {eyebrow(e.date + ' · ' + v.name, { marginTop: '8px' })}
-      <div className="rowc" style={{ gap: '12px', marginTop: '6px' }}>
+      <div
+        ref={head}
+        tabIndex={-1}
+        className="rowc pass-head"
+        style={{ gap: '12px', marginTop: '6px' }}
+        aria-label={fresh.current ? (e.rsvp ? "Booked. You're on the list" : "Booked. You're in") : undefined}
+      >
         <span className="ok-tick" aria-hidden>
           <svg
             viewBox="0 0 24 24"
@@ -30,7 +51,7 @@ export function Pass(p) {
             <path d="M5 12.5l4.5 4.5L19 7" />
           </svg>
         </span>
-        {stop(e.rsvp ? "you're on the list" : "you're booked")}
+        {stop(line)}
       </div>
       <PassCard ctx={c} e={e} v={v} />
       <div className="bottom-stack" style={{ alignItems: 'stretch' }}>

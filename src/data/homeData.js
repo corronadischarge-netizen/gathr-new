@@ -1,6 +1,7 @@
 /* Home v3: the app's nights, prepared for the door verdict and the ranking (lib/door.js, lib/homeRank.js) */
 import { crowdLevel } from '../design-system/utils';
 import { getDoorVerdict } from '../lib/door';
+import { heroPick } from '../lib/homeRank';
 import { addDays, homeWindow, nightDay } from '../lib/clock';
 import { travelMins } from '../lib/distance';
 import { currentGroup, groupFromPlan } from './group';
@@ -74,4 +75,14 @@ export function homeItems(S, t) {
         sample: door.sample
       };
     });
+}
+
+/* not for this group: the best night that lets them in, that day or the next (event page and booking sheet) */
+export function tryInstead(S, e, t) {
+  var all = homeItems(S, t),
+    it = all.filter((x) => x.id === e.id)[0],
+    items = all.filter((x) => x.id !== e.id && x.verdict.state === 'yes'),
+    day = it ? it.day : homeWindow(t).day,
+    pick = heroPick(items, day) || heroPick(items, addDays(day, 1));
+  return pick ? EVENTS[pick.id] : null;
 }

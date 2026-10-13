@@ -12,6 +12,10 @@ import { useEdgeSwipe } from './hooks/useEdgeSwipe';
 import { useSheetExit } from './hooks/useSheetExit';
 import { useScreenTransition } from './hooks/useScreenTransition';
 import { scrollToTop, useScrollMemory } from './hooks/useScrollMemory';
+import { PENDING_AFTER, POLL_EVERY, bookingStep, inFlight, requestId } from './lib/booking';
+import { rupees } from './data/format';
+import { haptic } from './lib/haptics';
+import { log } from './lib/log';
 import { ms, reducedMotion } from './lib/motion';
 import { optimistic } from './lib/optimistic';
 import { cleanCode } from './lib/promoterInvite';
@@ -174,7 +178,8 @@ export function App() {
     'glSeen',
     'cityWant',
     'cityAsk',
-    'energy'
+    'energy',
+    'bk'
   ];
   (() => {
     var p = store('gathr.state');
@@ -187,6 +192,14 @@ export function App() {
         s0.onList = false;
       }
       if (s0.seen) s0.stack = ['tonight'];
+      /* a booking that was paying when the app closed: back on its sheet, asking the bank about the same payment
+         (interactions spec 7, "returning resumes it"). Anything else starts fresh next time */
+      if (inFlight(s0.bk) && EVENTS[s0.bk.ev]) {
+        s0.stack = ['tonight', 'event'];
+        s0.cur = s0.bk.ev;
+        s0.sheet = 'list';
+        s0.dir = 'fwd';
+      } else s0.bk = null;
     }
     if (s0.mode === 'host' && s0.org && s0.org.profile && s0.seen) s0.stack = ['hostdoor'];
     else s0.mode = 'guest';
@@ -226,6 +239,11 @@ export function App() {
       } catch (e) {}
   })();
   const [S, setS] = useState(s0);
+  var bk = useRef(s0.bk || null), // the booking, changed at once on every event (see bkSend)
+    live = useRef(S), // the latest state, for answers that arrive later
+    freeBusy = useRef(false),
+    saving = useRef({});
+  live.current = S;
   function set(p) {
     setS((o) => Object.assign({}, o, typeof p === 'function' ? p(o) : p));
   }
@@ -512,6 +530,7 @@ export function App() {
   ctx.signOut = () => {
     forgetPush().then(() => Auth.signOut());
     PERSONAL_KEYS.forEach((k) => store(k, null));
+    bk.current = null;
     if (Remote.remoteOn) {
       store(ORG_KEY, null);
       syncOrg(orgLoad());
@@ -566,6 +585,160 @@ export function App() {
       set({ savedOnce: true });
       toast('Saved to Plans');
     }
+  };
+
+  /* ---------- booking (interactions spec 7) ----------
+     The booking's state lives here, not in the sheet, so closing the sheet, the background and a restart all keep
+     it. bk.current changes at once on every event (before the screen redraws), so two taps in the same moment
+     can't both start a payment: the second PAY isn't accepted by the machine and does nothing. */
+  ctx.bkSend = bkSend;
+  function bkSend(ev, data) {
+    var from = bk.current ? bk.current.state : 'idle',
+      next = bookingStep(bk.current, ev, data);
+    if (!next) return false;
+    if (next.state === 'idle') next = null;
+    bk.current = next;
+    // "Stop paying?" only makes sense while money may be moving
+    set(inFlight(next) ? { bk: next } : { bk: next, stopAsk: false });
+    log('booking', { from: from, on: ev, to: next ? next.state : 'idle', nightId: next ? next.ev : undefined });
+    return true;
+  }
+  /* the sheet opens: a fresh booking, unless a payment is still open (then the sheet shows that one) */
+  ctx.bkOpen = (id, blocked) => {
+    if (inFlight(bk.current)) return;
+    bk.current = null;
+    bkSend(blocked ? 'OPEN_BLOCKED' : 'OPEN', { ev: id, tries: 0, err: null, rid: null });
+  };
+  /* Pay: one request id per attempt; the payment service answers each id once */
+  ctx.pay = (info) => {
+    if (!bkSend('PAY', Object.assign({}, info, { rid: requestId() }))) return false;
+    charge(bk.current);
+    return true;
+  };
+  /* free list nights: the same machine without paying (selecting → success) */
+  ctx.bookFree = (info) => {
+    if (freeBusy.current || !bk.current || bk.current.state !== 'selecting') return Promise.resolve(false);
+    freeBusy.current = true;
+    var b = Object.assign({}, bk.current, info);
+    var saved = b.dbNight ? Remote.book(b.ev, b.party.couples, b.party.stags, b.party.girls, null) : Promise.resolve(null);
+    return saved.then(
+      (booking) => {
+        freeBusy.current = false;
+        if (bkSend('FREE', info)) booked(b, null, booking);
+        return true;
+      },
+      (err) => {
+        freeBusy.current = false;
+        haptic.error();
+        toast(Remote.sayError(err));
+        return false;
+      }
+    );
+  };
+  function charge(b) {
+    Pay.charge({ rid: b.rid, amount: b.total, title: b.title, email: S.email, phone: S.phone }).then(
+      (r) => paid(b.rid, r.id),
+      (err) => failed(b.rid, err.message)
+    );
+  }
+  /* the bank said yes (from the payment itself or from asking again): a gathr night is then booked in the
+     database, once per request id, however many times the yes arrives */
+  function paid(rid, payId) {
+    var b = bk.current;
+    if (!b || b.rid !== rid || !inFlight(b) || saving.current[rid]) return;
+    if (!b.dbNight) {
+      if (bkSend('PAID', { payId: payId })) booked(b, payId, null);
+      return;
+    }
+    saving.current[rid] = true;
+    Remote.book(b.ev, b.party.couples, b.party.stags, b.party.girls, payId).then(
+      (booking) => {
+        if (bkSend('PAID', { payId: payId })) booked(b, payId, booking);
+      },
+      (err) => {
+        delete saving.current[rid];
+        // with real payments this case needs a refund: the server-side payment check (planned) closes it
+        failed(rid, Remote.sayError(err) + (payId && !/^test_/.test(payId) ? '. Your payment reference is ' + payId + '; we’ll refund it' : ''));
+      }
+    );
+  }
+  function failed(rid, why) {
+    var b = bk.current;
+    if (!b || b.rid !== rid) return;
+    if (bkSend('FAILED', { err: why || 'You haven’t been charged' })) haptic.error();
+  }
+  /* you're in: the pass, with the tick and the wristband (they play once, on the pass, for this booking) */
+  function booked(b, payId, booking) {
+    var earned = b.n >= 3 && b.total && !(booking && booking.guests) ? 50 : 0,
+      onSheet = live.current.sheet === 'list';
+    set((o) => ({
+      celebrate: b.rid || 'free_' + Date.now(),
+      onList: true,
+      planned: b.ev,
+      cur: b.ev,
+      guests: booking ? booking.passes : b.n,
+      sent: !!b.gpb,
+      sheet: onSheet ? null : o.sheet,
+      stack: onSheet ? o.stack.concat('pass') : o.stack,
+      dir: onSheet ? 'fwd' : o.dir,
+      payId: payId || null,
+      myBookings: booking ? Object.assign({}, o.myBookings, { [b.ev]: booking }) : o.myBookings,
+      credit: o.credit - (b.credit || 0) + earned,
+      gp: b.gpb ? Object.assign({}, o.gp, { stage: 'booked', booked: b.ev, fresh: false }) : o.gp,
+      gpBook: null
+    }));
+    // closed the sheet while it was paying: the answer still arrives, as a toast with the way to the pass
+    if (!onSheet)
+      toast(EVENTS[b.ev].rsvp || !b.total ? "You're on the list" : "You're in", {
+        label: 'Show pass',
+        run: () => go('pass', { cur: b.ev, toast: null })
+      });
+    if (earned) setTimeout(() => toast('+' + rupees(earned) + ' planner credit for booking your group'), 2400);
+  }
+  /* while paying: after 20 s with no answer, "Checking with your bank"; while pending, ask about the same request id
+     every few seconds; coming back to the app asks straight away. A restart mid-payment joins the same payment */
+  useEffect(() => {
+    var b = S.bk;
+    if (!inFlight(b)) return;
+    var stop = false,
+      timer = null,
+      poll = null;
+    function ask() {
+      Pay.status(b.rid).then((r) => {
+        if (stop) return;
+        if (r.status === 'paid') paid(b.rid, r.id);
+        else if (r.status === 'failed') failed(b.rid, 'Your bank declined it. You haven’t been charged');
+        else if (r.status === 'none') failed(b.rid, 'The payment never reached the bank. You haven’t been charged');
+      });
+    }
+    if (b.state === 'paying') timer = setTimeout(() => bkSend('TIMEOUT'), Math.max(0, b.at + PENDING_AFTER - Date.now()));
+    else poll = setInterval(ask, POLL_EVERY);
+    function back() {
+      if (document.visibilityState !== 'visible') return;
+      if (b.state === 'paying' && Date.now() - b.at >= PENDING_AFTER) bkSend('TIMEOUT');
+      ask();
+    }
+    document.addEventListener('visibilitychange', back);
+    return () => {
+      stop = true;
+      clearTimeout(timer);
+      clearInterval(poll);
+      document.removeEventListener('visibilitychange', back);
+    };
+  }, [S.bk && S.bk.state, S.bk && S.bk.rid]);
+  // opened mid-payment after a restart: rejoin the same payment (same request id, so no second charge)
+  useEffect(() => {
+    if (inFlight(bk.current) && bk.current.state === 'paying' && !Pay.live) charge(bk.current);
+  }, []);
+  /* closing the booking sheet (✕, scrim, Android back): while money may be moving it asks "Stop paying?" first */
+  ctx.closeSheet = () => {
+    if (S.sheet === 'list' && inFlight(bk.current)) {
+      set({ stopAsk: true });
+      return;
+    }
+    if (S.busy) return;
+    if (S.sheet === 'list' && bk.current && !inFlight(bk.current)) bkSend('CLOSE');
+    set({ sheet: null, stopAsk: false });
   };
   var screens = {
     hostdoor: HostDoor,
@@ -637,9 +810,8 @@ export function App() {
   /* Android back button and gesture: close what's open first, then go back a screen, then home, then leave */
   var hwBack = useRef(null);
   hwBack.current = (CapApp) => {
-    if (S.sheet) {
-      if (!S.busy) set({ sheet: null });
-    } else if (S.scanning) set({ scanning: false });
+    if (S.sheet) ctx.closeSheet();
+    else if (S.scanning) set({ scanning: false });
     else if (scr === 'map' && S.mapSel) set({ mapSel: null });
     // an expanded section closes before the screen does (All nights: "Not for your group")
     else if (scr === 'allnights' && S.anOpen && Object.values(S.anOpen).some(Boolean)) set({ anOpen: {} });
