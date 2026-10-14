@@ -129,8 +129,9 @@ export function note(t) {
 }
 
 /* a person without a photo: their initials, centred */
-export function fav(name, size) {
-  return <Avatar key={name} name={name} size={size || 40} />;
+/* a person's avatar: their picture when there is one, otherwise their initials */
+export function fav(name, size, image) {
+  return <Avatar key={name} name={name} image={image} size={size || 40} />;
 }
 
 export function statusChip(t, tone) {

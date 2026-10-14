@@ -8,12 +8,12 @@ export function PickCard(p) {
   var c = p.ctx;
   return (
     <div className="rel feature-wrap">
-      <Tap onClick={() => c.openEvent('twin')} className="tap" aria-label="This week's pick">
+      <Tap onClick={() => c.openEvent('epitomelive')} className="tap" aria-label="This week's pick">
         <FeatureCard
-          image={EVENTS.twin.img}
-          kicker="Pick of the fortnight · Fri 9 Oct"
+          image={EVENTS.epitomelive.img}
+          kicker={'Pick of the fortnight · ' + EVENTS.epitomelive.date}
           kickerIcon="sparkles"
-          title="Twin Strings live at Epitome"
+          title="Sunday Morning live at Epitome"
           action="See the night"
           ctaSpan
         />

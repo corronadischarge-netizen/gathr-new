@@ -58,9 +58,10 @@ export function Search(p) {
     });
   }
   var artists = [
-    ['Twin Strings', 'Indie pop, soft rock · 9 Oct at Epitome', 'twin'],
-    ['The Yellow Diary', 'Live band · 4 Oct at KOPA Mall', 'yellow']
-  ].filter((a) => !q || (a[0] + a[1]).toLowerCase().indexOf(q) >= 0);
+    ['The Offspring', 'Live rock · ' + (EVENTS.millerssessions || {}).date + ' at The Millers', 'millerssessions'],
+    ['Fireboy DML', 'Afrobeats, live · ' + (EVENTS.desidrop || {}).date + ' at Xclusive Superclub', 'desidrop'],
+    ['Andre Power', 'Hip-hop DJ · ' + EVENTS.kikiafterdark.date + ' at Kiki', 'kikiafterdark']
+  ].filter((a) => EVENTS[a[2]]).filter((a) => !q || (a[0] + a[1]).toLowerCase().indexOf(q) >= 0);
   return (
     <div className="col" style={{ padding: '52px 0 140px', gap: '24px' }}>
       <div className="px col" style={{ gap: '8px' }}>
@@ -186,8 +187,8 @@ export function Search(p) {
               {'Nothing for ‘' + S.query.trim() + '’. Try an artist or an area'}
             </p>
             <div className="wrap">
-              {['Twin Strings'].concat(AREA_LIST.slice(0, 4)).map((x) => (
-                <Chip key={x} icon={x === 'Twin Strings' ? 'music-2' : 'map-pin'} onClick={() => fill(x)}>
+              {['The Offspring'].concat(AREA_LIST.slice(0, 4)).map((x) => (
+                <Chip key={x} icon={x === 'The Offspring' ? 'music-2' : 'map-pin'} onClick={() => fill(x)}>
                   {x}
                 </Chip>
               ))}

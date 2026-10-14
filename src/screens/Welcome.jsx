@@ -146,7 +146,7 @@ export function Welcome(p) {
             <i style={{ transform: 'translateX(-40%)' }} />
           </div>
           <div className="plan-crew" style={{ marginTop: '6px' }}>
-            {['Zoya', 'Aman', 'Kavya', 'Kabir'].map((n) => fav(n, 32))}
+            {['Dev', 'Arjun', 'Meera', 'Kabir'].map((n) => fav(n, 32))}
           </div>
         </div>
         <span className="w-tag" style={{ '--d': '200ms', left: '150px', top: '6px' }}>

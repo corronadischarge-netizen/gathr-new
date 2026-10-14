@@ -77,7 +77,7 @@ export function Plans(p) {
   );
 }
 
-/* the nights you've been to, newest first: yours, then sample ones while you have none */
+/* the nights you've been to, newest first (the demo account's come from the demo; nobody else gets sample ones) */
 export function pastNights(S) {
   var mine = (S.pastNights || []).concat(
       Object.keys(S.myBookings || {}).filter((k) => EVENTS[k] && isPast(EVENTS[k]))
@@ -86,7 +86,7 @@ export function pastNights(S) {
     list = mine
       .filter((k) => EVENTS[k] && !seen[k] && (seen[k] = 1))
       .map((k) => ({ id: k, sample: false }));
-  if (!list.length)
+  if (!list.length && S.demo)
     list = Object.keys(EVENTS)
       .filter((k) => isPast(EVENTS[k]) && !EVENTS[k].org)
       .sort((a, b) => new Date(EVENTS[b].iso) - new Date(EVENTS[a].iso))

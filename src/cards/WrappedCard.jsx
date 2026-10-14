@@ -18,7 +18,7 @@ export function WrappedCard(p) {
       <div className="wc-grid">
         <div>
           <span className="wc-k">Top venue</span>
-          <span className="wc-v">Kukoo</span>
+          <span className="wc-v">The Millers</span>
         </div>
         <div>
           <span className="wc-k">Top sound</span>
@@ -26,7 +26,7 @@ export function WrappedCard(p) {
         </div>
         <div>
           <span className="wc-k">Your crew</span>
-          <span className="wc-v">{'Zoya & Aman'}</span>
+          <span className="wc-v">{'Dev & Arjun'}</span>
         </div>
         <div>
           <span className="wc-k">Status</span>

@@ -1,4 +1,5 @@
 import { orgSave } from '../data/organisers';
+import { demoGuest } from '../data/demo';
 import { Wordmark } from '../design-system';
 import { TABS } from '../navigation';
 
@@ -22,12 +23,12 @@ function jumpToHosting(c, key) {
       c,
       Object.assign({}, c.S.org, {
         profile: {
-          name: 'Kukoo',
+          name: 'The Game Palacio',
           type: 'venue',
-          venueId: 'kukoo',
-          venueIds: ['kukoo'],
+          venueId: 'palacio',
+          venueIds: ['palacio'],
           newVenue: null,
-          insta: 'kukoo.pune',
+          insta: 'thegamepalacio',
           phone: '',
           status: 'pending',
           since: new Date().toISOString()
@@ -114,7 +115,7 @@ export function ReviewPanel(p) {
               if (it[0] === 'rules' || it[0] === 'list' || it[0] === 'poster' || it[0] === 'friends')
                 c.set({
                   stack: ['tonight', 'event'],
-                  cur: it[0] === 'friends' ? 'illegal' : c.S.cur,
+                  cur: it[0] === 'friends' ? 'bollywoodbash' : c.S.cur,
                   sheet: it[0],
                   dir: 'fwd'
                 });
@@ -123,7 +124,7 @@ export function ReviewPanel(p) {
               else if (it[0] === 'agecheck')
                 c.set({
                   stack: ['tonight', 'event'],
-                  cur: 'twin',
+                  cur: 'epitomelive',
                   age: null,
                   sheet: 'age',
                   after: null,
@@ -132,16 +133,16 @@ export function ReviewPanel(p) {
               else if (it[0] === 'newplan')
                 c.set({
                   stack: ['plans', 'newplan'],
-                  draft: { opts: ['lavish'], deadline: 'Thu 6 pm', name: 'Friday plan' },
+                  draft: { opts: ['unscrupulousfriday'], deadline: 'Thu 6 pm', name: 'Friday plan' },
                   sheet: null,
                   dir: 'fwd'
                 });
               else if (it[0] === 'groupbooked')
                 c.set((o) => ({
                   stack: ['plans', 'group'],
-                  gp: Object.assign({}, o.gp, { stage: 'booked', booked: 'lavish' }),
-                  planned: 'lavish',
-                  cur: 'lavish',
+                  gp: Object.assign({}, o.gp || demoGuest().gp, { stage: 'booked', booked: 'unscrupulousfriday', demo: true }),
+                  planned: 'unscrupulousfriday',
+                  cur: 'unscrupulousfriday',
                   guests: 5,
                   sent: true,
                   onList: true,

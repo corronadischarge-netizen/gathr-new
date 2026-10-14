@@ -7,7 +7,7 @@ const T = Date.parse('2026-10-16T13:00:00+05:30'); // Fri 1 pm, India time
 const H = 3600000;
 function plan(x) {
   return Object.assign(
-    { name: 'Friday plan', opts: ['a', 'b', 'c'], votes: { a: [], b: [], c: [] }, members: ['Zoya', 'Aman', 'Kavya'], stage: 'draft' },
+    { name: 'Friday plan', opts: ['a', 'b', 'c'], votes: { a: [], b: [], c: [] }, members: ['Dev', 'Arjun', 'Meera'], stage: 'draft' },
     x
   );
 }
@@ -30,15 +30,15 @@ test('voting → vote / change vote → voting; others\' votes arrive (REMOTE); 
   var gp = planStep(plan(), 'SHARE', { nights: [] }, T);
   assert.equal(planStep(gp, 'VOTE', { id: 'b' }, T).stage, 'voting');
   assert.equal(planStep(gp, 'VOTE', { id: 'zzz' }, T), null);
-  gp = planStep(gp, 'REMOTE', { votes: { a: ['Zoya'], b: ['Aman', ME] } }, T);
+  gp = planStep(gp, 'REMOTE', { votes: { a: ['Dev'], b: ['Arjun', ME] } }, T);
   var t = tally(gp, 'b');
-  assert.deepEqual(t.b, ['Aman', ME]);
+  assert.deepEqual(t.b, ['Arjun', ME]);
   assert.deepEqual(leaders(gp, 'b'), ['b']);
   assert.deepEqual(leaders(gp, 'a'), ['a']);
 });
 
 test('voting → deadline or planner closes → closed, winner = most votes', () => {
-  var gp = planStep(planStep(plan(), 'SHARE', {}, T), 'REMOTE', { votes: { a: ['Zoya', 'Aman'], b: ['Kavya'] } }, T);
+  var gp = planStep(planStep(plan(), 'SHARE', {}, T), 'REMOTE', { votes: { a: ['Dev', 'Arjun'], b: ['Meera'] } }, T);
   var c = planStep(gp, 'CLOSE', { me: 'a' }, T);
   assert.equal(c.stage, 'closed');
   assert.equal(c.winner, 'a');
@@ -46,7 +46,7 @@ test('voting → deadline or planner closes → closed, winner = most votes', ()
 });
 
 test('a tie → the planner picks from the tied nights only', () => {
-  var gp = planStep(planStep(plan(), 'SHARE', {}, T), 'REMOTE', { votes: { a: ['Zoya'], b: ['Aman'] } }, T);
+  var gp = planStep(planStep(plan(), 'SHARE', {}, T), 'REMOTE', { votes: { a: ['Dev'], b: ['Arjun'] } }, T);
   var c = planStep(gp, 'CLOSE', {}, T);
   assert.deepEqual(c.tied, ['a', 'b']);
   assert.equal(c.winner, null);
@@ -58,7 +58,7 @@ test('a tie → the planner picks from the tied nights only', () => {
 });
 
 test('closed → planner taps Book → booking → success → booked; closing the sheet goes back to closed', () => {
-  var c = planStep(planStep(planStep(plan(), 'SHARE', {}, T), 'REMOTE', { votes: { a: ['Zoya'] } }, T), 'CLOSE', {}, T);
+  var c = planStep(planStep(planStep(plan(), 'SHARE', {}, T), 'REMOTE', { votes: { a: ['Dev'] } }, T), 'CLOSE', {}, T);
   var b = planStep(c, 'BOOK', {}, T);
   assert.equal(b.stage, 'booking');
   assert.equal(planStep(b, 'BACK', {}, T).stage, 'closed');
@@ -80,15 +80,15 @@ test('voting → planner cancels → cancelled, undoable for 5 s only', () => {
 });
 
 test('any → a member leaves → same stage, count updated, their vote gone; undoable for 5 s', () => {
-  var gp = planStep(planStep(plan(), 'SHARE', {}, T), 'REMOTE', { votes: { a: ['Zoya', 'Aman'] } }, T);
-  var l = planStep(gp, 'LEAVE', { who: 'Aman' }, T);
+  var gp = planStep(planStep(plan(), 'SHARE', {}, T), 'REMOTE', { votes: { a: ['Dev', 'Arjun'] } }, T);
+  var l = planStep(gp, 'LEAVE', { who: 'Arjun' }, T);
   assert.equal(l.stage, 'voting');
   assert.equal(l.members.length, 2);
-  assert.deepEqual(l.votes.a, ['Zoya']);
-  var back = planStep(l, 'UNDO_LEAVE', { who: 'Aman' }, T + 4000);
+  assert.deepEqual(l.votes.a, ['Dev']);
+  var back = planStep(l, 'UNDO_LEAVE', { who: 'Arjun' }, T + 4000);
   assert.equal(back.members.length, 3);
-  assert.deepEqual(back.votes.a, ['Zoya', 'Aman']);
-  assert.equal(planStep(l, 'UNDO_LEAVE', { who: 'Aman' }, T + UNDO_FOR + 1), null);
+  assert.deepEqual(back.votes.a, ['Dev', 'Arjun']);
+  assert.equal(planStep(l, 'UNDO_LEAVE', { who: 'Arjun' }, T + UNDO_FOR + 1), null);
   ['closed', 'booking', 'booked'].forEach((s) => assert.equal(PLAN[s].LEAVE, s));
 });
 

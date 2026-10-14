@@ -1,31 +1,13 @@
 import { reportCount } from '../services/guestReports';
+import { DEMO } from './listings';
 
 /* Door rules for every night, in one shape (home spec 5.2), for getDoorVerdict().
-   Listed nights (District, Sort My Scene) only publish an age limit and sometimes a dress line; the rest below is
+   Listed nights only publish an age limit and sometimes a dress line; the rest below is
    SAMPLE data (sample: true) until gathr calls venues or guests answer, and screens label it "Sample data".
    Nights hosted on gathr use what the host set in the night form. */
 
-/* SAMPLE: what gathr's calls and guests' answers might say, so every verdict state shows up */
-const SAMPLE = {
-  illegal: { stag: 'fee', stagFee: 500, source: 'guests', guestAnswers: 12 },
-  gossip: { stag: 'not_allowed', source: 'gathr', checkedAt: '2026-10-09' },
-  dearwed: { stag: 'allowed', source: 'gathr', checkedAt: '2026-10-10' },
-  twilight: { stag: 'allowed', arriveBy: '22:30', source: 'guests', guestAnswers: 7 },
-  lavish: { stag: 'couples_only', dress: 'Formals', dressStrict: true, source: 'gathr', checkedAt: '2026-10-08' },
-  bollywood: { stag: 'allowed', source: 'gathr', checkedAt: '2026-10-11' },
-  scandalous: { stag: 'allowed', mixedOnly: true, source: 'gathr', checkedAt: '2026-08-20' },
-  twin: { stag: 'allowed', arriveBy: '22:00', source: 'gathr', checkedAt: '2026-10-10' },
-  resign: { stag: 'fee', stagFee: 1000, dressStrict: true, source: 'guests', guestAnswers: 3 },
-  ladiesnight: { stag: 'not_allowed', source: 'gathr', checkedAt: '2026-10-12' },
-  offmenu: { stag: 'allowed', source: 'gathr', checkedAt: '2026-10-07' },
-  basstapri: { mixedOnly: true, stag: 'allowed', source: 'guests', guestAnswers: 9 },
-  jamming: { stag: 'allowed', source: 'guests', guestAnswers: 6 },
-  dandiyaunited: { stag: 'allowed', source: 'gathr', checkedAt: '2026-10-11' },
-  royalraas: { stag: 'couples_only', source: 'gathr', checkedAt: '2026-10-11' },
-  punedandiya: { stag: 'allowed', source: 'gathr', checkedAt: '2026-10-12' },
-  jasmin: { stag: 'fee', stagFee: 1000, arriveBy: '23:00', source: 'gathr', checkedAt: '2026-10-12' }
-  // yellow, drexo, chuckberry: nothing known yet beyond the listing
-};
+/* SAMPLE: what gathr's calls and guests' answers might say, so every verdict state shows up (the demo set, data/demo.js) */
+const SAMPLE = DEMO.door;
 
 /* the host form's stag choice → the door's stag rule */
 const HOST_STAG = { welcome: 'allowed', groups: 'allowed', none: 'not_allowed', fee: 'fee', couples: 'couples_only' };

@@ -1,8 +1,11 @@
 import { useEffect, useRef, useState } from 'react';
 import { IMAGES_3D } from '../assets/images';
+import { DEMO_REQUEST } from '../data/demo';
+import { friendPhoto, friendRequest } from '../data/friends';
 import { EVENTS, VENUES } from '../data/listings';
 import { IconButton, Update, UpdateGroup } from '../design-system';
 import { now } from '../lib/clock';
+import { closesText } from '../lib/plan';
 import { haptic } from '../lib/haptics';
 import { ms, useFlip } from '../lib/motion';
 import { optimistic } from '../lib/optimistic';
@@ -118,46 +121,50 @@ export function Notifs(p) {
     );
   });
 
-  /* ---- sample updates (no live feed for these yet) ---- */
-  if (S.saved.twin) {
+  /* ---- sample updates for the demo account (no live feed for these yet): a friend request, and the host's
+     night in review (specs/demo-data.md section 7) ---- */
+  var req = friendRequest(S) || (done.indexOf('s:req') >= 0 ? DEMO_REQUEST : null),
+    accepted = done.indexOf('s:req') >= 0;
+  if (req) {
     sample = true;
     rows.push({
-      id: 's:twin',
-      kind: 'chance',
-      title: 'Twin Strings: few left',
-      meta: 'Fri 9 Oct · ₹1,299',
-      time: '5h',
-      action: 'Book',
-      object: nightObject(EVENTS.twin),
-      onAction: () => c.openEvent('twin', 'list')
-    });
-  }
-  var accepted = done.indexOf('s:ishaan') >= 0;
-  if (!S.ishaan || accepted) {
-    sample = true;
-    rows.push({
-      id: 's:ishaan',
+      id: 's:req',
       kind: 'decide',
       done: accepted,
-      title: 'Ishaan wants to be friends',
-      meta: accepted ? 'You’re friends now' : 'Joined from your plan link',
+      title: req.name + ' wants to add you as a friend',
+      meta: accepted ? 'You’re friends now' : 'Met you at Reggaeton Sundays',
       time: '1d',
-      name: 'Ishaan',
+      name: req.name,
+      image: req.photo,
       onAccept: () =>
         optimistic(c, {
           apply: () => {
-            c.set({ ishaan: 'yes' });
-            setDone((d) => d.concat('s:ishaan'));
+            c.set({ friendReq: 'yes' });
+            setDone((d) => d.concat('s:req'));
             haptic.success();
           },
           sync: () => new Promise((ok) => setTimeout(ok, 300)), // sample: no friends service yet
           rollback: () => {
-            c.set({ ishaan: null });
-            setDone((d) => d.filter((k) => k !== 's:ishaan'));
+            c.set({ friendReq: null });
+            setDone((d) => d.filter((k) => k !== 's:req'));
           }
         }),
       onDecline: () =>
-        decline('s:ishaan', () => c.set({ ishaan: 'no' }), 'Request declined. Ishaan won’t be told', () => c.set({ ishaan: null }))
+        decline('s:req', () => c.set({ friendReq: 'no' }), 'Request declined. ' + req.name + ' won’t be told', () => c.set({ friendReq: null }))
+    });
+  }
+  var inReview = S.demo && S.org && S.org.demo && (S.org.events || []).filter((o) => o.status === 'review')[0];
+  if (inReview) {
+    sample = true;
+    rows.push({
+      id: 's:review:' + inReview.id,
+      kind: 'info',
+      title: inReview.title + ' is in review',
+      meta: (S.org.profile || {}).name + ' · usually under a day',
+      time: '4h',
+      icon: 'clock',
+      tone: 'wait',
+      onOpen: () => c.set({ stack: ['you', 'orghome', 'orgevent'], orgView: inReview.id, dir: 'fwd' })
     });
   }
   /* your plan's news: who voted, who left (from the plan's polling) */
@@ -176,7 +183,8 @@ export function Notifs(p) {
   /* the day after a night you went to: one tap, opens the card (spec 6.12; on the phone this is the morning push) */
   var last = pastNights(S).filter((x) => !x.sample)[0],
     le = last && EVENTS[last.id],
-    asked = le && now() - new Date(le.iso).getTime() < 48 * 3600000 && !((S.dayAfter || {})[le.id] || {}).done;
+    // 48 hours from when the night ended (about 5 hours after it started)
+    asked = le && now() - new Date(le.iso).getTime() < 53 * 3600000 && !((S.dayAfter || {})[le.id] || {}).done;
   if (asked)
     rows.push({
       id: 'd:' + le.id,
@@ -187,32 +195,45 @@ export function Notifs(p) {
       object: nightObject(le),
       onAction: () => c.go('recap', { recapId: le.id })
     });
-  if (S.gp && S.gp.stage === 'voting' && !news.length) {
+  /* the demo plan: a friend's vote, and yours still to give */
+  var firstVote = S.gp && S.gp.stage === 'voting' && !news.length && S.gp.demo && (S.gp.opts || []).filter((k) => (S.gp.votes[k] || []).length)[0];
+  if (firstVote && EVENTS[firstVote]) {
+    var voter = S.gp.votes[firstVote][0];
     sample = true;
-    rows.push({
-      id: 's:vote',
-      kind: 'info',
-      title: 'Zoya voted for Lavish Friday',
-      meta: 'Voting closes ' + S.gp.deadline,
-      time: '1h',
-      name: 'Zoya',
-      onOpen: () => c.go('group')
-    });
+    rows.push(
+      Object.assign(
+        { id: 's:vote', title: voter + ' voted for ' + EVENTS[firstVote].title, time: '1h', name: voter, image: friendPhoto(voter) },
+        S.vote
+          ? { kind: 'info', meta: S.gp.name + ' · ' + closesText(S.gp, now()), onOpen: () => c.go('group') }
+          : { kind: 'task', action: 'Vote', meta: S.gp.name + ' · ' + closesText(S.gp, now()), onAction: () => c.go('group') }
+      )
+    );
   }
+  /* earlier: friends' nights (demo) */
+  if (S.demo)
+    [
+      ['Kabir', 'desidrop', '6h'],
+      ['Tanvi', 'epitomelive', '1d']
+    ].forEach((x) => {
+      var e = EVENTS[x[1]];
+      if (!e) return;
+      sample = true;
+      rows.push({ id: 's:going:' + x[1], kind: 'info', title: x[0] + ' is going to ' + e.title, meta: e.date, time: x[2], name: x[0], image: friendPhoto(x[0]), onOpen: () => c.openEvent(x[1]) });
+    });
   Object.keys(S.follow).forEach((f) => {
     sample = true;
     rows.push({
       id: 's:follow:' + f,
       kind: 'info',
       title: f + ' announced a new night',
-      meta: EVENTS.twin.date,
+      meta: EVENTS.millerssessions.date,
       time: '3h',
-      object: nightObject(EVENTS.twin),
-      onOpen: () => c.openEvent('twin')
+      object: nightObject(EVENTS.millerssessions),
+      onOpen: () => c.openEvent('millerssessions')
     });
   });
-  if (!asked) sample = true;
-  if (!asked) rows.push({
+  if (!asked && S.demo) sample = true;
+  if (!asked && S.demo) rows.push({
     id: 's:rate',
     kind: 'info',
     title: 'Rate your last night',

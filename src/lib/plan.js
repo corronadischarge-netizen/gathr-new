@@ -9,7 +9,7 @@ const IST = 330 * 60000,
   HOUR = 3600000,
   MIN = 60000;
 export const UNDO_FOR = 5000; // cancelling and leaving can be undone for 5 s
-export const ME = 'Riya'; // the sample "you" in the plan's lists
+export const ME = 'You'; // you, in the plan's lists (votes and members are first names; yours is "You")
 
 export const PLAN = {
   draft: { SHARE: 'voting', CANCEL: 'cancelled' },

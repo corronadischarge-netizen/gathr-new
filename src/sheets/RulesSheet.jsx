@@ -99,7 +99,7 @@ export function RulesSheet(p) {
       >
         Ask gathr to check with the venue
       </Button>
-      {e.org ? null : (
+      {e.org || !e.url ? null : (
         <a
           className="rule-link"
           style={{ justifyContent: 'center', fontSize: '13px', color: 'var(--ink-muted)' }}

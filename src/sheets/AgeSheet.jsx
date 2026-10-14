@@ -1,5 +1,5 @@
 import { blockedFor, priceTxt } from '../data/format';
-import { EVENTS } from '../data/listings';
+import { EVENTS, upcoming } from '../data/listings';
 import { Button, Chip, Sheet } from '../design-system';
 import { icon, meta, note, thumb } from '../ui/helpers';
 import { Tap } from '../ui/Tap';
@@ -9,6 +9,8 @@ export function AgeSheet(p) {
   var c = p.ctx,
     S = c.S,
     e = c.ev,
+    // an 18+ night to try instead: the next one coming up
+    alt = EVENTS[upcoming().filter((k) => (EVENTS[k].age || 18) < 21)[0]],
     close = () => {
       c.set({ sheet: null });
     };
@@ -42,20 +44,20 @@ export function AgeSheet(p) {
           ))}
         </div>
       )}
-      {blocked ? (
+      {blocked && alt ? (
         <div className="col" style={{ gap: '10px' }}>
           <Tap
             onClick={() => {
               c.set({ sheet: null });
-              c.openEvent('yellow');
+              if (alt) c.openEvent(alt.id);
             }}
             className="tap rowc g-card card"
             style={{ gap: '12px' }}
           >
-            {thumb(EVENTS.yellow, 48)}
+            {thumb(alt, 48)}
             <div className="col" style={{ gap: '2px', flexGrow: 1 }}>
-              <span className="title15">{'Try ' + EVENTS.yellow.title}</span>
-              {meta('18+ · ' + EVENTS.yellow.date + ' · ' + priceTxt(EVENTS.yellow))}
+              <span className="title15">{'Try ' + alt.title}</span>
+              {meta('18+ · ' + alt.date + ' · ' + priceTxt(alt))}
             </div>
             {icon('chevron-right')}
           </Tap>

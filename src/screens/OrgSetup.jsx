@@ -93,7 +93,7 @@ export function OrgSetup(p) {
             id="og-name"
             value={F.name}
             maxLength={40}
-            placeholder="Kukoo, or Techno Tuesdays"
+            placeholder="The Game Palacio, or Techno Tuesdays"
             onChange={(e) => upd({ name: e.target.value })}
           />
         </div>

@@ -7,7 +7,7 @@ const YES = { state: 'yes', text: 'Lets you in · 21+', icon: 'check' };
 const IF = { state: 'if', text: 'Formals only', icon: 'shirt' };
 const UNK = { state: 'unknown', text: 'Stag rules unknown', icon: 'info' };
 const NO = { state: 'no', text: 'Couples only', icon: 'x' };
-const FACES = [{ name: 'Zoya' }, { name: 'Aman' }, { name: 'Kavya' }, { name: 'Kabir' }];
+const FACES = [{ name: 'Dev' }, { name: 'Arjun' }, { name: 'Meera' }, { name: 'Kabir' }];
 
 function Sec(p) {
   return (
@@ -59,12 +59,12 @@ export function DsPreview(p) {
 
       <Sec title="NightTile · tile" sample>
         <NightRail title="Tonight · 9 more" seeAllLabel="See all" onSeeAll={() => c.toast('Opens All nights')} total={12}>
-          <NightTile key="a" image={img('dandiyaunited')} name="Dandiya United (East Pune)" venue="The Mills" time="6 pm" price="₹100" crowd="buzzing" verdict={YES} onClick={tap} />
-          <NightTile key="b" image={img('twin')} name="Twin Strings: Karwaan Tour" venue="Epitome" time="9:30 pm" price="₹1,299" crowd="warming" verdict={IF} badge="Promoted" onClick={tap} />
-          <NightTile key="c" image={img('jamming')} name="Jamming Night" venue="Kurry Leaf" time="8 pm" price="₹299" crowd="packed" verdict={UNK} badge="Live" onClick={tap} />
-          <NightTile key="d" name="A night with no organiser image" venue="Plunge" time="9 pm" crowd="quiet" verdict={YES} onClick={tap} />
-          <NightTile key="e" image={img('punedandiya')} name="Pune’s Biggest Dandiya Nights" venue="Mahalaxmi Lawns" time="7 pm" price="₹1,000" crowd="full" verdict={YES} onClick={tap} />
-          <NightTile key="f" image={img('royalraas')} name="Royal Raas 2.0" venue="Kurry Leaf" time="6 pm" price="Free" crowd="warming" verdict={NO} onClick={tap} />
+          <NightTile key="a" image={img('sunsetsession')} name="Sunset Session" venue="High Spirits" time="6 pm" price="₹100" crowd="buzzing" verdict={YES} onClick={tap} />
+          <NightTile key="b" image={img('rooftopafterdark')} name="Rooftop After Dark" venue="Toyroom" time="9:30 pm" price="₹1,299" crowd="warming" verdict={IF} badge="Promoted" onClick={tap} />
+          <NightTile key="c" image={img('unscrupulousfriday')} name="Unscrupulous Friday" venue="2BHK Diner & Key Club" time="8 pm" price="₹299" crowd="packed" verdict={UNK} badge="Live" onClick={tap} />
+          <NightTile key="d" name="A night with no organiser image" venue="Kiki" time="9 pm" crowd="quiet" verdict={YES} onClick={tap} />
+          <NightTile key="e" image={img('empiresaturdays')} name="Sambuca Saturdays" venue="Bastian Empire" time="7 pm" price="₹1,000" crowd="full" verdict={YES} onClick={tap} />
+          <NightTile key="f" image={img('dimoraladiesnight')} name="Classico" venue="Dimora Dance & Kitchen" time="6 pm" price="Free" crowd="warming" verdict={NO} onClick={tap} />
           <NightTile key="g" loading />
         </NightRail>
         <p className="meta px" style={{ margin: 0 }}>
@@ -74,10 +74,10 @@ export function DsPreview(p) {
 
       <Sec title="NightTile · row" sample>
         <div className="px col">
-          <NightTile layout="row" image={img('dandiyaunited')} name="Dandiya United (East Pune)" venue="The Mills" distance="15 min" time="6 pm" price="₹100" crowd="buzzing" verdict={YES} onClick={tap} />
-          <NightTile layout="row" image={img('twin')} name="Twin Strings: Karwaan Tour" venue="Epitome" distance="25 min" time="9:30 pm" price="₹1,299" crowd="warming" verdict={IF} onClick={tap} />
-          <NightTile layout="row" name="A night with no organiser image" venue="Plunge" distance="10 min" time="9 pm" crowd="quiet" verdict={UNK} onClick={tap} />
-          <NightTile layout="row" image={img('royalraas')} name="Royal Raas 2.0" venue="Kurry Leaf" distance="35 min" time="6 pm" price="Free" crowd="full" verdict={NO} onClick={tap} />
+          <NightTile layout="row" image={img('sunsetsession')} name="Sunset Session" venue="High Spirits" distance="15 min" time="6 pm" price="₹100" crowd="buzzing" verdict={YES} onClick={tap} />
+          <NightTile layout="row" image={img('rooftopafterdark')} name="Rooftop After Dark" venue="Toyroom" distance="25 min" time="9:30 pm" price="₹1,299" crowd="warming" verdict={IF} onClick={tap} />
+          <NightTile layout="row" name="A night with no organiser image" venue="Kiki" distance="10 min" time="9 pm" crowd="quiet" verdict={UNK} onClick={tap} />
+          <NightTile layout="row" image={img('dimoraladiesnight')} name="Classico" venue="Dimora Dance & Kitchen" distance="35 min" time="6 pm" price="Free" crowd="full" verdict={NO} onClick={tap} />
           <NightTile layout="row" loading />
         </div>
       </Sec>
@@ -86,7 +86,7 @@ export function DsPreview(p) {
         <div className="px col" style={{ gap: 'var(--space-3)' }}>
           <GroupPill state="plan-vote" people={FACES} title="Friday plan" line="Your vote · closes 8 pm" onOpen={() => c.toast('Opens the plan')} />
           <GroupPill state="plan-vote" people={FACES} title="Friday plan" line="Waiting on Kabir · 8 pm" onOpen={() => c.toast('Opens the plan')} />
-          <GroupPill state="plan-booked" people={FACES} title="Bollywood Night · Fri" line="You're in with Zoya, Aman + 2" onOpen={() => c.toast('Opens the pass')} />
+          <GroupPill state="plan-booked" people={FACES} title="Bollywood Night · Fri" line="You're in with Dev, Arjun + 2" onOpen={() => c.toast('Opens the pass')} />
           <GroupPill state="group-set" people={[{ name: c.S.me.name || 'You' }]} title="You + 3 guys" onOpen={() => c.toast('Opens Going as')} />
           <GroupPill state="group-unset" title="Who's going?" line="Add your group" onOpen={() => c.toast('Opens Going as')} />
         </div>

@@ -147,14 +147,26 @@ export function waitingLine(names, when) {
   return 'Waiting on ' + who + (when ? ' · ' + when : '');
 }
 
-/* who you're going with to a night you booked, for its StoryCard: you first, then the plan's members (a plan booking)
-   or the friends you picked in Going as. Four faces at most */
+/* who you're going with to a night you booked, for its StoryCard: you first, then the plan's members (a plan booking),
+   the friends on the booking, or the friends you picked in Going as. Four faces at most */
 export function goingWith(S, evId) {
   var me = { name: (S.me && S.me.name) || 'You', image: S.me && S.me.photo },
     gp = S.gp,
+    bk = (S.myBookings || {})[evId],
     names =
       gp && gp.stage === 'booked' && gp.booked === evId
         ? gp.members
-        : ((currentGroup(S) || {}).friends || []).map((f) => f.name);
+        : bk && bk.with && bk.with.length
+          ? bk.with
+          : ((currentGroup(S) || {}).friends || []).map((f) => f.name);
   return [me].concat(names.map((n) => ({ name: firstName(n) }))).slice(0, 4);
+}
+
+/* "You're in with Dev, Arjun + 1": the friends on a booking (two at most), then everyone else on it.
+   passes: the booking's passes, you included */
+export function inWithLine(start, names, passes) {
+  var shown = (names || []).slice(0, 2).map(firstName),
+    more = Math.max(0, (passes || 1) - 1 - shown.length);
+  if (!shown.length) return start;
+  return start + ' with ' + shown.join(', ') + (more ? ' + ' + more : '');
 }

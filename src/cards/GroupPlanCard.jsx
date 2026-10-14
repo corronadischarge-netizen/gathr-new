@@ -31,7 +31,7 @@ export function GroupPlanCard(p) {
                 S.gp.deadline}
         </span>
         <div className="plan-crew">
-          {['Zoya', 'Aman', 'Kavya', 'Kabir'].map((n) => (
+          {['Dev', 'Arjun', 'Meera', 'Kabir'].map((n) => (
             <Avatar key={n} name={n} size={36} />
           ))}
           <span className="plan-go">

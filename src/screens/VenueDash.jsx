@@ -6,7 +6,7 @@ import { eyebrow, i3, meta, note, stop } from '../ui/helpers';
 /* Venue view: what a venue sees (for pitching) */
 export function VenueDash(p) {
   var c = p.ctx,
-    e = EVENTS.illegal;
+    e = EVENTS.bollywoodbash;
   var stats = [
     ['184', 'booked via gathr this week'],
     ['83%', 'checked in at the door'],
@@ -36,7 +36,7 @@ export function VenueDash(p) {
       </div>
       <div className="rel">
         {i3('spotlight', 88, 'head-ic bob')}
-        {eyebrow('Kukoo · The Mills')}
+        {eyebrow('The Game Palacio · The Mills')}
         {stop('your week on gathr')}
       </div>
       <div className="dash-grid">
@@ -73,7 +73,7 @@ export function VenueDash(p) {
           />
           <div className="col" style={{ gap: '2px', flexGrow: 1 }}>
             <span className="title15">{e.title}</span>
-            {meta('Thu 1 Oct · Kukoo · ₹500')}
+            {meta(e.date + ' · The Game Palacio · ₹' + e.price)}
           </div>
         </div>
         {places.map((x) => (

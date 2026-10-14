@@ -1,6 +1,7 @@
+import { friendPhoto } from '../data/friends';
 import { BeforeYouGoCard } from '../cards/BeforeYouGoCard';
 import { APP_URL } from '../config';
-import { VENUES } from '../data/listings';
+import { VENUES, nightCrowd, onNow } from '../data/listings';
 import { ActionBar, CrowdMeter, IconButton } from '../design-system';
 import { shareToast } from '../lib/utils';
 import { Share } from '../services/share';
@@ -49,10 +50,10 @@ export function Ready(p) {
       </div>
       <div>
         {eyebrow(e.date + ' · ' + v.name)}
-        {stop('starts at ' + e.time)}
+        {stop(onNow(e) ? 'on now' : 'starts at ' + e.time)}
       </div>
       <div className="rowc" style={{ gap: '8px' }}>
-        <CrowdMeter booked={v.booked} cap={v.cap} level={v.crowd} />
+        <CrowdMeter booked={nightCrowd(e).booked} cap={nightCrowd(e).cap} level={nightCrowd(e).level} />
       </div>
       {grp ? (
         <div className="col" style={{ gap: '14px' }}>
@@ -60,7 +61,7 @@ export function Ready(p) {
           <div className="crew">
             {S.gp.members.map((n) => (
               <div key={n} className="crew-item">
-                {fav(n, 56)}
+                {fav(n, 56, friendPhoto(n))}
                 <span className="meta" style={{ color: 'var(--ink)' }}>
                   {n}
                 </span>

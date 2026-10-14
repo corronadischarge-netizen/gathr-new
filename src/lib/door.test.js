@@ -40,10 +40,10 @@ test('group maths: stags, couples, label, age phrase', () => {
 });
 
 test('a plan fills the group: everyone who joined plus you', () => {
-  var g = groupFromPlan({ members: ['Zoya', 'Aman', 'Kavya', 'Kabir'], groupType: 'guys' });
+  var g = groupFromPlan({ members: ['Dev', 'Arjun', 'Meera', 'Kabir'], groupType: 'guys' });
   assert.equal(g.size, 5);
   assert.equal(g.source, 'plan');
-  assert.equal(groupLabel(groupFromPlan({ members: ['Zoya', 'Aman'] })), '3 friends');
+  assert.equal(groupLabel(groupFromPlan({ members: ['Dev', 'Arjun'] })), '3 friends');
 });
 
 test('guys: stags OK → yes, with what to bring', () => {
@@ -222,7 +222,7 @@ test('copy (r25): every verdict is 20 characters at most, and never names the gr
 test('GroupPill copy (r25): who and what is next, never the make-up', () => {
   assert.equal(namesLine(['Riya Shah']), 'Riya');
   assert.equal(namesLine(['Riya', 'Dev']), 'Riya, Dev');
-  assert.equal(namesLine(['Riya', 'Dev', 'Zoya', 'Aman']), 'Riya, Dev + 2');
+  assert.equal(namesLine(['Riya', 'Dev', 'Dev', 'Arjun']), 'Riya, Dev + 2');
   assert.equal(countsTitle(guys(4)), 'You + 3 guys');
   assert.equal(countsTitle(girls(2)), 'You + 1 girl');
   assert.equal(countsTitle(couple), 'You and your date');
@@ -235,32 +235,32 @@ test('GroupPill copy (r25): who and what is next, never the make-up', () => {
   assert.equal(waitingLine(['Arjun'], '8 pm'), 'Waiting on Arjun · 8 pm');
   assert.equal(waitingLine(['Arjun', 'Dev'], '8 pm'), 'Waiting on 2 · 8 pm');
   // one line each, about 28 characters
-  [countsTitle(mixed(4, 5)), waitingLine(['Kavya'], 'Thu 6 pm'), "You're in with " + namesLine(['Zoya', 'Aman', 'Kavya', 'Kabir'])].forEach(
+  [countsTitle(mixed(4, 5)), waitingLine(['Meera'], 'Thu 6 pm'), "You're in with " + namesLine(['Dev', 'Arjun', 'Meera', 'Kabir'])].forEach(
     (t) => assert.ok(t.length <= 30, t)
   );
 });
 
 test('Add friends (r25): names for the pill, the door untouched', () => {
-  var zoya = { id: 'zoya', name: 'Zoya' },
-    aman = { id: 'aman', name: 'Aman' },
-    kavya = { id: 'kavya', name: 'Kavya' };
-  var g = toggleFriend(toggleFriend(guys(4), zoya), aman);
-  assert.equal(groupTitle(g), 'You, Zoya, Aman + 1');
+  var dev = { id: 'dev', name: 'Dev' },
+    arjun = { id: 'arjun', name: 'Arjun' },
+    meera = { id: 'meera', name: 'Meera' };
+  var g = toggleFriend(toggleFriend(guys(4), dev), arjun);
+  assert.equal(groupTitle(g), 'You, Dev, Arjun + 1');
   assert.equal(groupTitle(guys(4)), 'You + 3 guys');
-  assert.equal(groupTitle(toggleFriend(couple, aman)), 'You and Aman');
+  assert.equal(groupTitle(toggleFriend(couple, arjun)), 'You and Arjun');
   // picking more friends than the group holds grows guys and girls; a couple or a mixed group has no room
-  assert.equal(toggleFriend(toggleFriend(toggleFriend(guys(2), zoya), aman), kavya).size, 4);
-  assert.equal(toggleFriend(toggleFriend(couple, zoya), aman), null);
-  assert.equal(toggleFriend(mixed(1, 1, { friends: [zoya] }), aman), null);
+  assert.equal(toggleFriend(toggleFriend(toggleFriend(guys(2), dev), arjun), meera).size, 4);
+  assert.equal(toggleFriend(toggleFriend(couple, dev), arjun), null);
+  assert.equal(toggleFriend(mixed(1, 1, { friends: [dev] }), arjun), null);
   // unpick
-  assert.deepEqual(toggleFriend(g, zoya).friends, [aman]);
+  assert.deepEqual(toggleFriend(g, dev).friends, [arjun]);
   // a smaller group drops the last picked; just me drops them all
-  assert.deepEqual(fitFriends(Object.assign({}, g, { size: 2 })).friends, [zoya]);
+  assert.deepEqual(fitFriends(Object.assign({}, g, { size: 2 })).friends, [dev]);
   assert.deepEqual(fitFriends(Object.assign({}, g, { type: 'solo', size: 1 })).friends, []);
   // the door reads type, size and age only
   assert.deepEqual(verdict(door({ stag: 'couples_only' }), g), verdict(door({ stag: 'couples_only' }), guys(4)));
   // a plan fills names in by itself
-  assert.equal(groupTitle(groupFromPlan({ members: ['Zoya', 'Aman', 'Kavya', 'Kabir'], groupType: 'guys' })), 'You, Zoya, Aman + 2');
+  assert.equal(groupTitle(groupFromPlan({ members: ['Dev', 'Arjun', 'Meera', 'Kabir'], groupType: 'guys' })), 'You, Dev, Arjun + 2');
 });
 
 test('source line', () => {

@@ -5,9 +5,10 @@ import { usePullToRefresh } from '../hooks/usePullToRefresh';
 import { IMAGES_3D } from '../assets/images';
 import { TEST } from '../config';
 import { MO, WD, todayTxt } from '../data/dates';
-import { ageLine, groupTitle, isSet, namesLine, waitingLine } from '../data/group';
+import { friendPhoto } from '../data/friends';
+import { ageLine, groupTitle, inWithLine, isSet, namesLine, waitingLine } from '../data/group';
 import { groupFor, homeItems, planInfo } from '../data/homeData';
-import { EVENTS, VENUES, isPast } from '../data/listings';
+import { EVENTS, VENUES, isPast, onNow } from '../data/listings';
 import { gpVoted } from '../data/sample';
 import {
   Button,
@@ -86,7 +87,7 @@ function groupPill(c, group, pl) {
   /* r25: the pill says who and what's next; the group's make-up ("4 guys, all 21+") stays in Going as */
   if (pl && pl.live) {
     var gp = pl.gp,
-      faces = gp.members.map((n) => ({ name: n }));
+      faces = gp.members.map((n) => ({ name: n, image: friendPhoto(n) }));
     if (gp.stage === 'booked' && EVENTS[gp.booked]) {
       var b = EVENTS[gp.booked];
       return {
@@ -112,12 +113,15 @@ function groupPill(c, group, pl) {
   }
   /* your own booking for tonight or tomorrow (interactions spec 7: after booking, the pill says you're in) */
   var mine = S.planned && EVENTS[S.planned];
+  var bk = (S.myBookings || {})[S.planned] || {},
+    crew = bk.with || [];
   if (mine && !isPast(mine) && nightDay(new Date(mine.iso).getTime()) <= addDays(homeWindow(now()).day, 1))
     return {
       state: 'plan-booked',
-      people: [me],
+      people: [me].concat(crew.map((n) => ({ name: n, image: friendPhoto(n) }))).slice(0, 4),
       title: mine.title + ' · ' + WD[new Date(mine.iso).getDay()].slice(0, 3),
-      line: mine.rsvp ? "You're on the list" : "You're in",
+      // r25: who you're going with ("You're in with Dev, Arjun + 1")
+      line: inWithLine(mine.rsvp ? "You're on the list" : "You're in", crew, S.guests || bk.passes),
       onOpen: () => c.go('pass')
     };
   if (isSet(group))
@@ -293,7 +297,7 @@ export function HomeDoor(p) {
           price={priceLabel(e)}
           crowd={it.crowd || undefined}
           verdict={verdictText(it.verdict, group, 'line')}
-          badge={e.promoted ? 'Promoted' : undefined}
+          badge={onNow(e) ? 'Live' : e.promoted ? 'Promoted' : undefined}
           onClick={() => {
             log('tile_tap', { railId: railId, index: index, nightId: it.id, verdict: it.verdict.state });
             c.openEvent(it.id);
@@ -419,28 +423,36 @@ export function HomeDoor(p) {
                 cover={priceLabel(heroE) || undefined}
                 doorTime={heroE.time}
                 image={heroE.img}
-                friendsPeople={heroE.nFriends ? (heroE.friends || []).map((f) => ({ name: f })) : undefined}
+                friendsPeople={heroE.nFriends ? (heroE.friends || []).map((f) => ({ name: f, image: friendPhoto(f) })) : undefined}
                 friendsTotal={heroE.nFriends || undefined}
                 saved={!!S.saved[hero.id]}
+                live={onNow(heroE)}
               />
             </Tap>
-            <Button
-              variant="brand"
-              size="lg"
-              block
-              icon="ticket"
-              onClick={() => {
-                log('hero_cta_tap', { nightId: hero.id, passes: Math.min(n, 6) });
-                c.set({
-                  cur: hero.id,
-                  guests: Math.min(n, 6),
-                  sheet: heroE.age >= 21 && !S.age ? 'age' : 'list',
-                  after: 'list'
-                });
-              }}
-            >
-              {bookLabel(heroE, n)}
-            </Button>
+            {S.planned === hero.id ? (
+              // already booked: the main action is the pass (white; violet stays for booking)
+              <Button variant="primary" size="lg" block icon="ticket" onClick={() => c.go('pass')}>
+                Show my pass
+              </Button>
+            ) : (
+              <Button
+                variant="brand"
+                size="lg"
+                block
+                icon="ticket"
+                onClick={() => {
+                  log('hero_cta_tap', { nightId: hero.id, passes: Math.min(n, 6) });
+                  c.set({
+                    cur: hero.id,
+                    guests: Math.min(n, 6),
+                    sheet: heroE.age >= 21 && !S.age ? 'age' : 'list',
+                    after: 'list'
+                  });
+                }}
+              >
+                {bookLabel(heroE, n)}
+              </Button>
+            )}
           </section>
         ) : misfits.length ? (
           // nights are on tonight, but none lets this group in

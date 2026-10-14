@@ -1,3 +1,4 @@
+import { ME } from '../lib/plan';
 import { APP_URL } from '../config';
 import { priceTxt, rupees } from '../data/format';
 import { DOOR_OK, levelOf, nightsCount, passCode } from '../data/sample';
@@ -61,7 +62,7 @@ function GuestPasses(p) {
     e = p.e,
     v = p.v;
   var grp = S.gp && S.gp.stage === 'booked' && S.gp.booked === e.id,
-    names = grp ? ['Riya'].concat(S.gp.members) : null;
+    names = grp ? [ME].concat(S.gp.members) : null;
   return (
     <div className="col" style={{ gap: '10px' }}>
       <div style={{ height: 0, borderTop: '1px dashed var(--line)' }} />

@@ -4,6 +4,7 @@ import { agePhrase, groupLabel, isSet } from '../data/group';
 import { doorOf } from '../data/doorRules';
 import { groupFor, homeItems, tryInstead } from '../data/homeData';
 import { rupees } from '../data/format';
+import { nightCrowd } from '../data/listings';
 import { ActionBar, DoorVerdict, Icon, TonightSoFar, TopBar, VenueHero } from '../design-system';
 import { now } from '../lib/clock';
 import { doorRows, getDoorVerdict, verdictSource, verdictText } from '../lib/door';
@@ -35,6 +36,7 @@ export function EventScreen(p) {
     S = c.S,
     e = c.ev,
     v = c.ven,
+    nc = nightCrowd(e), // the night's own Booked so far (sample)
     t = now(),
     saved = !!S.saved[e.id],
     group = groupFor(S, t),
@@ -121,8 +123,8 @@ export function EventScreen(p) {
           image={e.img}
           area={v.name + ', ' + v.area}
           vibe={soundOf(e)}
-          booked={v.booked}
-          cap={v.cap}
+          booked={nc.booked}
+          cap={nc.cap}
           {...cover(e)}
           doorTime={e.time}
           distance={it && it.mins != null ? it.mins + ' min' : undefined}
@@ -172,7 +174,7 @@ export function EventScreen(p) {
         </section>
 
         <TonightSoFar
-          booked={v.booked}
+          booked={nc.booked}
           saved={v.saved}
           lastHour={v.lastHour}
           friends={e.friends && e.friends.length ? e.friends : null}

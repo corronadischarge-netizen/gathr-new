@@ -348,6 +348,15 @@ export function pullFeed() {
     );
 }
 
+/* Is the signed-in account the demo account (profiles.demo, migration 20261014120000)? Resolves false for everyone
+   else, and when the column isn't there yet */
+export function pullDemo() {
+  return db()
+    .then((c) => (me ? c.from('profiles').select('demo').eq('id', me).maybeSingle() : { data: null }))
+    .then((r) => !!(r && !r.error && r.data && r.data.demo))
+    .catch(() => false);
+}
+
 /* ---------------------------------------------------------------- gathr admin: verify organisers, put nights live */
 export function amAdmin() {
   return db()

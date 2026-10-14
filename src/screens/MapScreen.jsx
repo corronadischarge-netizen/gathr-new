@@ -13,6 +13,14 @@ import { Share } from '../services/share';
 import { i3, icon, meta, note, rowIcon, sampleTag, svgIcon, thumb } from '../ui/helpers';
 import { Tap } from '../ui/Tap';
 
+/* the venues on the map: the ones with a night coming up, and a known position (a venue whose area isn't
+   confirmed yet has no pin). Venues from Supabase with no nights stay off it */
+function mapVenues() {
+  var has = {};
+  upcoming().forEach((k) => (has[EVENTS[k].venue] = 1));
+  return Object.keys(VENUES).filter((k) => has[k] && VENUES[k].lat != null && VENUES[k].lng != null);
+}
+
 /* Booked so far on a pin: the level word with its dot, or the count for walk-in venues (no level, no dot) */
 function pinCrowd(x, html) {
   if (x.crowd) {
@@ -71,7 +79,7 @@ export function MapScreen(p) {
   const [q, setQ] = useState('');
   var qq = q.trim().toLowerCase(),
     hits = qq
-      ? Object.keys(VENUES)
+      ? mapVenues()
           .filter((k) => (VENUES[k].name + ' ' + VENUES[k].area).toLowerCase().indexOf(qq) >= 0)
           .sort((a, b) => VENUES[b].name.toLowerCase().startsWith(qq) - VENUES[a].name.toLowerCase().startsWith(qq))
       : [],
@@ -149,7 +157,7 @@ export function MapScreen(p) {
       fallback();
     });
     var fbTimer = setTimeout(fallback, 8000);
-    var keys = Object.keys(VENUES),
+    var keys = mapVenues(),
       mk = {},
       clusters = [];
     function pinEl(html, onTap, label) {
@@ -341,7 +349,7 @@ export function MapScreen(p) {
     if (d) r.m.easeTo({ zoom: r.m.getZoom() + d, duration: dur('--motion-normal') });
     else {
       var b = new maplibregl.LngLatBounds();
-      Object.keys(VENUES).forEach((k) => {
+      mapVenues().forEach((k) => {
         b.extend([VENUES[k].lng, VENUES[k].lat]);
       });
       r.m.fitBounds(b, {

@@ -1,7 +1,7 @@
 import { HowFriendsWorkCard } from '../cards/HowFriendsWorkCard';
 import { Switch } from '../components/Switch';
 import { APP_URL } from '../config';
-import { friendsOf } from '../data/friends';
+import { friendRequest, friendsOf } from '../data/friends';
 import { Button, IconButton } from '../design-system';
 import { shareToast } from '../lib/utils';
 import { Share } from '../services/share';
@@ -11,7 +11,8 @@ import { eyebrow, fav, i3, meta, note, sec, stop } from '../ui/helpers';
 export function FriendsList(p) {
   var c = p.ctx,
     S = c.S;
-  var list = friendsOf(S).map((f) => [f.name, f.from, f.together]);
+  var list = friendsOf(S).map((f) => [f.name, f.from, f.together, f.photo]),
+    req = friendRequest(S);
   return (
     <div className="full col pad-top" style={{ gap: '24px', paddingTop: '52px', paddingBottom: '32px' }}>
       <div className="rowc between">
@@ -36,24 +37,24 @@ export function FriendsList(p) {
           onClick={() => c.set({ shareNights: !S.shareNights })}
         />
       </div>
-      {!S.ishaan ? (
+      {req ? (
         <div className="col" style={{ gap: '10px' }}>
           <span className="g-section-title">Request</span>
           <div className="rowc" style={{ gap: '12px' }}>
-            {fav('Ishaan', 44)}
+            {fav(req.name, 44, req.photo)}
             <div className="col" style={{ gap: '2px', flexGrow: 1 }}>
-              <span className="title15">Ishaan</span>
-              {meta('Joined from your Friday plan link')}
+              <span className="title15">{req.name}</span>
+              {meta('Wants to add you as a friend')}
             </div>
-            <Button variant="ghost" size="sm" onClick={() => c.set({ ishaan: 'no' })}>
+            <Button variant="ghost" size="sm" onClick={() => c.set({ friendReq: 'no' })}>
               Ignore
             </Button>
             <Button
               variant="primary"
               size="sm"
               onClick={() => {
-                c.set({ ishaan: 'yes' });
-                c.toast('You and Ishaan are now friends');
+                c.set({ friendReq: 'yes' });
+                c.toast('You and ' + req.name + ' are now friends');
               }}
             >
               Accept
@@ -65,7 +66,7 @@ export function FriendsList(p) {
         {sec('Friends', meta(list.length + ''))}
         {list.map((f) => (
           <div key={f[0]} className="rowc list-row" style={{ gap: '12px' }}>
-            {fav(f[0], 44)}
+            {fav(f[0], 44, f[3])}
             <div className="col" style={{ gap: '2px', flexGrow: 1 }}>
               <span className="title15">{f[0]}</span>
               {meta(f[1] + ' · ' + f[2])}
@@ -126,7 +127,7 @@ export function FriendsList(p) {
           Share your invite link
         </Button>
       </div>
-      {note('Friends are sample data')}
+      {S.demo ? note('Friends are sample data') : null}
     </div>
   );
 }

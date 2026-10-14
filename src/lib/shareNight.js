@@ -1,5 +1,6 @@
 import { APP_URL } from '../config';
 import { WD } from '../data/dates';
+import { friendPhoto } from '../data/friends';
 import { goingWith } from '../data/group';
 import { VENUES } from '../data/listings';
 import { Share } from '../services/share';
@@ -19,11 +20,11 @@ export function nightCard(S, e) {
     meta: nightWhen(e),
     place: VENUES[e.venue].name,
     status: e.rsvp ? "You're on the list" : "You're in",
-    people: goingWith(S, e.id)
+    people: goingWith(S, e.id).map((p, i) => (i === 0 || p.image ? p : Object.assign({}, p, { image: friendPhoto(p.name) })))
   };
 }
 
-/* Share (r25): the night's StoryCard as a picture for the group chat, "We're in. Kukoo, Thu 9 pm". On a phone it's
+/* Share (r25): the night's StoryCard as a picture for the group chat, "We're in. The Game Palacio, Wed 9 pm" (Social House). On a phone it's
    the share sheet; elsewhere the picture downloads. If the picture can't be made, the link goes instead */
 export function shareNight(c, e) {
   var text = "We're in. " + VENUES[e.venue].name + ', ' + nightWhen(e).replace(' · ', ' ');

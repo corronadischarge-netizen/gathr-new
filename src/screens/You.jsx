@@ -1,5 +1,6 @@
 import { ModeSwitchCard } from '../cards/ModeSwitchCard';
 import { StatusCard } from '../cards/StatusCard';
+import { friendRequest, friendsOf } from '../data/friends';
 import { VENUES } from '../data/listings';
 import { AREA_LIST } from '../data/options';
 import { REC, levelOf, nightsCount } from '../data/sample';
@@ -35,7 +36,7 @@ export function You(p) {
     ['Age', S.age || 'Asked when a night needs it', () => c.go('editprofile'), 'id-card'],
     [
       'Friends',
-      (S.ishaan === 'yes' ? '5 friends' : '4 friends') + (!S.ishaan ? ' · 1 request' : ''),
+      friendsOf(S).length + (friendsOf(S).length === 1 ? ' friend' : ' friends') + (friendRequest(S) ? ' · 1 request' : ''),
       () => c.go('friendslist'),
       'users'
     ],
@@ -125,13 +126,13 @@ export function You(p) {
               {rowIcon('calendar-check')}
               <div className="col" style={{ gap: '2px', flexGrow: 1 }}>
                 <span className="title15">{r[1]}</span>
-                {meta(v.name + ' · ' + r[2] + ' · with ' + r[3])}
+                {meta(v.name + ' · ' + r[2] + (r[3] ? ' · with ' + r[3] : ''))}
               </div>
               {statusChip('Checked in', 'ok')}
             </div>
           );
         })}
-        {note('Past nights are sample data')}
+        {REC.length ? note('Past nights are sample data') : meta('Nights you go to show here')}
       </div>
       <div className="col">
         {rows.map((r) => (

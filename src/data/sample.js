@@ -1,14 +1,15 @@
+import { ME } from '../lib/plan';
 import { APP_URL } from '../config';
+import { demoRecord } from './demo';
 
-/* sample record of past nights: SAMPLE data, used for status, the record and Wrapped */
-export const REC = [
-  ['kukoo', 'Almost Illegal Thursday', '18 Sep', 'Zoya, Aman'],
-  ['plunge', 'Dear Wednesday', '10 Sep', 'Kavya'],
-  ['epitome', 'Indie night', '5 Sep', 'Aman'],
-  ['kukoo', 'Gossip Gurl', '3 Sep', 'Zoya, Kavya'],
-  ['opus', 'Lavish Friday', '29 Aug', 'Zoya, Aman, Kabir'],
-  ['fml', 'Twilight Thursday', '21 Aug', 'Aman']
-];
+/* the record of past nights: SAMPLE data, used for status, the record and Wrapped. [venue, night, date, with].
+   Only the demo account has one (its four past nights, data/demo.js); empty for everyone else */
+export const REC = [];
+export function setDemoRecord(on) {
+  if (on === REC.length > 0) return;
+  REC.length = 0;
+  if (on) demoRecord().forEach((r) => REC.push(r));
+}
 
 const LEVELS = [
   ['Newbie', 0, 'Your first nights out with gathr'],
@@ -16,14 +17,16 @@ const LEVELS = [
   ['Insider', 10, 'Everything Regular gets · reserved seating at partner venues · first look at new nights']
 ];
 
-export const DOOR_OK = { kukoo: 1, epitome: 1, palacio: 1, plunge: 1 };
+/* venues whose door gathr has confirmed (sample): the pass says "Door confirmed" */
+export const DOOR_OK = { palacio: 1, dimora: 1, epitome: 1, themillers: 1 };
 
 export const FRIEND_SHAPE = {
-  Zoya: ['flower', 'pink'],
-  Aman: ['arch', 'yellow'],
-  Kavya: ['circle', 'green'],
+  Dev: ['flower', 'pink'],
+  Arjun: ['arch', 'yellow'],
+  Meera: ['circle', 'green'],
   Kabir: ['pill', 'blue'],
-  Riya: ['flower', 'violet']
+  Riya: ['flower', 'violet'],
+  Tanvi: ['arch', 'pink']
 };
 
 export function nightsCount(S) {
@@ -50,7 +53,7 @@ export function gpVoted(gp, vote) {
       who[n] = k;
     });
   });
-  if (vote) who.Riya = vote;
+  if (vote) who[ME] = vote;
   return who;
 }
 

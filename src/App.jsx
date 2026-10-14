@@ -6,7 +6,9 @@ import { HOME_LAYOUT, REVIEW, TEST } from './config';
 import { EVENTS, VENUES, isPast } from './data/listings';
 import { NEXT_CITIES } from './data/options';
 import { hostNights } from './data/hostNights';
-import { ORG_KEY, orgLoad, setRemoteFeed, syncOrg } from './data/organisers';
+import { ORG_KEY, orgLoad, setRemoteFeed, showDemoFriends, syncOrg } from './data/organisers';
+import { dropOldNights, withDemo, withoutDemo } from './data/demoAccount';
+import { setDemoRecord } from './data/sample';
 import { TabBar, Toast } from './design-system';
 import { useEdgeSwipe } from './hooks/useEdgeSwipe';
 import { useSheetExit } from './hooks/useSheetExit';
@@ -76,6 +78,9 @@ const ANDROID = /Android/i.test(navigator.userAgent);
 
 /* Everything on this device that belongs to the person signed in. Logging out removes all of it
    (the "use it sideways" choice and unsent door check-ins aren't theirs, so they stay). */
+/* the app opened: the demo account's state is laid out once (App's first render) */
+var demoBooted = false;
+
 const PERSONAL_KEYS = [
   'gathr.me',
   'gathr.state',
@@ -101,14 +106,14 @@ export function App() {
     code: '',
     otpSent: false,
     sheet: null,
-    cur: 'illegal',
+    cur: 'bollywoodbash',
     filter: 'all',
     nights: {},
     age: null,
     guests: 2,
     onList: false,
     planned: null,
-    saved: { twin: 1 },
+    saved: {},
     vote: null,
     query: '',
     sfilters: {},
@@ -135,7 +140,9 @@ export function App() {
     busy: null,
     sent: false,
     shareNights: true,
-    ishaan: null,
+    friendReq: null, // the demo's friend request (Neha): null waiting, 'yes', 'no'
+    demo: false, // the signed-in account is the demo account (profiles.demo): data/demoAccount.js
+    demoDay: null, // the day the demo was laid out for
     upHidden: [],
     credit: 150,
     checkedIn: false,
@@ -143,15 +150,7 @@ export function App() {
     draft: null,
     gpBook: null,
     paidSplit: false,
-    gp: {
-      name: 'Friday plan',
-      opts: ['lavish', 'bollywood', 'resign'],
-      deadline: 'Thu 6 pm',
-      votes: { lavish: ['Zoya', 'Aman'], bollywood: ['Kavya'], resign: [] },
-      members: ['Zoya', 'Aman', 'Kavya', 'Kabir'],
-      stage: 'voting',
-      booked: null
-    }
+    gp: null // a group plan (the demo account starts with one: data/demo.js)
   });
   var s0 = blank();
   s0.me = Object.assign(s0.me, store('gathr.me') || {});
@@ -177,7 +176,9 @@ export function App() {
     'phone',
     'phoneOk',
     'shareNights',
-    'ishaan',
+    'friendReq',
+    'demo',
+    'demoDay',
     'upHidden',
     'checkedIn',
     'seen',
@@ -207,6 +208,10 @@ export function App() {
       PERSIST.forEach((k) => {
         if (p[k] !== undefined) s0[k] = p[k];
       });
+      dropOldNights(s0);
+      // the demo account: laid out again for today when the day has changed (once, when the app opens)
+      if (s0.demo && !demoBooted) Object.assign(s0, withDemo(s0));
+      demoBooted = true;
       if (s0.planned && (!EVENTS[s0.planned] || isPast(EVENTS[s0.planned]))) {
         // the night is over: it moves to Past nights, and the day-after card asks how it went
         if (EVENTS[s0.planned] && (s0.pastNights || []).indexOf(s0.planned) < 0)
@@ -274,6 +279,9 @@ export function App() {
       } catch (e) {}
   })();
   const [S, setS] = useState(s0);
+  /* friends going on nights: the demo account's friends, only while it's signed in */
+  showDemoFriends(S.demo);
+  setDemoRecord(S.demo);
   var bk = useRef(s0.bk || null), // the booking, changed at once on every event (see bkSend)
     live = useRef(S), // the latest state, for answers that arrive later
     refreshRef = useRef(() => {}),
@@ -361,7 +369,12 @@ export function App() {
       // the feed couldn't load (offline): the home stops waiting and shows what it has
       .catch(() => set({ feedFailed: true }));
     if (!S.signedIn) return;
-    Remote.pullMine()
+    var demoReady = Remote.pullDemo().then((on) => {
+      set((o) => (on ? withDemo(o) : withoutDemo(o)));
+      return on;
+    });
+    demoReady
+      .then((on) => (on ? null : Remote.pullMine()))
       .then((mine) => {
         if (!mine) return;
         var cur = orgLoad();
@@ -395,9 +408,10 @@ export function App() {
       })
       .catch(() => {});
     // your bookings for gathr nights follow you to any phone; the newest upcoming one is your plan
-    feedReady
-      .then(() => Remote.pullMyBookings())
+    Promise.all([feedReady, demoReady])
+      .then((x) => (x[1] ? null : Remote.pullMyBookings())) // the demo account's bookings are the demo's
       .then((list) => {
+        if (!list) return;
         var mine = {};
         list.forEach((b) => (mine[b.event] = b));
         set((o) => {

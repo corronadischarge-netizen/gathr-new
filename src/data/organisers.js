@@ -1,5 +1,7 @@
 import { MO, WD } from './dates';
-import { EVENTS, ORDER, VENUES, isPast } from './listings';
+import { DEMO, EVENTS, ORDER, VENUES, isPast } from './listings';
+import { DEMO_HOST, demoHostStats } from './demo';
+import { now } from '../lib/clock';
 import { passCode } from './sample';
 import { FAMILY_TAG, family, nightKind } from './taxonomy';
 import { store } from '../lib/utils';
@@ -11,6 +13,7 @@ export const ORG_KEY = 'gathr.org';
 
 export const AREA_XY = {
   'Koregaon Park': [18.5362, 73.893],
+  'Koregaon Park Annexe': [18.5394, 73.9066],
   'The Mills': [18.5356, 73.8779],
   'Kalyani Nagar': [18.5475, 73.9025],
   Baner: [18.5635, 73.778],
@@ -158,13 +161,43 @@ export function syncOrg(org) {
       ORDER.push(o.id);
     }
   });
-  // live nights from every other organiser on gathr (from Supabase)
-  remoteFeed.forEach((x) => {
+  // live nights from every other organiser on gathr: Supabase's, then the demo's (other venues' teams, and
+  // Afterhours Collective's live and past nights for everyone who isn't hosting them)
+  var demoFeed = DEMO.feed.concat(
+    DEMO.hostNights.filter((o) => o.status === 'live').map((o) => ({ night: o, host: DEMO_HOST.name }))
+  );
+  remoteFeed.concat(demoFeed).forEach((x) => {
     if (EVENTS[x.night.id] || !VENUES[x.night.venueId]) return;
     EVENTS[x.night.id] = orgToEvent(x.night, { name: x.host });
     ORDER.push(x.night.id);
   });
   ORDER.sort((a, b) => new Date(EVENTS[a].iso) - new Date(EVENTS[b].iso));
+  applyFriends();
+}
+
+/* friends going (demo): only the demo account has these friends, so only it sees them on nights */
+var friendsOn = false;
+function applyFriends() {
+  Object.keys(DEMO.going).forEach((k) => {
+    if (!EVENTS[k]) return;
+    EVENTS[k].friends = friendsOn ? DEMO.going[k].slice() : [];
+    EVENTS[k].nFriends = friendsOn ? DEMO.going[k].length : 0;
+  });
+}
+export function showDemoFriends(on) {
+  friendsOn = !!on;
+  applyFriends();
+}
+
+/* the demo account's organiser: Afterhours Collective and its six nights (host mode) */
+export function demoOrg(cur) {
+  var venues = DEMO.hostNights.map((o) => o.venueId).filter((k, i, a) => a.indexOf(k) === i);
+  return Object.assign({ checkins: {} }, cur, {
+    demo: true,
+    // a collective at several venues: they're where it lists nights, not venues it runs (ownNightsOnly)
+    profile: Object.assign({}, DEMO_HOST, { venueId: venues[0], venueIds: venues, customVenues: [], newVenue: null, since: null, ownNightsOnly: true }),
+    events: DEMO.hostNights.map((o) => Object.assign({}, o))
+  });
 }
 
 /* the live feed from Supabase: [{ night, host }], kept here so a local save doesn't drop it */
@@ -206,6 +239,21 @@ export function orgStats(S, id) {
     org = S.org || orgLoad(),
     ci = (org.checkins || {})[id] || {};
   var guests;
+  // the demo host's nights: sample numbers, plus anyone the Door checks in or adds as a walk-in on this phone
+  var dm = org.demo ? demoHostStats(id, now()) : null;
+  if (dm) {
+    var all = Object.assign({}, dm.ci, ci);
+    guests = dm.guests.concat((org.walkins || {})[id] || []);
+    return {
+      sample: true,
+      views: dm.views,
+      interested: dm.interested,
+      guests: guests,
+      checkedIn: guests.filter((g) => all[g.name]).length,
+      ci: all,
+      cap: dm.cap
+    };
+  }
   if (e && e.org) {
     // nights in Supabase: everyone who booked, from any phone (loaded by the app when hosting)
     var fromDb = S.remoteGuests && S.remoteGuests[id];

@@ -1,5 +1,7 @@
+import { friendPhoto } from '../data/friends';
+import { ME } from '../lib/plan';
 import { priceTxt } from '../data/format';
-import { EVENTS, VENUES } from '../data/listings';
+import { EVENTS, VENUES, nightCrowd } from '../data/listings';
 import { Avatar, Badge, CrowdMeter } from '../design-system';
 import { meta, thumb } from '../ui/helpers';
 import { Tap } from '../ui/Tap';
@@ -14,7 +16,7 @@ export function VoteOptionCard(p) {
     k = p.id;
   var e = EVENTS[k],
     v = VENUES[e.venue],
-    names = (gp.votes[k] || []).concat(S.vote === k ? ['Riya'] : []),
+    names = (gp.votes[k] || []).concat(S.vote === k ? [ME] : []),
     mine = S.vote === k,
     lead = k === p.winner && names.length;
   return (
@@ -43,13 +45,13 @@ export function VoteOptionCard(p) {
         <span className="vote-faces" aria-hidden="true">
           {names.map((n) => (
             <span key={n} data-flip={'face-' + n} className="vote-face">
-              <Avatar name={n === 'Riya' ? S.me.name || 'Riya' : n} image={n === 'Riya' ? S.me.photo : undefined} size={24} />
+              <Avatar name={n === ME ? S.me.name || ME : n} image={n === ME ? S.me.photo : friendPhoto(n)} size={24} />
             </span>
           ))}
         </span>
       </div>
       <div className="rowc between">
-        <CrowdMeter booked={v.booked} cap={v.cap} level={v.crowd} compact />
+        <CrowdMeter booked={nightCrowd(e).booked} cap={nightCrowd(e).cap} level={nightCrowd(e).level} compact />
         {names.length ? (
           <span key={names.join()} className="votes fade-up">
             {names.join(', ')}

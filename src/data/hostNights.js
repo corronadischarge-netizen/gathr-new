@@ -10,7 +10,8 @@ export function hostNights(S) {
     .filter((o) => o.status === 'live')
     .map((o) => o.id)
     .filter((k) => EVENTS[k] && !isPast(EVENTS[k]));
-  var mine = orgVenueIds(pr),
+  // a venue's team also sees the nights listed at its venue; the demo collective only its own
+  var mine = pr.ownNightsOnly ? [] : orgVenueIds(pr),
     listed = upcoming().filter((k) => mine.indexOf(EVENTS[k].venue) >= 0 && !EVENTS[k].org);
   return own.concat(listed).sort((a, b) => new Date(EVENTS[a].iso) - new Date(EVENTS[b].iso));
 }

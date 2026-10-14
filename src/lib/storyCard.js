@@ -40,9 +40,9 @@ export function storyCard(S) {
       x.font = F(600, 64);
       x.fillText('nights out in Pune', W / 2, 1070);
       var rows = [
-        ['Top venue', 'Kukoo'],
-        ['Top sound', 'Bollywood'],
-        ['Your crew', 'Zoya & Aman'],
+        ['Top venue', 'The Millers'],
+        ['Top sound', 'Retro'],
+        ['Your crew', 'Dev & Arjun'],
         ['Status', levelOf(nightsCount(S))[0]]
       ];
       rows.forEach((r, i) => {

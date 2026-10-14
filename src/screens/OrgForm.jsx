@@ -129,7 +129,8 @@ export function OrgForm(p) {
     if (status === 'live') c.toast('It’s live. Guests can book it now');
     else if (status === 'review') {
       c.toast(Auth.live ? 'Sent to gathr for a check. Usually under a day' : 'Sent for review');
-      if (!Auth.live)
+      // demo mode approves a night after 2.6 s, except the demo host's (they stay in review: specs/demo-data.md)
+      if (!Auth.live && !o.demo && !(org && org.demo))
         setTimeout(() => {
           var cur = orgLoad();
           cur.events = cur.events.map((x) =>

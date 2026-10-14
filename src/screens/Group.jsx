@@ -1,3 +1,4 @@
+import { friendPhoto } from '../data/friends';
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { BookedNightCard } from '../cards/BookedNightCard';
 import { VoteOptionCard } from '../cards/VoteOptionCard';
@@ -6,7 +7,7 @@ import { gpVoted, planLink } from '../data/sample';
 import { Button, Chip, IconButton } from '../design-system';
 import { now } from '../lib/clock';
 import { ms, phoneScale, reducedMotion, useFlip, useSwap } from '../lib/motion';
-import { closesText, leaders, tally } from '../lib/plan';
+import { ME, closesText, leaders, tally } from '../lib/plan';
 import { shareToast } from '../lib/utils';
 import { Share } from '../services/share';
 import { eyebrow, fav, i3, meta, note, statusChip, stop } from '../ui/helpers';
@@ -34,7 +35,7 @@ export function Group(p) {
       </div>
     );
   var who = gpVoted(gp, S.vote),
-    all = ['Riya'].concat(gp.members),
+    all = [ME].concat(gp.members),
     voted = all.filter((n) => who[n]).length,
     t = now(),
     stage = gp.stage,
@@ -45,7 +46,7 @@ export function Group(p) {
     win = deciding ? gp.winner : top[0] || gp.opts[0],
     be = booked ? EVENTS[gp.booked] : null,
     we = win ? EVENTS[win] : null;
-  var memberStatus = (n) => (!booked ? (who[n] ? ['Voted', 'ok'] : ['Waiting', 'wait']) : n === 'Riya' ? ['Booked', 'ok'] : ['Has pass', 'ok']);
+  var memberStatus = (n) => (!booked ? (who[n] ? ['Voted', 'ok'] : ['Waiting', 'wait']) : n === ME ? ['Booked', 'ok'] : ['Has pass', 'ok']);
   var line = booked
     ? gp.name + ' · booked'
     : voting
@@ -83,9 +84,9 @@ export function Group(p) {
         <div className="crew">
           {all.map((n) => (
             <div key={n} className="crew-item">
-              {fav(n, 52)}
+              {fav(n, 52, n === ME ? S.me.photo : friendPhoto(n))}
               <span className="meta" style={{ color: 'var(--ink)' }}>
-                {n === 'Riya' ? 'You' : n}
+                {n === ME ? 'You' : n}
               </span>
               <Status s={memberStatus(n)} />
             </div>
@@ -136,7 +137,7 @@ export function Group(p) {
               block
               icon="share"
               onClick={() => {
-                var left = all.filter((n) => !who[n] && n !== 'Riya');
+                var left = all.filter((n) => !who[n] && n !== ME);
                 Share.link(
                   gp.name,
                   (left.length ? left.join(', ') + ': ' : '') +

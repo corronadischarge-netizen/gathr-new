@@ -21,16 +21,17 @@ export const PlanSync = {
   }
 };
 
-/* sample friends: after you share, each one votes at their moment, and Kabir drops out */
+/* sample friends: after you share a plan, each one votes at their moment, and Kabir drops out.
+   The demo account's own Friday plan (demo: true) is left as it is: 2 of 4 have voted */
 const SCRIPT = [
-  { after: 6000, who: 'Zoya', pick: 0 },
-  { after: 14000, who: 'Aman', pick: -1 },
-  { after: 26000, who: 'Kavya', pick: 0 },
+  { after: 6000, who: 'Dev', pick: 0 },
+  { after: 14000, who: 'Arjun', pick: -1 },
+  { after: 26000, who: 'Meera', pick: 0 },
   { after: 40000, who: 'Kabir', leave: true }
 ];
 
 function sample(gp, now) {
-  if (!gp || !gp.sharedAt || (gp.stage !== 'voting' && gp.stage !== 'closed')) return null;
+  if (!gp || gp.demo || !gp.sharedAt || (gp.stage !== 'voting' && gp.stage !== 'closed')) return null;
   var since = now - gp.sharedAt,
     voted = {},
     votes = null,

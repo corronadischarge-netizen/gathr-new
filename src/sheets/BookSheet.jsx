@@ -1,3 +1,4 @@
+import { ME } from '../lib/plan';
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { useOnline } from '../hooks/useOnline';
 import { AuthForm } from '../components/AuthForm';
@@ -27,7 +28,7 @@ export function BookSheet(p) {
     e = c.ev,
     v = c.ven;
   var gpb = S.gp && S.gpBook === e.id,
-    crew = gpb ? ['Riya'].concat(S.gp.members) : null;
+    crew = gpb ? [ME].concat(S.gp.members) : null;
   /* A night hosted on gathr is booked in the database, which needs the party: couples, guys and girls.
      That's how the night's stag rule and promoter pay work. Listed nights keep a simple pass count. */
   var dbNight = remoteOn && e.remote && !gpb;

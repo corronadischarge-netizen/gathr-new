@@ -1,12 +1,11 @@
 /* Home v3: the app's nights, prepared for the door verdict and the ranking (lib/door.js, lib/homeRank.js) */
-import { crowdLevel } from '../design-system/utils';
 import { getDoorVerdict } from '../lib/door';
 import { heroPick } from '../lib/homeRank';
 import { addDays, homeWindow, nightDay } from '../lib/clock';
 import { travelMins } from '../lib/distance';
 import { currentGroup, groupFromPlan } from './group';
 import { doorOf } from './doorRules';
-import { EVENTS, ORDER, VENUES, isPast } from './listings';
+import { EVENTS, ORDER, VENUES, isPast, nightCrowd } from './listings';
 import { AREA_LIST } from './options';
 import { FAMILY_TAG } from './taxonomy';
 
@@ -54,7 +53,7 @@ export function homeItems(S, t) {
     .map((e) => {
       var v = VENUES[e.venue] || {},
         start = new Date(e.iso).getTime(),
-        crowd = crowdLevel(v.booked, v.cap), // sample: venue bookings against its cap
+        crowd = nightCrowd(e).level, // sample: the night's bookings against its cap (the demo sets them)
         door = doorOf(e);
       return {
         id: e.id,

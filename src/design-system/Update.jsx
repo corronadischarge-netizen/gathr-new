@@ -5,18 +5,11 @@ import { cx } from './utils';
 
 /* The lead of an update: a night's 3D object, a person's photo (or their initials), or gathr's icon tinted by meaning */
 export function UpdateLead(p) {
-  if (p.image) {
+  // app addition: a person's photo, or their initials when there's none or it doesn't load; never a silhouette
+  if (p.image || p.name) {
     return (
       <span className="g-up-lead is-person">
-        <img src={p.image} alt="" />
-      </span>
-    );
-  }
-  // app addition: a person without a photo shows their initials, never a silhouette
-  if (p.name) {
-    return (
-      <span className="g-up-lead is-person">
-        <Avatar name={p.name} size={44} />
+        <Avatar name={p.name} image={p.image} size={44} />
       </span>
     );
   }

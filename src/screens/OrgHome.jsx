@@ -20,7 +20,8 @@ export function OrgHome(p) {
     e: EVENTS[o.id] || orgToEvent(o, pr),
     st: nightStage(o, orgToEvent(o, pr))
   }));
-  var mine = orgVenueIds(pr);
+  // a venue's team also sees the nights listed at its venue; the demo collective only its own
+  var mine = pr.ownNightsOnly ? [] : orgVenueIds(pr);
   var listed = upcoming()
     .filter((k) => mine.indexOf(EVENTS[k].venue) >= 0 && !EVENTS[k].org)
     .map((k) => ({ id: k, e: EVENTS[k], st: 'live', imported: true }));

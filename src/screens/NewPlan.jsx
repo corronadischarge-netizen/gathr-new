@@ -153,7 +153,7 @@ export function NewPlan(p) {
                 name: d.name,
                 opts: d.opts,
                 votes: votes,
-                members: ['Zoya', 'Aman', 'Kavya', 'Kabir'],
+                members: ['Dev', 'Arjun', 'Meera', 'Kabir'],
                 // the group's make-up, for the door verdicts (5 with you: the 4 sample friends + you)
                 groupType: d.groupType || null,
                 women: d.groupType === 'mixed' ? d.women || 0 : 0,

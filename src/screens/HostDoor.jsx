@@ -36,7 +36,7 @@ export function HostDoor(p) {
   var recent = inP
     .filter((g) => st.ci[g.name] > 1)
     .sort((a, b) => st.ci[b.name] - st.ci[a.name])
-    .slice(0, 4);
+    .slice(0, 5); // the last five in (specs/demo-data.md)
   return (
     <div className="full col pad-top" style={{ gap: '22px', paddingTop: '52px', paddingBottom: '140px' }}>
       <HostBar ctx={c} />
