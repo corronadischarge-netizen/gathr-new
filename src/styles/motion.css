@@ -186,7 +186,7 @@
 .celebrate .ok-tick path { stroke-dasharray: 24; animation: draw var(--motion-slower) var(--motion-fast) var(--ease-standard) both; }
 @keyframes draw { from { stroke-dashoffset: 24; } to { stroke-dashoffset: 0; } }
 /* the order (spec 7): the tick draws (450 ms) and the phone buzzes, "You're in" fades up, then the pass rises into
-   place and the wristband drops onto its corner. About 1.5 s in all, once per booking */
+   place and the lanyard pass drops onto its corner. About 1.5 s in all, once per booking */
 .celebrate .pass-head .g-display { animation: g-fade var(--motion-normal) calc(var(--motion-fast) + var(--motion-slower)) var(--ease-standard) both; }
 .celebrate .pass-ticket { animation: pass-rise var(--motion-slower) calc(var(--motion-fast) + var(--motion-slower) + var(--motion-normal)) var(--ease-enter) both; }
 @keyframes pass-rise { from { opacity: 0; transform: translateY(var(--space-8)); } to { opacity: 1; transform: none; } }
@@ -221,7 +221,7 @@
   *, *::before, *::after { transition-property: opacity !important; transition-duration: var(--dur-fast) !important; scroll-behavior: auto !important; }
   .ghost-fwd, .ghost-back { animation-name: fade-out !important; }
   .screen.under { transform: none; }
-  .g-tab-ind, .tk-slot, .g-nt { transition: none; }
+  .g-tab-ind, .g-nt { transition: none; }
   .g-nt:active { transform: none; }
   .screen.nav-fwd, .screen.nav-back, .sheet-slot.rise, .g-toast, .w-in, .w-card, .w-tag, .w-3d, .w-fade, .fade-up,
   .mood, .vibe-tile, .celebrate .ok-tick, .celebrate .pass-ticket, .roll-up, .roll-down { animation-name: g-fade !important; }

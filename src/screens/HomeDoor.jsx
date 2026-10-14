@@ -5,7 +5,7 @@ import { usePullToRefresh } from '../hooks/usePullToRefresh';
 import { IMAGES_3D } from '../assets/images';
 import { TEST } from '../config';
 import { MO, WD, todayTxt } from '../data/dates';
-import { agePhrase, groupLabel, isSet } from '../data/group';
+import { ageLine, groupTitle, isSet, namesLine, waitingLine } from '../data/group';
 import { groupFor, homeItems, planInfo } from '../data/homeData';
 import { EVENTS, VENUES, isPast } from '../data/listings';
 import { gpVoted } from '../data/sample';
@@ -81,7 +81,9 @@ function bookLabel(e, n) {
 /* Shubh's rule (13 Oct): a live plan (tonight or tomorrow) wins: it's time-sensitive, it rallies the group and it
    turns into one booking for everyone. Otherwise who you're going as; otherwise "Who's going?" */
 function groupPill(c, group, pl) {
-  var S = c.S;
+  var S = c.S,
+    me = { name: S.me.name || 'You', image: S.me.photo };
+  /* r25: the pill says who and what's next; the group's make-up ("4 guys, all 21+") stays in Going as */
   if (pl && pl.live) {
     var gp = pl.gp,
       faces = gp.members.map((n) => ({ name: n }));
@@ -90,45 +92,47 @@ function groupPill(c, group, pl) {
       return {
         state: 'plan-booked',
         people: faces,
-        title: WD[new Date(b.iso).getDay()] + ' · ' + b.title,
-        line: "You're in · Show pass",
+        title: b.title + ' · ' + WD[new Date(b.iso).getDay()].slice(0, 3),
+        line: "You're in with " + namesLine(gp.members),
         onOpen: () => c.go('pass')
       };
     }
-    return {
-      state: 'plan-vote',
-      people: faces,
-      title: gp.name + ' · ' + groupLabel(group) + ', ' + agePhrase(group, S.age),
-      line:
-        gp.stage === 'voting'
-          ? Object.keys(gpVoted(gp, S.vote)).length + ' of ' + (gp.members.length + 1) + ' voted · ' + closesText(gp, now())
-          : gp.winner
-            ? 'Voting closed · book ' + EVENTS[gp.winner].title
-            : "Voting closed · it's a tie",
-      onOpen: () => c.go('group')
-    };
+    var line;
+    if (gp.stage === 'voting') {
+      var voted = gpVoted(gp, S.vote),
+        waiting = gp.members.filter((n) => !voted[n]),
+        closes = closesText(gp, now());
+      line = !S.vote
+        ? 'Your vote · ' + closes
+        : waiting.length
+          ? waitingLine(waiting, closes.replace(/^closes /, ''))
+          : 'Everyone voted · ' + closes;
+    } else line = gp.winner ? 'Voting closed · time to book' : "Voting closed · it's a tie";
+    return { state: 'plan-vote', people: faces, title: gp.name, line: line, onOpen: () => c.go('group') };
   }
   /* your own booking for tonight or tomorrow (interactions spec 7: after booking, the pill says you're in) */
   var mine = S.planned && EVENTS[S.planned];
   if (mine && !isPast(mine) && nightDay(new Date(mine.iso).getTime()) <= addDays(homeWindow(now()).day, 1))
     return {
       state: 'plan-booked',
-      people: [{ name: S.me.name || 'You', image: S.me.photo }],
-      title: WD[new Date(mine.iso).getDay()] + ' · ' + mine.title,
-      line: (mine.rsvp ? "You're on the list" : "You're in") + ' · Show pass',
+      people: [me],
+      title: mine.title + ' · ' + WD[new Date(mine.iso).getDay()].slice(0, 3),
+      line: mine.rsvp ? "You're on the list" : "You're in",
       onOpen: () => c.go('pass')
     };
   if (isSet(group))
     return {
       state: 'group-set',
-      people: [{ name: S.me.name || 'You', image: S.me.photo }],
-      title: 'Going as ' + groupLabel(group) + ', ' + agePhrase(group, S.age),
+      // you, then the friends you picked in Going as (r25)
+      people: [me].concat((group.friends || []).map((f) => ({ name: f.name }))).slice(0, 4),
+      title: groupTitle(group),
+      line: ageLine(group, S.age),
       onOpen: () => c.set({ sheet: 'goingas', gaFrom: 'home' })
     };
   return {
     state: 'group-unset',
     title: "Who's going?",
-    line: 'Add your group to check the door',
+    line: 'Add your group',
     onOpen: () => c.set({ sheet: 'goingas', gaFrom: 'home' })
   };
 }
@@ -395,8 +399,7 @@ export function HomeDoor(p) {
               state={hv.state}
               text={hv.text}
               icon={hv.icon}
-              // the hero's line is tight: "Checked by gathr" without the date
-              source={hsrc && { kind: hsrc.kind, count: hsrc.count }}
+              source={hsrc}
             />
             <Tap
               onClick={(ev) => {

@@ -5,8 +5,9 @@ import { Media } from './Media';
 import { CROWD, cx } from './utils';
 
 /* A small poster tile for browsing many nights (rails), or a row in the full list (layout="row").
-   The whole tile is one link: no buttons inside. Answers the five questions at a glance:
-   door (verdict line), crowd (on the photo), what (name), where and when, cost */
+   The whole tile is one link: no buttons inside. Answers the five questions at a glance.
+   r25 tile order: what (name) → where and when + cost → the door line only when it asks something of you (if, unknown);
+   a yes shows nothing on a tile, but every verdict stays in the link's name. Rows always show the door line */
 export function NightTile(p) {
   var row = p.layout === 'row',
     soldOut = p.crowd === 'full',
@@ -88,12 +89,12 @@ export function NightTile(p) {
         </>
       ) : (
         <span className="g-nt-body" aria-hidden="true">
-          {verdict}
           <span className="g-nt-name">{p.name}</span>
           <span className="g-nt-foot">
             <span className="g-nt-meta">{[p.venue, p.time].filter(Boolean).join(' · ')}</span>
             {priceEl}
           </span>
+          {p.verdict && p.verdict.state !== 'yes' ? verdict : null}
         </span>
       )}
     </Tag>

@@ -48,3 +48,5 @@ export { SiteHeader } from './SiteHeader';
 export { Update, UpdateGroup, UpdateLead } from './Update';
 export { Toast } from './Toast';
 export { ActionBar } from './ActionBar';
+export { StoryCard } from './StoryCard';
+export { CardDeck } from './CardDeck';

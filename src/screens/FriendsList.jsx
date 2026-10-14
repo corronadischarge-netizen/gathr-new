@@ -1,6 +1,7 @@
 import { HowFriendsWorkCard } from '../cards/HowFriendsWorkCard';
 import { Switch } from '../components/Switch';
 import { APP_URL } from '../config';
+import { friendsOf } from '../data/friends';
 import { Button, IconButton } from '../design-system';
 import { shareToast } from '../lib/utils';
 import { Share } from '../services/share';
@@ -10,13 +11,7 @@ import { eyebrow, fav, i3, meta, note, sec, stop } from '../ui/helpers';
 export function FriendsList(p) {
   var c = p.ctx,
     S = c.S;
-  var list = [
-    ['Zoya', 'From your contacts', '5 nights together'],
-    ['Aman', 'From your contacts', '4 nights together'],
-    ['Kavya', 'Joined from your plan link', '2 nights together'],
-    ['Kabir', 'Added by QR at Opus', '1 night together']
-  ];
-  if (S.ishaan === 'yes') list.push(['Ishaan', 'Joined from your plan link', 'New']);
+  var list = friendsOf(S).map((f) => [f.name, f.from, f.together]);
   return (
     <div className="full col pad-top" style={{ gap: '24px', paddingTop: '52px', paddingBottom: '32px' }}>
       <div className="rowc between">

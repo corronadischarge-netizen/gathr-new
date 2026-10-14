@@ -12,7 +12,7 @@ export const HOST_KINDS = {
   night_live: ['ticket', 'ok'],
   night_submitted: ['ticket', 'info'],
   verified: ['heart', 'ok'],
-  promoter_joined: ['wristband', 'ok']
+  promoter_joined: ['lanyard-pass', 'ok']
 };
 
 export function HostBar(p) {

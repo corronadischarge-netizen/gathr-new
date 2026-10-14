@@ -3,10 +3,10 @@ import { DoorVerdict, GroupPill, IconButton, NightRail, NightTile } from '../des
 
 /* Review only (?review → "Home v3 · components"): every state of the four new home v3 components, on sample data */
 const T = '2026-10-10T12:00:00+05:30';
-const YES = { state: 'yes', text: 'Lets you in · 18+', icon: 'check' };
+const YES = { state: 'yes', text: 'Lets you in · 21+', icon: 'check' };
 const IF = { state: 'if', text: 'Formals only', icon: 'shirt' };
-const UNK = { state: 'unknown', text: 'Stag rules not listed', icon: 'info' };
-const NO = { state: 'no', text: 'Couples only tonight', icon: 'x' };
+const UNK = { state: 'unknown', text: 'Stag rules unknown', icon: 'info' };
+const NO = { state: 'no', text: 'Couples only', icon: 'x' };
 const FACES = [{ name: 'Zoya' }, { name: 'Aman' }, { name: 'Kavya' }, { name: 'Kabir' }];
 
 function Sec(p) {
@@ -38,10 +38,10 @@ export function DsPreview(p) {
 
       <Sec title="DoorVerdict · pill" sample>
         <div className="px col" style={{ gap: 'var(--space-3)' }}>
-          <DoorVerdict look="pill" state="yes" text="Lets 4 guys in · ID needed" source={{ kind: 'gathr', checkedAt: T }} />
-          <DoorVerdict look="pill" state="if" icon="shirt" text="Lets 4 guys in · formals only, before 10:30" source={{ kind: 'host' }} />
-          <DoorVerdict look="pill" state="unknown" text="Stag rules not listed" onAsk={() => c.toast('Opens WhatsApp or a call to the venue')} />
-          <DoorVerdict look="pill" state="no" text="Couples only tonight" source={{ kind: 'guests', count: 12 }} />
+          <DoorVerdict look="pill" state="yes" text="Lets you in · 21+" source={{ kind: 'gathr', checkedAt: T }} />
+          <DoorVerdict look="pill" state="if" icon="shirt" text="Formals only" source={{ kind: 'host' }} />
+          <DoorVerdict look="pill" state="unknown" text="Stag rules unknown" onAsk={() => c.toast('Opens WhatsApp or a call to the venue')} />
+          <DoorVerdict look="pill" state="no" text="Couples only" source={{ kind: 'guests', count: 12 }} />
           <DoorVerdict look="pill" state="unknown" icon="info" text="Couples only" source={{ kind: 'gathr', checkedAt: T }} />
         </div>
       </Sec>
@@ -84,10 +84,11 @@ export function DsPreview(p) {
 
       <Sec title="GroupPill" sample>
         <div className="px col" style={{ gap: 'var(--space-3)' }}>
-          <GroupPill state="plan-vote" people={FACES} title="Friday plan · 4 guys, all 21+" line="3 of 4 voted · closes 8 pm" onOpen={() => c.toast('Opens the plan')} />
-          <GroupPill state="plan-booked" people={FACES} title="Friday · Bollywood Night" line="You're in · Show pass" onOpen={() => c.toast('Opens the pass')} />
-          <GroupPill state="group-set" people={[{ name: c.S.me.name || 'You' }]} title="Going as 4 guys, all 21+" onOpen={() => c.toast('Opens Going as')} />
-          <GroupPill state="group-unset" title="Who's going?" line="Add your group to check the door" onOpen={() => c.toast('Opens Going as')} />
+          <GroupPill state="plan-vote" people={FACES} title="Friday plan" line="Your vote · closes 8 pm" onOpen={() => c.toast('Opens the plan')} />
+          <GroupPill state="plan-vote" people={FACES} title="Friday plan" line="Waiting on Kabir · 8 pm" onOpen={() => c.toast('Opens the plan')} />
+          <GroupPill state="plan-booked" people={FACES} title="Bollywood Night · Fri" line="You're in with Zoya, Aman + 2" onOpen={() => c.toast('Opens the pass')} />
+          <GroupPill state="group-set" people={[{ name: c.S.me.name || 'You' }]} title="You + 3 guys" onOpen={() => c.toast('Opens Going as')} />
+          <GroupPill state="group-unset" title="Who's going?" line="Add your group" onOpen={() => c.toast('Opens Going as')} />
         </div>
       </Sec>
     </div>

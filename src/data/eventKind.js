@@ -12,7 +12,7 @@ function soundIcon(g) {
   if (/bolly(?!tech)/.test(g)) return 'mic';
   if (/hip/.test(g)) return 'headphones';
   if (/edm|tech/.test(g)) return 'spotlight';
-  if (/afro/.test(g)) return 'wristband';
+  if (/afro/.test(g)) return 'spotlight'; // not one of the system's sounds: spotlight (the wristband left the live system, r25)
   if (/live|indie|rock|pop|band/.test(g)) return 'speaker';
   if (/dj/.test(g)) return 'vinyl';
   if (/girl/.test(g)) return 'cocktail';

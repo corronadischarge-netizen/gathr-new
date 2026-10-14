@@ -158,7 +158,7 @@ export function Welcome(p) {
           {i3('champagne', 80, 'bob')}
         </span>
         <span className="w-3d" style={{ '--d': '380ms', '--r': '8deg', left: '222px', top: '176px' }}>
-          {i3('wristband', 66)}
+          {i3('sunglasses', 66)}
         </span>
       </div>
     );

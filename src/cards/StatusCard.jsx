@@ -15,7 +15,7 @@ export function StatusCard(p) {
           <span className="status-lv">{lv[0]}</span>
           {meta(n + ' nights out with gathr')}
         </div>
-        {i3('wristband', 72)}
+        {i3('lanyard-pass', 72)}
       </div>
       {nx ? (
         <div className="col" style={{ gap: '6px' }}>

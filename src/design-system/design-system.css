@@ -121,14 +121,14 @@ body { margin: 0; font-family: var(--font-sans); background: var(--bg); color: v
 /* FriendsGoing */
 .g-friends { display: inline-flex; align-items: center; gap: var(--space-2); }
 .g-avatars { display: inline-flex; }
-.g-avatar { flex: none; border-radius: var(--radius-full); overflow: hidden; display: inline-grid; place-items: center; background-color: var(--night-800); color: var(--night-300); box-shadow: 0 0 0 2px var(--surface); }
+.g-avatar { flex: none; border-radius: var(--radius-full); overflow: hidden; display: inline-grid; place-items: center; background-color: var(--night-800); color: var(--ink-muted); box-shadow: 0 0 0 2px var(--surface); }
 .g-avatar img { width: 100%; height: 100%; object-fit: cover; display: block; }
 .g-avatar-initials { display: grid; place-items: center; width: 100%; height: 100%; line-height: 1; font-weight: 600; text-align: center; letter-spacing: 0; color: var(--night-50); }
 .g-avatar + .g-avatar { margin-left: -8px; }
 .g-friends-text { white-space: nowrap; font-size: 13px; font-weight: 600; color: var(--ink); }
 
 /* ProgressBar (onboarding) */
-.g-progress { width: 188px; height: 4px; border-radius: var(--radius-full); background: var(--night-800); overflow: hidden; }
+.g-progress { width: 188px; height: 2px; border-radius: var(--radius-full); background: var(--night-800); overflow: hidden; }
 .g-progress span { display: block; height: 100%; border-radius: inherit; background: var(--ink); transition: transform var(--motion-slow) var(--ease-standard); }
 
 /* TopBar */
@@ -177,9 +177,9 @@ body { margin: 0; font-family: var(--font-sans); background: var(--bg); color: v
 .g-feature-copy { z-index: 1; }
 .g-feature .g-bloom { background: transparent; }
 .g-feature-copy { position: relative; flex: 1; padding: var(--space-6) var(--space-5) var(--space-5); display: flex; flex-direction: column; align-items: center; text-align: center; gap: var(--space-2); color: var(--night-50); }
-.g-feature-kicker { display: inline-flex; align-items: center; gap: var(--space-1); font-size: 13px; font-weight: 500; color: var(--night-300); }
+.g-feature-kicker { display: inline-flex; align-items: center; gap: var(--space-1); font-size: 13px; font-weight: 500; color: var(--ink-muted); }
 .g-feature-title { margin: 0; font-size: 20px; line-height: 1.2; font-weight: 600; }
-.g-feature-body { margin: 0; font-size: 15px; line-height: 20px; font-weight: 400; color: var(--night-300); }
+.g-feature-body { margin: 0; font-size: 15px; line-height: 20px; font-weight: 400; color: var(--ink-muted); }
 .g-feature-go { margin-top: auto; display: inline-flex; align-items: center; gap: var(--space-1); height: 36px; padding: 0 var(--space-4); border: 0; border-radius: var(--radius-full); background: var(--night-50); color: var(--night-950); font: inherit; font-size: 13px; font-weight: 600; cursor: pointer; }
 
 /* VenueHero: the full-bleed detail header (the meditation-app player screen) */
@@ -206,7 +206,7 @@ body { margin: 0; font-family: var(--font-sans); background: var(--bg); color: v
 .g-pin-dot { width: 22px; height: 22px; border-radius: var(--radius-full); }
 .g-pin-text { display: flex; flex-direction: column; }
 .g-pin-text b { font-weight: 700; }
-.g-pin-text span { color: var(--night-300); }
+.g-pin-text span { color: var(--ink-muted); }
 .g-pin-tail { width: 8px; height: 8px; margin-top: 4px; border-radius: var(--radius-full); background: var(--night-50); }
 .g-pin.is-selected .g-pin-head { background: var(--brand); }
 .g-pin.is-selected .g-pin-text span { color: var(--violet-100); }
@@ -264,10 +264,11 @@ body { margin: 0; font-family: var(--font-sans); background: var(--bg); color: v
 .g-slide-text { margin: 0; font-size: 40px; line-height: 1.3; font-weight: 500; max-width: 860px; }
 .g-slide-foot { display: flex; justify-content: space-between; align-items: center; font-size: 32px; font-weight: 600; }
 .g-slide-tag { height: 72px; font-size: 34px; padding: 0 36px; }
+.g-slide .g-slide-tag { font-size: 34px; } /* keeps its 1080-canvas size; app.css shrinks .g-vibe (r25) */
 .g-slide-tag::after { width: 30px; height: 18px; }
 .g-slide-cover { background: var(--night-950); color: var(--night-50); }
 .g-slide-cover .g-slide-head { font-size: 150px; }
-.g-slide-cover .g-slide-foot { color: var(--night-300); }
+.g-slide-cover .g-slide-foot { color: var(--ink-muted); }
 .g-slide-body .g-slide-head { font-size: 104px; }
 .g-slide-pillar { font-size: 30px; font-weight: 700; }
 .g-slide-count { font-size: 30px; font-weight: 700; opacity: .7; }
@@ -278,10 +279,10 @@ body { margin: 0; font-family: var(--font-sans); background: var(--bg); color: v
 .g-poster { background: var(--night-950); color: var(--night-50); padding: 72px; gap: 56px; }
 .g-poster > * { position: relative; }
 .g-poster-top { display: flex; justify-content: space-between; align-items: center; }
-.g-poster-accent { font-weight: 300; font-size: 56px; color: var(--night-300); }
+.g-poster-accent { font-weight: 300; font-size: 56px; color: var(--ink-muted); }
 .g-poster-name { margin: 96px 0 0; font-size: 240px; line-height: .9; font-weight: 600; letter-spacing: -0.02em; }
 .g-poster .g-chain { margin-top: auto; }
-.g-poster-support { margin: 0; font-size: 36px; line-height: 1.3; font-weight: 500; color: var(--night-300); }
+.g-poster-support { margin: 0; font-size: 36px; line-height: 1.3; font-weight: 500; color: var(--ink-muted); }
 
 /* SiteHeader */
 .g-site { display: flex; align-items: center; gap: var(--space-6); padding: var(--space-2) var(--space-2) var(--space-2) var(--space-6); border-radius: var(--radius-full); }
@@ -311,9 +312,9 @@ body { margin: 0; font-family: var(--font-sans); background: var(--bg); color: v
 .g-ecard-fade { position: absolute; inset: 40% 0 0 0; background: linear-gradient(180deg, transparent, color-mix(in srgb, var(--night-950) 85%, transparent) 55%, var(--night-950)); pointer-events: none; }
 .g-ecard-top { position: absolute; top: var(--space-3); left: var(--space-3); }
 .g-ecard-copy { position: relative; padding: var(--space-4); display: flex; flex-direction: column; align-items: center; text-align: center; gap: var(--space-1); }
-.g-ecard-kicker { font-size: 13px; line-height: 18px; font-weight: 500; color: var(--night-300); }
+.g-ecard-kicker { font-size: 13px; line-height: 18px; font-weight: 500; color: var(--ink-muted); }
 .g-ecard-title { margin: 0; font-size: 15px; line-height: 20px; font-weight: 600; }
-.g-ecard-meta { margin: 0; font-size: 13px; line-height: 18px; color: var(--night-300); font-weight: 500; }
+.g-ecard-meta { margin: 0; font-size: 13px; line-height: 18px; color: var(--ink-muted); font-weight: 500; }
 .g-ecard-cta { margin-top: var(--space-3); width: 100%; height: 44px; border: 0; border-radius: var(--radius-full); background: var(--night-50); color: var(--night-950); font: inherit; font-size: 15px; font-weight: 600; cursor: pointer; }
 .g-ecard-cta:focus-visible { outline: 2px solid transparent; box-shadow: var(--focus-ring); }
 
@@ -349,9 +350,9 @@ body { margin: 0; font-family: var(--font-sans); background: var(--bg); color: v
 .g-vh2-top { position: absolute; left: var(--space-4); right: var(--space-4); top: 52px; z-index: 2; display: flex; justify-content: space-between; }
 .g-vh2-head { position: absolute; left: var(--space-5); right: var(--space-5); top: 292px; z-index: 2; }
 .g-vh2-name { margin: 0; font-family: var(--font-display); font-size: 32px; line-height: 36px; font-weight: 700; letter-spacing: -0.04em; }
-.g-vh2-sub { margin: 6px 0 0; font-size: 13px; line-height: 16px; font-weight: 500; color: var(--night-300); }
+.g-vh2-sub { margin: 6px 0 0; font-size: 13px; line-height: 16px; font-weight: 500; color: var(--ink-muted); }
 .g-vh2-card { position: absolute; left: var(--space-3); right: var(--space-3); top: 384px; z-index: 2; box-sizing: border-box; padding: var(--space-5); border-radius: var(--radius-lg); background: var(--night-900); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--white) 6%, transparent);
-  display: grid; grid-template-columns: 124px minmax(0, 1fr); column-gap: var(--space-5); row-gap: var(--space-4); --ink: var(--night-50); --ink-muted: var(--night-300); --surface-raised: var(--night-800); }
+  display: grid; grid-template-columns: 124px minmax(0, 1fr); column-gap: var(--space-5); row-gap: var(--space-4); --ink: var(--night-50); --ink-muted: var(--night-500); --surface-raised: var(--night-800); }
 .g-vh2-cta { position: absolute; left: var(--space-4); right: var(--space-4); bottom: 28px; z-index: 2; }
 
 /* FactList: icon circle, 13px label, 16px value on the right edge */
@@ -492,7 +493,7 @@ body { margin: 0; font-family: var(--font-sans); background: var(--bg); color: v
 
 /* Sticker: a 3D object from assets/Stickers, still unless it's the screen's one bob (motion.css). From bundle.css */
 .g-sticker { display: block; object-fit: contain; filter: drop-shadow(0 14px 18px #00000099); transform: rotate(var(--tilt, 0deg)); }
-.g-sticker-ph { display: grid; place-items: center; border-radius: 28%; background: var(--night-700); color: var(--night-300); font-size: 11px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; box-shadow: inset 0 0 0 1.5px var(--night-600); transform: rotate(var(--tilt, 0deg)); }
+.g-sticker-ph { display: grid; place-items: center; border-radius: 28%; background: var(--night-700); color: var(--ink-muted); font-size: 11px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; box-shadow: inset 0 0 0 1.5px var(--night-600); transform: rotate(var(--tilt, 0deg)); }
 
 /* TagPill: a short label on a photo or collage (bundle.css .g-tag) */
 .g-tag { display: inline-flex; align-items: center; gap: 6px; height: 34px; padding: 0 14px 0 12px; border-radius: var(--radius-full); font-size: 13px; font-weight: 600; white-space: nowrap; box-shadow: var(--shadow-float); }
@@ -503,11 +504,14 @@ body { margin: 0; font-family: var(--font-sans); background: var(--bg); color: v
 .g-tag-brand { background: var(--brand); color: var(--on-brand); }
 
 /* DoorVerdict (proposed r24): will they let us in? Words carry it; colour repeats it */
-.g-dv-pill { display: flex; align-items: center; justify-content: space-between; gap: var(--space-3); min-width: 0; }
+.g-dv { position: relative; } /* keeps the hidden "Door: " inside scrolling rails (r25) */
+/* r25: the verdict alone in the pill ("Ask the venue" beside it), the short source line under it */
+.g-dv-pill { display: flex; flex-direction: column; align-items: flex-start; gap: var(--space-1); min-width: 0; }
+.g-dv-row { display: flex; align-items: center; justify-content: space-between; gap: var(--space-3); width: 100%; min-width: 0; }
 .g-dv-tag { flex: none; min-width: 0; max-width: 100%; }
 .g-dv-tag > span:last-child { overflow: hidden; text-overflow: ellipsis; }
 .g-dv-pill.is-no .g-dv-tag { color: var(--limit-text); }
-.g-dv-src { flex: 0 1 auto; min-width: 0; font-size: 11px; line-height: 14px; color: var(--ink-faint); text-align: right; }
+.g-dv-src { min-width: 0; font-size: 11px; line-height: 14px; color: var(--ink-faint); text-align: left; }
 .g-dv-line { display: inline-flex; align-items: center; gap: var(--space-1); max-width: 100%; min-width: 0; font-size: 13px; line-height: 18px; font-weight: 600; }
 .g-dv-line .g-dv-text { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .g-dv-line.is-yes { color: var(--go-text); }
@@ -539,6 +543,10 @@ body { margin: 0; font-family: var(--font-sans); background: var(--bg); color: v
 .g-nt-row .g-nt-img { flex: none; width: 64px; height: 80px; border-radius: var(--radius-sm); background-position: center 30%; }
 .g-nt-row .g-nt-body { flex: 1; }
 .g-nt-end { flex: none; display: flex; flex-direction: column; align-items: flex-end; gap: 6px; }
+/* r25: All nights rows keep price + crowd in a fixed column, left-aligned, so the crowd bars line up on every row */
+.g-nt-row .g-nt-end { width: 120px; align-items: flex-start; }
+/* r25: on a tile the door line, when shown, closes the block */
+.g-nt-tile .g-nt-body > .g-dv-line { margin-top: 2px; }
 .g-nt-row .g-nt-price { font-size: 20px; line-height: 24px; }
 .g-nt-skel { display: block; background: var(--night-800); }
 .g-nt-tile .g-nt-skel.g-nt-img { width: 156px; height: 195px; border-radius: var(--radius-md); }
@@ -610,3 +618,26 @@ body { margin: 0; font-family: var(--font-sans); background: var(--bg); color: v
   .g-up-done { animation-name: g-fade; animation-duration: var(--dur-fast); }
   .g-up.is-leaving { animation: fade-out var(--dur-fast) linear forwards; }
 }
+
+/* StoryCard (r25): the card for a night that's yours. Solid photo card; only the status chip is glass (it sits on the photo) */
+.g-story { position: relative; width: 264px; aspect-ratio: 3 / 4.3; border-radius: var(--radius-xl); overflow: hidden; background-color: var(--night-950); color: var(--night-50); isolation: isolate; --ink-muted: var(--night-500); }
+.g-story-media { position: absolute; inset: 0; border-radius: 0; }
+.g-story-fade { position: absolute; inset: 35% 0 0; background: linear-gradient(180deg, transparent, color-mix(in srgb, var(--night-950) 80%, transparent) 50%, var(--night-950)); }
+.g-story-status { position: absolute; top: 14px; left: 14px; display: inline-flex; align-items: center; gap: 6px; height: 32px; padding: 0 12px 0 6px; border-radius: var(--radius-full); background: var(--glass-scrim); -webkit-backdrop-filter: blur(var(--blur-sm)); backdrop-filter: blur(var(--blur-sm)); box-shadow: inset 0 0 0 1px var(--glass-edge); font-size: 13px; font-weight: 600; }
+.g-story-status-dot { width: 20px; height: 20px; border-radius: var(--radius-full); display: grid; place-items: center; background: var(--go); color: var(--on-fill); }
+.g-story-body { position: absolute; left: 0; right: 0; bottom: 0; padding: 0 18px 20px; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 2px; }
+.g-story-people { display: inline-flex; align-items: center; margin-bottom: 10px; }
+.g-story-av { box-shadow: 0 0 0 2px var(--night-950); }
+.g-story-av + .g-story-av { margin-left: -6px; }
+.g-story-title { margin: 0 0 4px; font-family: var(--font-display); font-weight: 700; font-size: 20px; line-height: 24px; letter-spacing: -0.03em; }
+.g-story-meta { margin: 0; font-size: 13px; line-height: 18px; color: var(--ink-muted); }
+
+/* CardDeck (r25 in the app): the focused card centred, neighbours smaller and dimmer. --deck-shift (cards right of focus
+   minus cards left of it) keeps the focused one in the middle; each neighbour overlaps by 36 */
+.g-deck { display: flex; align-items: center; justify-content: center; touch-action: pan-y; transform: translateX(calc(var(--deck-shift, 0) * (264px - 36px) / 2)); transition: transform var(--dur-slow) var(--ease-standard); }
+.g-deck-item { flex: none; transition: transform var(--dur-slow) var(--ease-standard), opacity var(--dur-slow); }
+.g-deck-item.is-left, .g-deck-item.is-right { transform: scale(.86); opacity: .74; }
+.g-deck-item.is-left { margin-right: -36px; }
+.g-deck-item.is-right { margin-left: -36px; }
+.g-deck-item.is-active { position: relative; z-index: 1; }
+@media (prefers-reduced-motion: reduce) { .g-deck, .g-deck-item { transition: none; } }

@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
-import { currentGroup, groupFromPlan, groupLabel } from '../data/group';
+import { friendsOf } from '../data/friends';
+import { currentGroup, fitFriends, groupFromPlan, groupLabel, toggleFriend } from '../data/group';
 import { Button, Chip, Icon, IconButton, Sheet } from '../design-system';
 import { haptic } from '../lib/haptics';
 import { log } from '../lib/log';
@@ -60,20 +61,31 @@ export function GoingAsSheet(p) {
   var [g, setG] = useState(Object.assign({ women: 0, men: 0 }, start, start.type === 'mixed' && !start.women && !start.men ? split(start.size) : null));
   function pick(type) {
     var size = type === 'solo' ? 1 : type === 'couple' ? 2 : Math.max(2, g.type === 'solo' || g.type === 'couple' ? 2 : g.size);
-    setG(Object.assign({}, g, { type: type, size: size }, type === 'mixed' ? split(size) : { women: 0, men: 0 }));
+    setG(fitFriends(Object.assign({}, g, { type: type, size: size }, type === 'mixed' ? split(size) : { women: 0, men: 0 })));
   }
   function setSize(n) {
-    setG(Object.assign({}, g, { size: n }, g.type === 'mixed' ? split(n) : null));
+    setG(fitFriends(Object.assign({}, g, { size: n }, g.type === 'mixed' ? split(n) : null)));
   }
   function setSide(side, n) {
     var x = Object.assign({}, g, { [side]: n });
     x.size = x.women + x.men;
-    setG(x);
+    setG(fitFriends(x));
   }
   useEffect(() => {
     log('going_as_open', { from: S.gaFrom || 'home' });
   }, []);
+  /* r25 "Add friends": names for the GroupPill only; a pick with no room buzzes and changes nothing (like the stepper) */
+  function friend(f) {
+    var x = toggleFriend(g, f);
+    if (!x) {
+      haptic.warning();
+      return;
+    }
+    haptic.tap();
+    setG(x);
+  }
   function save(next) {
+    next = fitFriends(next);
     log('going_as_save', { type: next.type, size: next.size, under21: !!next.under21 });
     c.set({ group: Object.assign({}, next, { source: 'manual' }), sheet: null });
     // the sheet closes, the home re-sorts under it, and a toast says what changed (interactions spec 6.2)
@@ -100,6 +112,21 @@ export function GoingAsSheet(p) {
           </>
         ) : count ? (
           <Stepper label="How many of you?" sub="Including you" value={g.size} min={2} max={10} onChange={setSize} />
+        ) : null}
+        {g.type !== 'solo' ? (
+          <>
+            <span className="rowc between">
+              <span className="caps ga-caps">Add friends</span>
+              <span className="sample ga-sample">Sample data</span>
+            </span>
+            <div className="ga-chips" role="group" aria-label="Add friends">
+              {friendsOf(S).map((f) => (
+                <Chip key={f.id} selected={(g.friends || []).some((x) => x.id === f.id)} onClick={() => friend(f)}>
+                  {f.name}
+                </Chip>
+              ))}
+            </div>
+          </>
         ) : null}
         <span className="caps ga-caps">Anyone under 21?</span>
         <div className="ga-chips" role="radiogroup" aria-label="Anyone under 21?">

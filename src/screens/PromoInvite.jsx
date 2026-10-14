@@ -74,7 +74,7 @@ export function PromoInvite(p) {
       <div className="full col pad-top" style={gap}>
         {back}
         <div className="rel">
-          {i3('wristband', 88, 'head-ic bob')}
+          {i3('lanyard-pass', 88, 'head-ic bob')}
           {eyebrow('Promoter invite')}
           {stop('enter your code')}
         </div>
@@ -123,7 +123,7 @@ export function PromoInvite(p) {
       <div className="full col pad-top" style={gap}>
         {back}
         <div className="rel">
-          {i3('wristband', 88, 'head-ic bob')}
+          {i3('lanyard-pass', 88, 'head-ic bob')}
           {eyebrow('Promoter invite · ' + code)}
           {stop(why ? 'can’t open it' : 'one sec')}
         </div>

@@ -20,10 +20,10 @@ export function PassCard(p) {
   return (
     <>
       <div className="rowc" style={{ justifyContent: 'center', marginTop: '24px' }}>
-        {/* the wristband sits on the ticket's corner; right after booking it drops onto it (the screen's one sticker) */}
+        {/* the lanyard pass sits on the ticket's corner (it replaced the wristband, r25); right after booking it drops onto it (the screen's one sticker) */}
         <span className="pass-ticket">
           <Ticket {...ticketProps(S, e, S.guests)} />
-          {i3('wristband', 56, 'pass-band')}
+          {i3('lanyard-pass', 56, 'pass-band')}
         </span>
       </div>
       <div className="g-card card col" style={{ marginTop: '24px', padding: '20px', gap: '12px' }}>

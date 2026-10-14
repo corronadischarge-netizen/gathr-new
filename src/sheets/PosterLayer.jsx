@@ -45,7 +45,7 @@ export function PosterLayer(p) {
         {svgIcon(['M6 6l12 12', 'M18 6L6 18'])}
       </button>
       <img ref={img} src={e.img} alt={'Poster for ' + e.title} className="poster-img" />
-      <p className="meta" style={{ textAlign: 'center', margin: '16px 24px 0', color: 'var(--night-300)' }}>
+      <p className="meta" style={{ textAlign: 'center', margin: '16px 24px 0', color: 'var(--ink-muted)' }}>
         The organiser’s full poster · tap or press Esc to close
       </p>
     </div>

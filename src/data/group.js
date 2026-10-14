@@ -1,5 +1,7 @@
 /* Going as: who's going tonight, so the door rules can be checked for the whole group (home spec 5.1).
-   group = { type: 'guys' | 'girls' | 'mixed' | 'couple' | 'solo' (just me, board 04) | null, size, women, men, under21, under25, source: 'manual' | 'plan' }
+   group = { type: 'guys' | 'girls' | 'mixed' | 'couple' | 'solo' (just me, board 04) | null, size, women, men, under21, under25, source: 'manual' | 'plan',
+             friends?: [{ id, name }] (r25, optional: friends on gathr you picked, for the GroupPill's names only) }
+   The door is checked from type, size and age only; friends never change a verdict.
    null (or no type) = not set. Stored on the phone as S.group. */
 
 export function isSet(g) {
@@ -68,6 +70,8 @@ export function groupFromPlan(gp) {
     men: gp.men || 0,
     under21: !!gp.under21,
     under25: !!gp.under25,
+    // r25: a plan fills names in by itself
+    friends: gp.members.slice(0, t === 'couple' ? 1 : size - 1).map((n) => ({ id: firstName(n).toLowerCase(), name: firstName(n) })),
     source: 'plan'
   };
 }
@@ -77,4 +81,80 @@ export function groupFromPlan(gp) {
 export function currentGroup(S) {
   if (S.groupOff) return null; // ?group=none: the home as if nothing were set
   return isSet(S.group) ? S.group : null;
+}
+
+/* GroupPill copy (r25): who and what's next, never the group's make-up ("4 guys, all 21+" lives in Going as) */
+
+/* "Riya Shah" → "Riya" */
+export function firstName(n) {
+  return String(n || '').trim().split(/\s+/)[0];
+}
+
+/* first names, at most two, then "+ n": "Riya", "Riya, Dev", "Riya, Dev + 2" */
+export function namesLine(names) {
+  var n = (names || []).map(firstName).filter(Boolean),
+    two = n.slice(0, 2).join(', ');
+  return n.length > 2 ? two + ' + ' + (n.length - 2) : two;
+}
+
+/* who's going, from the counts in Going as: "You + 3 guys", "You + 2 girls", "You and your date", "You + 4 friends",
+   "Just you" */
+export function countsTitle(g) {
+  if (!isSet(g) || g.type === 'solo' || (g.size || 1) < 2) return 'Just you';
+  if (g.type === 'couple') return 'You and your date';
+  var more = g.size - 1,
+    word = g.type === 'guys' ? 'guy' : g.type === 'girls' ? 'girl' : 'friend';
+  return 'You + ' + more + ' ' + word + (more === 1 ? '' : 's');
+}
+
+/* the pill's title for a set group: names when you picked friends ("You, Riya, Dev + 1", "You and Dev" for a couple),
+   otherwise the counts ("You + 3 guys"). "+ n" is everyone else in the group, on gathr or not */
+export function groupTitle(g) {
+  var f = (isSet(g) && g.type !== 'solo' && g.friends) || [];
+  if (!f.length) return countsTitle(g);
+  if (g.type === 'couple') return 'You and ' + firstName(f[0].name);
+  var shown = f.slice(0, 2).map((x) => firstName(x.name)),
+    more = Math.max(0, (g.size || 1) - 1 - shown.length);
+  return ['You'].concat(shown).join(', ') + (more ? ' + ' + more : '');
+}
+
+/* Going as, "Add friends": pick or unpick one friend. Guys and girls grow to fit (10 at most); a couple has room for
+   one date and a mixed group for its counts, so a pick with no room returns null (the sheet buzzes, nothing changes) */
+export function toggleFriend(g, f) {
+  var list = g.friends || [];
+  if (list.some((x) => x.id === f.id)) return Object.assign({}, g, { friends: list.filter((x) => x.id !== f.id) });
+  var next = list.concat({ id: f.id, name: firstName(f.name) }),
+    need = next.length + 1;
+  if (need <= (g.size || 1)) return Object.assign({}, g, { friends: next });
+  if ((g.type === 'guys' || g.type === 'girls') && need <= 10) return Object.assign({}, g, { friends: next, size: need });
+  return null;
+}
+
+/* after the type or size changes: just me has no friends; a smaller group drops the last ones picked */
+export function fitFriends(g) {
+  if (!g.friends) return g;
+  return Object.assign({}, g, { friends: g.type === 'solo' ? [] : g.friends.slice(0, Math.max(0, (g.size || 1) - 1)) });
+}
+
+/* the pill's age line, only when it changes things. The group keeps "anyone under 21" as yes/no, not a count */
+export function ageLine(g, profileAge) {
+  return under21(g, profileAge) ? 'Someone under 21' : null;
+}
+
+/* "Waiting on Arjun · 8 pm", "Waiting on 2 · 8 pm" */
+export function waitingLine(names, when) {
+  var who = names.length === 1 ? firstName(names[0]) : names.length;
+  return 'Waiting on ' + who + (when ? ' · ' + when : '');
+}
+
+/* who you're going with to a night you booked, for its StoryCard: you first, then the plan's members (a plan booking)
+   or the friends you picked in Going as. Four faces at most */
+export function goingWith(S, evId) {
+  var me = { name: (S.me && S.me.name) || 'You', image: S.me && S.me.photo },
+    gp = S.gp,
+    names =
+      gp && gp.stage === 'booked' && gp.booked === evId
+        ? gp.members
+        : ((currentGroup(S) || {}).friends || []).map((f) => f.name);
+  return [me].concat(names.map((n) => ({ name: firstName(n) }))).slice(0, 4);
 }

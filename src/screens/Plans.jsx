@@ -1,4 +1,4 @@
-import { TicketStack } from '../cards/TicketStack';
+import { UpcomingDeck } from '../cards/UpcomingDeck';
 import { GroupPlanSummaryCard } from '../cards/GroupPlanSummaryCard';
 import { priceTxt } from '../data/format';
 import { useRef } from 'react';
@@ -21,8 +21,8 @@ export function Plans(p) {
         {stop('your plans')}
       </div>
       <div className="col" style={{ gap: '12px' }}>
-        <span className="g-section-title">Your tickets</span>
-        <TicketStack ctx={c} />
+        <span className="g-section-title">Your nights</span>
+        <UpcomingDeck ctx={c} />
       </div>
       <div className="col" style={{ gap: '12px' }}>
         {sec(

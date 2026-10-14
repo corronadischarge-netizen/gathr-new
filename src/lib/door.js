@@ -2,7 +2,7 @@
    door = { minAge, stag: 'allowed' | 'fee' | 'couples_only' | 'not_allowed' | null, stagFee, mixedOnly, dress, dressStrict,
             arriveBy: 'HH:MM', source: 'host' | 'gathr' | 'guests' | null, checkedAt, guestAnswers }
    Pure: no app imports beyond the group helpers, so it can be tested on its own. */
-import { groupLabel, isSet, stags, under21, under25 } from '../data/group.js';
+import { isSet, stags, under21, under25 } from '../data/group.js';
 
 const DAY = 86400000;
 
@@ -41,10 +41,10 @@ function rupees(n) {
 function plainRule(d) {
   if (d.stag === 'couples_only') return 'Couples only';
   if (d.mixedOnly) return 'Mixed groups only';
-  if (d.stag === 'not_allowed') return 'No stag entry';
+  if (d.stag === 'not_allowed') return 'No stags';
   if (d.stag === 'fee') return 'Stags ' + rupees(d.stagFee || 0);
   if (d.stag === 'allowed') return 'Stags OK';
-  return 'Stag rules not listed';
+  return 'Stag rules unknown';
 }
 
 /* → { state: 'yes' | 'if' | 'unknown' | 'no', reasons: [text], kinds: [kind], plain, minAge, source } */
@@ -63,28 +63,28 @@ export function getDoorVerdict(door, group, profileAge, t) {
     return out('no', [d.minAge + '+ only'], ['age']);
   // no group set: say the rule plainly, styled as unknown
   if (!set) {
-    if (d.minAge == null && u21) return out('unknown', ['Age limit not listed'], ['age']);
+    if (d.minAge == null && u21) return out('unknown', ['Age limit unknown'], ['age']);
     return Object.assign(out('unknown', [plainRule(d)], ['stag']), { plain: true });
   }
-  if (d.stag === 'not_allowed' && st > 0) return out('no', ['No stag entry'], ['stag']);
-  if (d.stag === 'couples_only' && st > 0) return out('no', ['Couples only tonight'], ['stag']);
+  if (d.stag === 'not_allowed' && st > 0) return out('no', ['No stags'], ['stag']);
+  if (d.stag === 'couples_only' && st > 0) return out('no', ['Couples only'], ['stag']);
   if (d.mixedOnly && group.type === 'guys') return out('no', ['Mixed groups only'], ['stag']);
   // 2. unknown: a rule that matters for this group is missing
-  if (st > 0 && d.stag == null) return out('unknown', ['Stag rules not listed'], ['stag']);
-  if (d.minAge == null && u21) return out('unknown', ['Age limit not listed'], ['age']);
+  if (st > 0 && d.stag == null) return out('unknown', ['Stag rules unknown'], ['stag']);
+  if (d.minAge == null && u21) return out('unknown', ['Age limit unknown'], ['age']);
   // 3. if: the group fits, but something is on them (two at most, most important first)
   var r = [],
     k = [];
   if (d.dressStrict && d.dress) {
-    r.push(d.dress.toLowerCase() + ' only');
+    r.push(cap(d.dress.toLowerCase()) + ' only');
     k.push('dress');
   }
   if (d.arriveBy) {
-    r.push('before ' + clock12(d.arriveBy));
+    r.push('Before ' + clock12(d.arriveBy));
     k.push('arrive');
   }
   if (d.stag === 'fee' && st > 0) {
-    r.push('stags ' + rupees(d.stagFee || 0));
+    r.push('Stags ' + rupees(d.stagFee || 0));
     k.push('fee');
   }
   if (r.length) return out('if', r.slice(0, 2), k.slice(0, 2));
@@ -123,27 +123,26 @@ function cap(s) {
   return s.charAt(0).toUpperCase() + s.slice(1);
 }
 
-/* the words and icon for a verdict. look 'pill' (hero card, event page) or 'line' (tiles and rows) */
+/* the words and icon for a verdict (r25: 20 characters at most, the group never repeated: the GroupPill says who).
+   The pill (hero card, event page) and the line (tiles and rows) use the same words; group and look stay for callers.
+   The ID reminder and a second condition live in doorRows, where there's room */
 export function verdictText(v, group, look) {
-  var who = groupLabel(isSet(group) ? group : null),
-    pill = look !== 'line',
-    text;
-  if (v.state === 'yes')
-    text = pill ? 'Lets ' + who + ' in · ' + v.reasons[0] : 'Lets you in' + (v.minAge === 18 ? ' · 18+' : '');
-  else if (v.state === 'if') text = pill ? 'Lets ' + who + ' in · ' + v.reasons.join(', ') : cap(v.reasons[0]);
+  var text;
+  // the age only when it narrows things (21+, 25+): 18+ is every night's floor, so it goes unsaid (Shubh, 14 Oct)
+  if (v.state === 'yes') text = 'Lets you in' + (v.minAge >= 21 ? ' · ' + v.minAge + '+' : '');
   else text = v.reasons[0];
   return { state: v.state, text: text, icon: v.state === 'if' ? IF_ICON[v.kinds[0]] : ICON[v.state] };
 }
 
-/* where the rule came from, next to the pill: "Set by the host", "Checked by gathr · 3 days ago", "From 12 guests".
+/* where the rule came from, under the pill (r25, short): "Set by host", "Checked 3d ago", "From 12 guests".
    src = { kind: 'host' | 'gathr' | 'guests', checkedAt, count } (DoorVerdict's source prop) */
 export function formatSource(src, t, tight) {
   if (!src || !src.kind) return null;
-  if (src.kind === 'host') return 'Set by the host';
+  if (src.kind === 'host') return 'Set by host';
   if (src.kind === 'guests') return 'From ' + src.count + ' guests';
   if (tight || !src.checkedAt) return 'Checked by gathr';
   var days = Math.max(0, Math.floor((t - Date.parse(src.checkedAt)) / DAY));
-  return 'Checked by gathr · ' + (days === 0 ? 'today' : days === 1 ? '1 day ago' : days + ' days ago');
+  return days === 0 ? 'Checked today' : 'Checked ' + days + 'd ago';
 }
 
 /* a verdict's source, in DoorVerdict's shape */

@@ -716,7 +716,7 @@ export function App() {
     if (!b || b.rid !== rid) return;
     if (bkSend('FAILED', { err: why || 'You haven’t been charged' })) haptic.error();
   }
-  /* you're in: the pass, with the tick and the wristband (they play once, on the pass, for this booking) */
+  /* you're in: the pass, with the tick and the lanyard pass (they play once, on the pass, for this booking) */
   function booked(b, payId, booking) {
     var earned = b.n >= 3 && b.total && !(booking && booking.guests) ? 50 : 0,
       onSheet = live.current.sheet === 'list';

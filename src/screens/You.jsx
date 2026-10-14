@@ -62,7 +62,7 @@ export function You(p) {
     'Promoter invite',
     'Got a code from a host? Enter it here',
     () => c.go('promoinvite', { piCode: null }),
-    ['wristband', 'yellow']
+    ['lanyard-pass', 'yellow']
   ]);
   // promoters: the nights hosts invited them to, with their own guest lists
   if ((S.promoting || []).length)
@@ -71,7 +71,7 @@ export function You(p) {
       S.promoting.length +
         (S.promoting.length === 1 ? ' night · your guest list' : ' nights · your guest lists'),
       () => c.go('promoting'),
-      ['wristband', 'green']
+      ['lanyard-pass', 'green']
     ]);
   // gathr admins (and only them) get a way in to approvals
   if (S.isAdmin)

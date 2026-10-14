@@ -20,7 +20,7 @@ export function Recap(p) {
       </div>
       <div className="rel">
         {i3('memories', 96, 'head-ic bob', { top: '-8px' })}
-        <span className="g-accent" style={{ color: 'var(--night-300)' }}>
+        <span className="g-accent" style={{ color: 'var(--ink-muted)' }}>
           {e.date.toLowerCase()}
         </span>
         {stop(['your night,', <br key="b" />, 'wrapped'])}
