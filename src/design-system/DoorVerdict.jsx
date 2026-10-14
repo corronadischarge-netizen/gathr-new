@@ -10,7 +10,7 @@ const ICON = { yes: 'check', if: 'check', unknown: 'info', no: 'x' };
 const TONE = { yes: 'go', if: 'light', unknown: 'dark', no: 'dark' };
 
 /* Will they let us in? For the group set in Going as, always in words (the colour only repeats it).
-   look 'pill' (hero card, event page: TagPill, "Ask the venue" beside it for unknown, the short source under it, r25)
+   look 'pill' (hero card, event page: TagPill with the short source beside it, right-aligned, r25.1; "Ask the venue" takes that spot for unknown)
    or 'line' (tiles and rows: icon 16 + words) */
 export function DoorVerdict(p) {
   var state = p.state || 'unknown',
@@ -30,18 +30,17 @@ export function DoorVerdict(p) {
   var src = p.showSource === false ? null : formatSource(p.source, now());
   return (
     <div key={swap} className={cx('g-dv', 'g-dv-pill', 'is-' + state, swap && 'g-swap', p.className)}>
-      <div className="g-dv-row">
-        <TagPill tone={TONE[state]} icon={icon} className="g-dv-tag">
-          <span className="g-sr">Door: </span>
-          {p.text}
-        </TagPill>
-        {state === 'unknown' && p.onAsk ? (
-          <Button variant="subtle" size="sm" onClick={p.onAsk}>
-            Ask the venue
-          </Button>
-        ) : null}
-      </div>
-      {src ? <span className="g-dv-src">{src}</span> : null}
+      <TagPill tone={TONE[state]} icon={icon} className="g-dv-tag">
+        <span className="g-sr">Door: </span>
+        {p.text}
+      </TagPill>
+      {state === 'unknown' && p.onAsk ? (
+        <Button variant="subtle" size="sm" onClick={p.onAsk}>
+          Ask the venue
+        </Button>
+      ) : src ? (
+        <span className="g-dv-src">{src}</span>
+      ) : null}
     </div>
   );
 }

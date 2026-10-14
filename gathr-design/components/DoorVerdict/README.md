@@ -18,7 +18,7 @@ The pill and the line use the same words. The group isn't repeated: the `GroupPi
 - 20 characters at most, sentence case, no full stop.
 - One condition in the pill. A second condition, the ID reminder and the dress details live in the event page's "Who gets in" rows, where there's room.
 
-**Source line** (pill only): under the pill, 4 below, 11/14 `ink-faint`, left-aligned. **Set by host** · **Checked 3d ago** (**Checked today**; **Checked by gathr** when there's no date) · **From 12 guests**. Tiles and rows never show it.
+**Source line** (pill only): beside the pill on the same row, right-aligned, 11/14 `ink-faint`; it truncates before the pill does. With `onAsk`, "Ask the venue" takes that spot. **Set by host** · **Checked 3d ago** (**Checked today**; **Checked by gathr** when there's no date) · **From 12 guests**. Tiles and rows never show it.
 
 | State | Pill | Line |
 |---|---|---|

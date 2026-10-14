@@ -1098,3 +1098,7 @@ body { margin: 0; font-family: var(--font-sans); background: var(--bg); color: v
 .g-slide .g-slide-tag { font-size: 34px; }
 /* ProgressBar: a hairline, not a bar */
 .g-progress { height: 2px; }
+
+/* r25.1 — DoorVerdict pill: the source line sits beside the pill again, on one row, right-aligned */
+.g-dv-pill { flex-direction: row; align-items: center; justify-content: space-between; gap: var(--space-3); }
+.g-dv-src { flex: 0 1 auto; min-width: 0; text-align: right; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }

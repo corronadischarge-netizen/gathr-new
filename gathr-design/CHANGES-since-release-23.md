@@ -19,7 +19,7 @@ Work through these one area at a time. Check each in the browser at 390 wide bef
    - no: the reason: "Couples only", "21+ only", "No stags", "Mixed groups only" (was "Couples only tonight")
    - The ID reminder and any second condition move to the event page's "Who gets in" rows.
    - Pill and line now use the same words.
-5. **DoorVerdict source line is short and sits under the pill:** "Set by host" · "Checked 3d ago" ("Checked today", "Checked by gathr" with no date) · "From 12 guests". 11/14 `ink-faint`, 4 below the pill, left-aligned. "Ask the venue" stays beside the pill for unknown.
+5. **DoorVerdict source line is short and sits beside the pill (25.1: back on one row, as before release 25):** "Set by host" · "Checked 3d ago" ("Checked today", "Checked by gathr" with no date) · "From 12 guests". 11/14 `ink-faint`, right-aligned on the pill's row; it truncates before the pill does. "Ask the venue" takes that spot for unknown.
 6. **GroupPill shows who and what's next, not the group's make-up.** See components/GroupPill/README.md for every state:
    - plan, you haven't voted: "Friday plan" / "Your vote · closes 8 pm"
    - plan, waiting: "Friday plan" / "Waiting on Arjun · 8 pm" ("Waiting on 2" for more)

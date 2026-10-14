@@ -704,12 +704,11 @@
         h(Icon, { name: icon, size: 16 }), h('span', { className: 'g-dv-text' }, words));
     }
     var src = p.showSource === false ? null : doorSource(p.source);
-    /* r25: the pill holds only the verdict (2–3 words); the source sits under it, small */
+    /* r25.1: the pill holds only the verdict (2–3 words); the short source sits beside it on the same row, right-aligned */
+    var ask = state === 'unknown' && p.onAsk ? h(Button, { variant: 'subtle', size: 'sm', onClick: p.onAsk }, 'Ask the venue') : null;
     return h('div', { className: cx('g-dv', 'g-dv-pill', 'is-' + state, p.className) },
-      h('div', { className: 'g-dv-row' },
-        h(TagPill, { tone: DV_TONE[state], icon: icon, className: 'g-dv-tag' }, words),
-        state === 'unknown' && p.onAsk ? h(Button, { variant: 'subtle', size: 'sm', onClick: p.onAsk }, 'Ask the venue') : null),
-      src ? h('span', { className: 'g-dv-src' }, src) : null);
+      h(TagPill, { tone: DV_TONE[state], icon: icon, className: 'g-dv-tag' }, words),
+      ask || (src ? h('span', { className: 'g-dv-src' }, src) : null));
   }
   DoorVerdict.source = doorSource;
 

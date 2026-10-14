@@ -506,12 +506,11 @@ body { margin: 0; font-family: var(--font-sans); background: var(--bg); color: v
 /* DoorVerdict (proposed r24): will they let us in? Words carry it; colour repeats it */
 .g-dv { position: relative; } /* keeps the hidden "Door: " inside scrolling rails (r25) */
 /* r25: the verdict alone in the pill ("Ask the venue" beside it), the short source line under it */
-.g-dv-pill { display: flex; flex-direction: column; align-items: flex-start; gap: var(--space-1); min-width: 0; }
-.g-dv-row { display: flex; align-items: center; justify-content: space-between; gap: var(--space-3); width: 100%; min-width: 0; }
+.g-dv-pill { display: flex; align-items: center; justify-content: space-between; gap: var(--space-3); min-width: 0; } /* r25.1: source beside the pill, right-aligned */
 .g-dv-tag { flex: none; min-width: 0; max-width: 100%; }
 .g-dv-tag > span:last-child { overflow: hidden; text-overflow: ellipsis; }
 .g-dv-pill.is-no .g-dv-tag { color: var(--limit-text); }
-.g-dv-src { min-width: 0; font-size: 11px; line-height: 14px; color: var(--ink-faint); text-align: left; }
+.g-dv-src { flex: 0 1 auto; min-width: 0; font-size: 11px; line-height: 14px; color: var(--ink-faint); text-align: right; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .g-dv-line { display: inline-flex; align-items: center; gap: var(--space-1); max-width: 100%; min-width: 0; font-size: 13px; line-height: 18px; font-weight: 600; }
 .g-dv-line .g-dv-text { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .g-dv-line.is-yes { color: var(--go-text); }
