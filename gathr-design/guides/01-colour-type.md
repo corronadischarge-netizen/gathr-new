@@ -22,6 +22,7 @@ Everything else is black and greys (`bg`, `surface`, `surface-raised`, `line`, `
 - **Selections and buttons are flat:** one flat fill, no shine, no edge highlight, no glow. That covers the selected chip, tile and pin, the selected tab and its sliding pill, rings, the brand button and Update's Accept.
 - **Shine is expression only:** a same-hue gloss built **only** from the hue's own -100/-300/-500 steps (the deepest violet and blue are mixed with night-950), for vibe tags, pill chains, stat bubbles, the pill pattern and social fields. It isn't a colour token: `--shine-<hue>` in bundle.css is a recipe made only of palette tokens plus a white highlight, so "no colour value outside tokens.json" still holds.
 - **Status badges:** flat, the one exception to the shine. Solid badges are one flat fill of the hue's fill step (night-950 text on yellow, green and red; white on violet). Transparent badges are a flat 20% wash of the hue with a 1px hue edge and the -100 step as text. Neutral badges are flat night-800 with a night-700 edge. The colours are still only the four above, plus grey.
+- **Door verdict (`DoorVerdict`):** green `go` for **yes** (the group gets in), white for **if** (gets in with a condition: dress, arrive by, stag fee), dark grey for **unknown** (a rule isn't listed), and `limit-text` red words for **no**. The words always carry the meaning and the colour repeats it. `if` is never yellow (yellow means energy right now) and red is only for `no`.
 - **Booked so far:** grey Early → green Filling up → yellow Buzzing → **yellow Packed** → red Full. Packed is the high point, so it's yellow (energy right now); red is only for Full, the one real limit. Always with its word, and counts as people ("412 of 480"), never a percentage.
 
 ## Type ladder
@@ -50,6 +51,20 @@ Everything else is black and greys (`bg`, `surface`, `surface-raised`, `line`, `
 
 **Casing:** sentence case everywhere: buttons, chips, body, messages. Only gathr's own display headlines go lowercase with the yellow full stop. Names keep their own spelling and never get the yellow full stop ("Almost Illegal Thursday", "F Bar"). Dates and places in pills are sentence case: "Sat 04.10", "F Bar, Pune".
 
+## Three text levels (release 25)
+
+Hierarchy comes from a clear step in brightness, not only size and weight. Muted text used to be night-300, so close to `ink` (2.0:1 between them) that headlines and supporting lines read as one white. It's now one step darker.
+
+| Level | Token (night) | Use | Against `ink` |
+|---|---|---|---|
+| 1 | `ink` (night-50) | names, headlines, prices, the main line | — |
+| 2 | `ink-muted` (night-500) | venue and time, meta, supporting lines, labels | 2.6:1 darker |
+| 3 | `ink-faint` (night-400) | timestamps, counters, source lines ("Checked 3d ago") | 3.3:1 darker |
+
+- One white per block: the name (and the price) are `ink`; everything under them is `ink-muted`.
+- Don't use `night-300` for text any more; it's kept for tints and badge highlights.
+- Day theme is unchanged (`ink-muted` and `ink-faint` are night-600 on paper).
+
 ## Readable on every surface
 
 4.5:1 for text, 3:1 at 24px+. Every component passes in both themes.
@@ -57,8 +72,8 @@ Everything else is black and greys (`bg`, `surface`, `surface-raised`, `line`, `
 | Text | on `bg` | on `surface` | on `surface-raised` |
 |---|---|---|---|
 | `ink` | 18.2 | 15.6 | 14.0 |
-| `ink-muted` | 9.3 | 8.0 | 7.2 |
-| `ink-faint` | 7.0 | 6.0 | 5.4 |
+| `ink-muted` (night-500) | 7.0 | 6.0 | 5.4 |
+| `ink-faint` (night-400) | 5.5 | 4.7 | 4.2: use `ink-muted` |
 | `brand-text` | 16.4 | 14.1 | 12.7 |
 
 Never as text: violet-500 on dark (2.8), night-600 (3.0), green, red or pink -500 on paper. Dark-only panels on light pages take the `g-night` class.

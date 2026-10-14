@@ -2,18 +2,26 @@
 
 *(Image: Home and onboarding screens. See the live design system.)*
 
-**Why:** every screen should answer the four promise questions (how busy, who's going, is it on, what it costs) before anything else.
+**Why:** every screen should answer the five promise questions (will they let us in, how busy, who's going, is it on, what it costs) before anything else.
 
 Designed at 390 × 844, night theme. See TonightScreen and OnboardingScreen for full compositions.
 
-## The home recipe
+## The home recipe (door-first, release 24)
 
-1. `TopBar`: your photo left, glass icon buttons right.
-2. Eyebrow (13, muted) over one `display` line.
-3. `MoodTile` row: pick a vibe. The selected tile turns violet.
-4. "Near you" + subtle "See all".
-5. `EventCard` or `StoryCard` carousel, the next card peeking in (`CardDeck`).
-6. Floating glass `TabBar`, 120px bottom padding.
+The home has one job: can my group get in, and can we afford it, tonight. Then book in as few taps as possible, and browse the week without a long scroll.
+
+1. `TopBar`: your photo left, the city, glass Search and bell (with its new dot) right.
+2. `GroupPill`, 16 below: who you're going with and what's next: "Friday plan · Waiting on Arjun · 8 pm", "You, Riya, Dev + 1", or "Who's going?". The group's make-up ("4 guys, all 21+") stays in the Going as sheet.
+3. **Hero, 24 below:** `section` "Best for your group tonight", then a `DoorVerdict` pill in two or three words ("Lets you in · 21+", "Formals only") with its short source under it ("Checked 3d ago"), a `VenueCard`, and the one `Button brand lg block` ("Get 4 passes · ₹2,400"). Gaps 10.
+4. **Rails, 40 below:** `NightRail` "Tonight · 4 more" and "Tomorrow · Sat" of `NightTile`s, 36 apart. Nights that won't let the group in never appear here.
+5. **"Not feeling these?", 44 below:** a `MoodTile` row ("I'm feeling" · the sound · "5 this week"); none selected, so none bobs.
+6. **The rest of the week:** one `NightRail` per day, at most 5.
+7. **End card, 44 below:** `night-900` radius 24, a `Sticker` that bobs (the screen's one), "{n} nights this week" with the yellow full stop, "{m} let your group in", a white "See them all".
+8. Floating glass `TabBar`, 140px bottom padding.
+
+Two sizes only: one big hero, then small tiles. Never stack full-size cards on the home. The full list ("All nights") uses `NightTile layout="row"` under sticky day headings, with nights not for the group collapsed into one row: "Not for your group · 3".
+
+**Going as (Sheet):** "Who's going?" · `Chip`s Guys / Girls / Couple / Mixed group · a size stepper (`IconButton` minus/plus around a Jakarta 700 20 number) · "Anyone under 21?" chips · white "Show nights for {group}" · ghost "Just me tonight". Saving re-ranks the home and every verdict changes in place. Release 25: an optional "Add friends" row picks people from your friends, so the `GroupPill` can show names ("You, Riya, Dev + 1"); counts stay for people who aren't on gathr. A plan fills names in by itself.
 
 Detail screens swap the tab bar for one full-width button: white for the main action, violet when that action is booking.
 
@@ -25,6 +33,9 @@ Detail screens swap the tab bar for one full-width button: white for the main ac
 
 | Need | Use |
 |---|---|
+| Will they let us in | `DoorVerdict` (pill on the hero and event page, line on tiles and rows) |
+| Who you're going with (home) | `GroupPill` |
+| Browse many nights | `NightRail` of `NightTile`s; `NightTile layout="row"` in the full list |
 | Pick a vibe or category | `MoodTile` |
 | A night, photo-first | `EventCard` (feed), `StoryCard` (spotlight, plans) |
 | Browse a few big cards | `CardDeck` |

@@ -1,6 +1,6 @@
 # Checklist
 
-Run before anything ships. First question: does this help someone know the room before they get there (how busy, who's going, is it on, what it costs)?
+Run before anything ships. First question: does this help someone know the room before they get there (will they let us in, how busy, who's going, is it on, what it costs)?
 
 - [ ] Black is 50%+ of a feed. Photos and objects are the colour.
 - [ ] The UI uses only violet, yellow, green and red, each for its one job. The main action is the white pill; violet only for the one booking button per screen.
@@ -34,3 +34,7 @@ Run before anything ships. First question: does this help someone know the room 
 - [ ] Every short message is a `Toast`: 32px up (12px above the tab bar), 2.4 s, or 5 s with an action.
 - [ ] Headings: `section` on the page, `title` for sheets, `headline` (15/20 600) inside cards.
 - [ ] No gradients beyond blooms on occasions, the functional fades (photo, tab bar, pinned buttons) and the screen glow at the top of each screen.
+- [ ] Every night shows a `DoorVerdict` for the current group. Verdicts use icon + words, never colour alone; `if` is white, red only for `no`. With no group set, rules show plainly and nothing claims "Lets you in".
+- [ ] Browsing many nights uses `NightRail`s of `NightTile`s: one hero, then small tiles, never a stack of full-size cards. A tile is one link with no button inside.
+- [ ] The home has one `GroupPill` (solid, never violet) and one violet booking button, the hero's.
+- [ ] Three text levels: names and prices in `ink`; venue, time and meta under them in `ink-muted`; timestamps and source lines in `ink-faint`. No `night-300` text.

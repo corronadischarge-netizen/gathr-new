@@ -1,4 +1,4 @@
-/* @ds-bundle: {"format":4,"namespace":"Gathr","components":[{"name":"Wordmark"},{"name":"Icon"},{"name":"Button"},{"name":"IconButton"},{"name":"Chip"},{"name":"SearchField"},{"name":"Badge"},{"name":"CrowdMeter"},{"name":"Avatar"},{"name":"FriendsGoing"},{"name":"ProgressBar"},{"name":"PageIndicator"},{"name":"Bloom"},{"name":"TopBar"},{"name":"TabBar"},{"name":"Sheet"},{"name":"VenueHero"},{"name":"VenueCard"},{"name":"FeatureCard"},{"name":"RankCard"},{"name":"EventCard"},{"name":"EventRow"},{"name":"MapPin"},{"name":"VibeTag"},{"name":"PhotoFrame"},{"name":"PillChain"},{"name":"StatBubbles"},{"name":"DotGrid"},{"name":"SocialSlide"},{"name":"EventPoster"},{"name":"SiteHeader"},{"name":"Sticker"},{"name":"MoodTile"},{"name":"RingAvatar"},{"name":"TagPill"},{"name":"ReactionBubble"},{"name":"CommentBubble"},{"name":"StoryCard"},{"name":"CardDeck"},{"name":"PhotoStack"},{"name":"Ticket"},{"name":"EchoPattern"}]} */
+/* @ds-bundle: {"format":4,"namespace":"Gathr","components":[{"name":"Wordmark"},{"name":"Icon"},{"name":"Button"},{"name":"IconButton"},{"name":"Chip"},{"name":"SearchField"},{"name":"Badge"},{"name":"CrowdMeter"},{"name":"Avatar"},{"name":"FriendsGoing"},{"name":"ProgressBar"},{"name":"PageIndicator"},{"name":"Bloom"},{"name":"TopBar"},{"name":"TabBar"},{"name":"Sheet"},{"name":"VenueHero"},{"name":"VenueCard"},{"name":"FeatureCard"},{"name":"RankCard"},{"name":"EventCard"},{"name":"EventRow"},{"name":"MapPin"},{"name":"VibeTag"},{"name":"PhotoFrame"},{"name":"PillChain"},{"name":"StatBubbles"},{"name":"DotGrid"},{"name":"SocialSlide"},{"name":"EventPoster"},{"name":"SiteHeader"},{"name":"Sticker"},{"name":"MoodTile"},{"name":"RingAvatar"},{"name":"TagPill"},{"name":"ReactionBubble"},{"name":"CommentBubble"},{"name":"StoryCard"},{"name":"CardDeck"},{"name":"PhotoStack"},{"name":"Ticket"},{"name":"EchoPattern"},{"name":"DoorVerdict"},{"name":"NightTile"},{"name":"NightRail"},{"name":"GroupPill"}]} */
 (function () {
   var React = window.React;
   var h = React.createElement;
@@ -680,6 +680,104 @@
       (p.icons || []).slice(0, 2).map(function (b, i) { return h(IconButton, { key: i, variant: 'solid', icon: b.icon, label: b.label, onClick: b.onClick, className: 'g-actionbar-ic' }); }),
       h(Button, { variant: m.variant || 'brand', size: 'lg', icon: m.icon, disabled: !!m.disabled, onClick: m.onClick, className: 'g-actionbar-main' }, m.label || 'Get passes'));
   }
+
+  /* ---------- Release 24: the door (home v3, from the Seeker app) ---------- */
+  /* DoorVerdict: will they let us in? For the group set in Going as, always in words; the colour only repeats it.
+     look 'pill' (hero card, event page: TagPill + source line, or "Ask the venue") · 'line' (tiles and rows: icon 16 + words) */
+  var DV_ICON = { yes: 'check', 'if': 'check', unknown: 'info', no: 'x' };
+  var DV_TONE = { yes: 'go', 'if': 'light', unknown: 'dark', no: 'dark' };
+  /* the source line, short: "Set by host" · "Checked 3d ago" · "From 12 guests" (r25) */
+  function doorSource(s) {
+    if (!s || !s.kind) return null;
+    if (s.kind === 'host') return 'Set by host';
+    if (s.kind === 'guests') return 'From ' + s.count + ' guests';
+    var t = s.checkedAt ? Date.parse(s.checkedAt) : NaN;
+    if (s.tight || isNaN(t)) return 'Checked by gathr';
+    var d = Math.max(0, Math.floor((Date.now() - t) / 86400000));
+    return d === 0 ? 'Checked today' : 'Checked ' + d + 'd ago';
+  }
+  function DoorVerdict(p) {
+    var state = DV_ICON[p.state] ? p.state : 'unknown', icon = p.icon || DV_ICON[state];
+    var words = [h('span', { key: 'sr', className: 'g-sr' }, 'Door: '), p.text];
+    if (p.look === 'line') {
+      return h('span', { className: cx('g-dv', 'g-dv-line', 'is-' + state, p.className) },
+        h(Icon, { name: icon, size: 16 }), h('span', { className: 'g-dv-text' }, words));
+    }
+    var src = p.showSource === false ? null : doorSource(p.source);
+    /* r25: the pill holds only the verdict (2–3 words); the source sits under it, small */
+    return h('div', { className: cx('g-dv', 'g-dv-pill', 'is-' + state, p.className) },
+      h('div', { className: 'g-dv-row' },
+        h(TagPill, { tone: DV_TONE[state], icon: icon, className: 'g-dv-tag' }, words),
+        state === 'unknown' && p.onAsk ? h(Button, { variant: 'subtle', size: 'sm', onClick: p.onAsk }, 'Ask the venue') : null),
+      src ? h('span', { className: 'g-dv-src' }, src) : null);
+  }
+  DoorVerdict.source = doorSource;
+
+  /* NightTile: a small poster tile for browsing many nights (rails), or a row in the full list (layout "row").
+     The whole tile is one link, no buttons inside. Door (verdict line), crowd (on the photo), name, where and when, price */
+  function NightTile(p) {
+    var row = p.layout === 'row', price = p.price || null, crowd = CROWD[p.crowd] ? p.crowd : null;
+    var base = cx('g-nt', row ? 'g-nt-row' : 'g-nt-tile', crowd === 'full' && 'is-soldout', p.className);
+    if (p.loading) {
+      return h('div', { className: cx(base, 'is-loading'), 'aria-hidden': 'true' },
+        h('span', { className: 'g-nt-img g-nt-skel' }),
+        h('span', { className: 'g-nt-body' }, h('span', { className: 'g-nt-skel g-nt-bar' }), h('span', { className: 'g-nt-skel g-nt-bar' }), h('span', { className: 'g-nt-skel g-nt-bar is-short' })));
+    }
+    var label = [p.verdict && p.verdict.text, [p.name, p.venue, p.time, price || 'Price not listed', crowd ? CROWD[crowd].label : null].filter(Boolean).join(', ')].filter(Boolean).join('. ');
+    var badge = p.badge === 'Live' ? h(Badge, { tone: 'now', live: true }, 'Live') : p.badge === 'Promoted' ? h(Badge, { tone: 'glass' }, 'Promoted') : null;
+    var verdict = p.verdict ? h(DoorVerdict, { look: 'line', state: p.verdict.state, text: p.verdict.text, icon: p.verdict.icon }) : null;
+    var priceEl = price ? h('b', { className: 'g-nt-price' }, price) : h('span', { className: 'g-nt-noprice' }, 'Price not listed');
+    var go = function (e) { if (p.onClick) p.onClick(e); };
+    var link = p.href ? { href: p.href, onClick: p.onClick } : { role: 'link', tabIndex: 0, onClick: go, onKeyDown: function (e) { if (e.key === 'Enter') { e.preventDefault(); go(e); } } };
+    var media = h(Media, { image: p.image, neutral: true, label: row ? null : 'Organiser image', className: 'g-nt-img' },
+      p.image ? h('span', { className: 'g-grain g-nt-grain', 'aria-hidden': 'true' }) : null,
+      !row && badge ? h('span', { className: 'g-nt-badge' }, badge) : null,
+      !row && crowd ? h('span', { className: 'g-nt-crowd' }, h(CrowdMeter, { level: crowd, compact: true, glass: true })) : null);
+    var body = row
+      ? [h('span', { key: 'b', className: 'g-nt-body', 'aria-hidden': 'true' }, verdict,
+          h('span', { className: 'g-nt-name' }, p.name),
+          h('span', { className: 'g-nt-meta' }, [p.venue, p.distance, p.time].filter(Boolean).join(' · '))),
+         h('span', { key: 'e', className: 'g-nt-end', 'aria-hidden': 'true' }, priceEl, crowd ? h(CrowdMeter, { level: crowd, compact: true }) : null)]
+      : [h('span', { key: 'b', className: 'g-nt-body', 'aria-hidden': 'true' },
+          /* r25: the night's name leads; where and when + price under it; the door line only when it asks something of you */
+          h('span', { className: 'g-nt-name' }, p.name),
+          h('span', { className: 'g-nt-foot' }, h('span', { className: 'g-nt-meta' }, [p.venue, p.time].filter(Boolean).join(' · ')), priceEl),
+          p.verdict && p.verdict.state !== 'yes' ? verdict : null)];
+    return h(p.href ? 'a' : 'div', Object.assign({}, link, { className: base, 'aria-label': label }), media, body);
+  }
+
+  /* NightRail: a titled horizontal row of NightTiles for one day. The next tile peeks from the right; tiles snap to their start.
+     When the day has more nights than tiles (total), a "See all {n}" end tile closes the row */
+  function NightRail(p) {
+    var tiles = React.Children.toArray(p.children).filter(Boolean);
+    if (!tiles.length) return null;
+    var more = p.total && p.total > tiles.length;
+    var see = function (e) { if (p.onSeeAll) p.onSeeAll(e); };
+    return h('section', { className: cx('g-rail', p.className) },
+      h('div', { className: 'g-rail-head' },
+        h('h2', { className: 'g-rail-title' }, p.title),
+        p.seeAllLabel && p.onSeeAll ? h(Button, { variant: 'subtle', size: 'sm', onClick: p.onSeeAll }, p.seeAllLabel) : null),
+      h('div', { className: 'g-rail-scroll', role: 'list', 'aria-label': p.title + ', ' + (p.total || tiles.length) + ' nights', tabIndex: 0 },
+        tiles.map(function (t, i) { return h('div', { key: t.key || i, role: 'listitem', className: 'g-rail-item' }, t); }),
+        more ? h('div', { role: 'listitem', className: 'g-rail-item' },
+          h('div', { role: 'link', tabIndex: 0, className: 'g-rail-end', onClick: see, onKeyDown: function (e) { if (e.key === 'Enter') { e.preventDefault(); see(e); } } },
+            h('span', null, 'See all ' + p.total), h(Icon, { name: 'arrow-right', size: 20 }))) : null));
+  }
+
+  /* GroupPill: the one place the home says who you're going with: the active plan if there is one, otherwise Going as.
+     state: plan-vote | plan-booked | group-set | group-unset. Solid, never glass, never violet (it isn't a selection) */
+  function GroupPill(p) {
+    var unset = p.state === 'group-unset', people = (p.people || []).slice(0, 4);
+    return h('button', { type: 'button', className: cx('g-gp', 'is-' + (p.state || 'group-unset'), p.className), onClick: p.onOpen, 'aria-label': [p.title, p.line].filter(Boolean).join('. ') },
+      h('span', { className: 'g-gp-faces', 'aria-hidden': 'true' },
+        unset ? h('span', { className: 'g-gp-you' }, h(Icon, { name: 'user', size: 20 }))
+          : people.map(function (x, i) { return h(Avatar, { key: (x.name || '') + i, name: x.name, image: x.image, size: 32, className: 'g-gp-face' }); })),
+      h('span', { className: 'g-gp-copy', 'aria-hidden': 'true' },
+        h('span', { className: 'g-gp-title' }, p.title),
+        p.line ? h('span', { className: 'g-gp-line' }, p.line) : null),
+      p.state === 'group-set' ? h('span', { className: 'g-gp-change', 'aria-hidden': 'true' }, 'Change') : h(Icon, { name: 'chevron-right', size: 20, className: 'g-gp-chev' }));
+  }
+
   Icon.names = function () { return Object.keys(ICONS); }; Icon.groups = ICON_GROUPS; Icon.filledNames = function () { return Object.keys(FILLED_ICONS); };
   window.Gathr = Object.assign(window.Gathr || {}, {
     Wordmark: Wordmark, Icon: Icon, Button: Button, IconButton: IconButton, Chip: Chip, SearchField: SearchField,
@@ -690,6 +788,7 @@
     SocialSlide: SocialSlide, EventPoster: EventPoster, SiteHeader: SiteHeader,
     Sticker: Sticker, MoodTile: MoodTile, RingAvatar: RingAvatar, TagPill: TagPill, ReactionBubble: ReactionBubble, CommentBubble: CommentBubble,
     ActionBar: ActionBar, Update: Update, UpdateGroup: UpdateGroup, UpdateLead: UpdateLead, Toast: Toast,
+    DoorVerdict: DoorVerdict, NightTile: NightTile, NightRail: NightRail, GroupPill: GroupPill,
     StoryCard: StoryCard, CardDeck: CardDeck, PhotoStack: PhotoStack, EchoPattern: EchoPattern, Ticket: Ticket
   });
 })();

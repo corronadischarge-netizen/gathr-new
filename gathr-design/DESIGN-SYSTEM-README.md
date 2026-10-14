@@ -4,10 +4,11 @@
 
 ## How the promise shows up
 
-Every component answers one of four questions before you leave the house. If a piece doesn't help answer one, it doesn't ship.
+Every component answers one of five questions before you leave the house, and the door comes first. If a piece doesn't help answer one, it doesn't ship.
 
 | You want to know | gathr shows it as | Built with |
 |---|---|---|
+| Will they let us in? | the door rule for your group in two or three words, with where it came from under it: "Lets you in · 21+" · "Checked 3d ago" | `DoorVerdict`, `NightTile`, `GroupPill` |
 | How full will it be? | booked so far against a cap verified by gathr: "Packed · 412 of 480", never a percentage | `CrowdMeter`, `TonightSoFar` |
 | Who's going? | real faces on the card, "Riya + 2 friends going" | `FriendsGoing`, `RingAvatar` |
 | Is it on right now? | yellow means energy right now: live, or a buzzing room | `Badge tone="now"` |
