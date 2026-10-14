@@ -80,7 +80,7 @@ export function VenuePicker(p) {
             var v = VENUES[k];
             if (!v) return null;
             return (
-              <div key={k} className="rowc list-row" style={{ gap: '10px' }}>
+              <div key={k} className="rowc list-row venue-row" style={{ gap: '12px' }}>
                 <div className="col" style={{ gap: '2px', flexGrow: 1, minWidth: 0 }}>
                   <span className="title15">{v.name}</span>
                   {meta(v.area + (v.added ? ' · added by you' : ''))}
@@ -92,7 +92,7 @@ export function VenuePicker(p) {
                     Make main
                   </button>
                 )}
-                <IconButton icon="x" label={'Remove ' + v.name} variant="tonal" onClick={() => remove(k)} />
+                <IconButton icon="x" label={'Remove ' + v.name} variant="tonal" size={40} onClick={() => remove(k)} />
               </div>
             );
           })}

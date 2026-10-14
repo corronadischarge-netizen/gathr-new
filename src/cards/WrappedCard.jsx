@@ -1,14 +1,14 @@
 import { MO } from '../data/dates';
 import { REC } from '../data/sample';
-import { i3 } from '../ui/helpers';
+import { Bloom } from '../design-system';
 
-/* Wrapped: the month-in-review story card */
+/* Wrapped: the month-in-review story card. A recap is one of the bloom's occasions: the gathr gradient rises from the
+   bottom; the words stay in the dark top half (Bloom README). No 3D objects */
 export function WrappedCard(p) {
   var S = p.ctx.S;
   return (
     <div className="wrap-card">
-      {i3('discoball', 96, 'wc-ic1 bob')}
-      {i3('vinyl', 80, 'wc-ic2')}
+      <Bloom recipe="uv" at="low" still />
       <span className="wc-kick">
         {(S.me.name ? S.me.name.split(' ')[0].toLowerCase() + '’s ' : 'your ') +
           MO[new Date().getMonth()].toLowerCase()}
@@ -22,7 +22,7 @@ export function WrappedCard(p) {
         </div>
         <div>
           <span className="wc-k">Top sound</span>
-          <span className="wc-v">Bollywood</span>
+          <span className="wc-v">Retro</span>
         </div>
         <div>
           <span className="wc-k">Your crew</span>
@@ -33,7 +33,6 @@ export function WrappedCard(p) {
           <span className="wc-v">Regular</span>
         </div>
       </div>
-      <span className="wc-foot">gathr. · pune after dark</span>
     </div>
   );
 }

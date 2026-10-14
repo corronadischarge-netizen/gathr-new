@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useLayoutEffect } from 'react';
 import { MO, WD } from '../data/dates';
 import { agePhrase, groupLabel, isSet } from '../data/group';
 import { groupFor, homeItems } from '../data/homeData';
@@ -49,14 +49,21 @@ export function AllNights(p) {
   }
   var any = Object.keys(f).length > 0;
 
-  function jump(day) {
+  /* scroll the list (only the list, never the page around it) so a day's heading is at the top */
+  function jump(day, instant) {
     var target = days.filter((d) => d >= day)[0];
-    var el = target && document.getElementById('an-' + target);
-    if (el) el.scrollIntoView({ block: 'start', behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
+    var el = target && document.getElementById('an-' + target),
+      list = el && el.closest('.screen');
+    if (!list) return;
+    var top = list.scrollTop + el.getBoundingClientRect().top - list.getBoundingClientRect().top;
+    var smooth = !instant && !matchMedia('(prefers-reduced-motion: reduce)').matches;
+    list.scrollTo({ top: top, behavior: smooth ? 'smooth' : 'auto' });
   }
-  // opened from "See all": start at that day
-  useEffect(() => {
-    if (S.anDay) jump(S.anDay);
+  // opened from "See all": start at that day, already in place as the screen slides in (one movement, not two).
+  // The first day is the top of the list, so the title and filters stay in view. After the app's own scroll reset
+  // (a microtask runs once this render's layout effects are done, before anything is painted)
+  useLayoutEffect(() => {
+    if (S.anDay && S.anDay > days[0]) Promise.resolve().then(() => jump(S.anDay, true));
   }, []);
   // the week's sounds, most nights first
   var sounds = SOUNDS.map((s) => [s, all.filter((it) => (EVENTS[it.id].tags || []).indexOf(s[0]) >= 0).length]).filter((x) => x[1] > 0);

@@ -50,3 +50,4 @@ export { Toast } from './Toast';
 export { ActionBar } from './ActionBar';
 export { StoryCard } from './StoryCard';
 export { CardDeck } from './CardDeck';
+export { EchoPattern } from './EchoPattern';

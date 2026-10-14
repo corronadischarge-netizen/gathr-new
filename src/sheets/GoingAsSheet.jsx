@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { friendsOf } from '../data/friends';
 import { currentGroup, fitFriends, groupFromPlan, groupLabel, toggleFriend } from '../data/group';
+import { isPast } from '../data/listings';
 import { Button, Chip, Icon, IconButton, Sheet } from '../design-system';
 import { haptic } from '../lib/haptics';
 import { log } from '../lib/log';
@@ -92,11 +93,27 @@ export function GoingAsSheet(p) {
     c.toast('Showing nights for ' + groupLabel(next));
   }
   var count = g.type !== 'solo' && g.type !== 'couple';
+  // a night you've booked that's still to come
+  var booked = c.plan && !isPast(c.plan) ? c.plan : null;
   // an active plan's group, offered as a one-tap fill
   var plan = S.gp && (S.gp.stage === 'voting' || S.gp.stage === 'booked') ? groupFromPlan(S.gp) : null;
   return (
     <Sheet title="Who's going?" subtitle="We'll check the door rules for you" onClose={() => c.set({ sheet: null })}>
       <div className="col ga">
+        {booked ? (
+          // tonight's (or tomorrow's) booking: one tap to the pass; the rest of the sheet is for the next night
+          <button type="button" className="ga-note is-plan" onClick={() => {
+              c.set({ sheet: null });
+              c.go('pass');
+            }}>
+            <Icon name="ticket" size={20} />
+            <span className="col" style={{ flex: 1, textAlign: 'left' }}>
+              <span className="title15">{(booked.rsvp ? 'You’re on the list · ' : 'You’re in · ') + booked.title}</span>
+              <span>{booked.date + ' · ' + booked.time + ' · Show pass'}</span>
+            </span>
+            <Icon name="chevron-right" size={20} />
+          </button>
+        ) : null}
         <span className="caps ga-caps">Your group</span>
         <div className="ga-chips" role="radiogroup" aria-label="Your group">
           {TYPES.map((t) => (
@@ -113,7 +130,7 @@ export function GoingAsSheet(p) {
         ) : count ? (
           <Stepper label="How many of you?" sub="Including you" value={g.size} min={2} max={10} onChange={setSize} />
         ) : null}
-        {g.type !== 'solo' ? (
+        {g.type !== 'solo' && friendsOf(S).length ? (
           <>
             <span className="rowc between">
               <span className="caps ga-caps">Add friends</span>
@@ -150,12 +167,24 @@ export function GoingAsSheet(p) {
             </span>
             <Icon name="chevron-right" size={20} />
           </button>
-        ) : (
-          <div className="ga-note">
-            <Icon name="calendar" size={20} />
-            <span>Started a plan? It fills this in for you</span>
-          </div>
-        )}
+        ) : null}
+        {/* plan another night with friends: the plan fills this in once they join (always offered, Shubh 15 Oct) */}
+          <button
+            type="button"
+            className="ga-note is-plan"
+            onClick={() => {
+              c.set({ sheet: null });
+              c.go('newplan', { draft: { opts: [], deadline: 'Thu 6 pm', name: 'Friday plan' } });
+            }}
+          >
+            <Icon name="calendar-plus" size={20} />
+            <span className="col" style={{ flex: 1, textAlign: 'left' }}>
+              <span className="title15">Plan a night with friends</span>
+              <span>Vote together, book once. It fills this in</span>
+            </span>
+            <Icon name="chevron-right" size={20} />
+          </button>
+
         <Button variant="primary" size="lg" block onClick={() => save(g)}>
           {'Show nights for ' + groupLabel(g)}
         </Button>

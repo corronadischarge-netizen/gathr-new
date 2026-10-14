@@ -266,10 +266,10 @@ export function demoGuest(today, now) {
   };
 }
 
-/* the past nights record (You, Wrapped): [venue, night, date, with] */
+/* the past nights record (You, Wrapped): [venue, night, date, with, night id] */
 export function demoRecord(today) {
   var b = buildDemo(today),
-    row = (id, venue, title, d, who) => [venue, title, dateTxt(addDays(b.today, d) + 'T21:00:00+05:30').slice(4), who];
+    row = (id, venue, title, d, who) => [venue, title, dateTxt(addDays(b.today, d) + 'T21:00:00+05:30').slice(4), who, id];
   return [
     row('retrorewind', 'themillers', 'Retro Rewind', -2, 'Dev, Arjun'),
     row('reggaetonsundays', 'bailamos', 'Reggaeton Sundays', -5, 'Kabir'),

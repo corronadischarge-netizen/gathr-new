@@ -77,10 +77,11 @@ export function NightTile(p) {
       </Media>
       {row ? (
         <>
+          {/* rows match tiles (Shubh, 15 Oct): the name leads, the door line closes the block */}
           <span className="g-nt-body" aria-hidden="true">
-            {verdict}
             <span className="g-nt-name">{p.name}</span>
             <span className="g-nt-meta">{[p.venue, p.distance, p.time].filter(Boolean).join(' · ')}</span>
+            {verdict}
           </span>
           <span className="g-nt-end" aria-hidden="true">
             {priceEl}

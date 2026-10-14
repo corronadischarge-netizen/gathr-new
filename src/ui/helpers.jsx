@@ -49,7 +49,14 @@ export function thumb(e, size) {
   return (
     <div
       className="g-media thumb"
-      style={{ width: size + 'px', height: size + 'px', backgroundImage: 'url(' + e.img + ')' }}
+      style={{
+        width: size + 'px',
+        height: size + 'px',
+        // the gathr touch on organiser art: a fade to black at the bottom
+        backgroundImage: e.img
+          ? 'linear-gradient(180deg, transparent 40%, color-mix(in srgb, var(--night-950) 70%, transparent)), url(' + e.img + ')'
+          : undefined
+      }}
     />
   );
 }

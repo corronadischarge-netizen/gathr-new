@@ -2,11 +2,12 @@ import { useEffect, useRef, useState } from 'react';
 import { APP_URL } from '../config';
 import { agePhrase, groupLabel, isSet } from '../data/group';
 import { doorOf } from '../data/doorRules';
+import { friendPhoto } from '../data/friends';
 import { groupFor, homeItems, tryInstead } from '../data/homeData';
 import { rupees } from '../data/format';
 import { nightCrowd } from '../data/listings';
 import { ActionBar, DoorVerdict, Icon, TonightSoFar, TopBar, VenueHero } from '../design-system';
-import { now } from '../lib/clock';
+import { addDays, homeWindow, nightDay, now } from '../lib/clock';
 import { doorRows, getDoorVerdict, verdictSource, verdictText } from '../lib/door';
 import { log } from '../lib/log';
 import { shareToast } from '../lib/utils';
@@ -29,6 +30,14 @@ function action(e, n) {
   if (e.rsvp) return 'Get on the list · ' + n;
   if (e.door) return 'Get on the list';
   return 'Get ' + n + (n === 1 ? ' pass' : ' passes');
+}
+
+/* "Tonight · Wed 14 Oct · 9 pm", "Tomorrow · Thu 15 Oct · 9 pm", or "Sat 17 Oct · 10 pm" */
+function whenLine(e) {
+  var day = nightDay(new Date(e.iso).getTime()),
+    w = homeWindow(now()),
+    rel = day === w.day ? (w.when === 'tonight' ? 'Tonight' : 'Tomorrow') : day === addDays(w.day, 1) && w.when === 'tonight' ? 'Tomorrow' : null;
+  return [rel, e.date, e.time].filter(Boolean).join(' · ');
 }
 
 export function EventScreen(p) {
@@ -84,8 +93,9 @@ export function EventScreen(p) {
       setGlass(y > 280); // the photo is 380 tall; its buttons sit 52 to 100 from the top
       // the photo stays put while the card scrolls over it (no parallax, no zoom), then leaves with the page
       if (media) media.style.transform = y > 0 ? 'translateY(' + Math.min(y, media.offsetHeight) + 'px)' : '';
-      // once the hero's own button has scrolled under the top bar, the same button pins to the bottom
-      if (cta) setPinned(y > cta.offsetTop + cta.offsetHeight - 100);
+      // a hand-off, never two buttons at once: as the hero's button reaches the top bar (52 + 64 tall) it fades out and
+      // the same button pins to the bottom
+      if (cta) setPinned(y > cta.offsetTop - 124);
     };
     onScroll();
     scr.addEventListener('scroll', onScroll, { passive: true });
@@ -98,7 +108,7 @@ export function EventScreen(p) {
   }, [glass, pinned]);
 
   return (
-    <div className="col ev3" ref={root}>
+    <div className={'col ev3' + (pinned ? ' is-pinned' : '')} ref={root}>
       <div className="ev3-bar-slot">
         <div ref={bar} className={'ev3-bar' + (glass ? ' is-on' : '')} aria-hidden={glass ? undefined : 'true'}>
           <TopBar
@@ -122,6 +132,7 @@ export function EventScreen(p) {
           name={e.title}
           image={e.img}
           area={v.name + ', ' + v.area}
+          when={whenLine(e)} // the day and date, emphasised above the name (Shubh, 15 Oct)
           vibe={soundOf(e)}
           booked={nc.booked}
           cap={nc.cap}
@@ -177,7 +188,7 @@ export function EventScreen(p) {
           booked={nc.booked}
           saved={v.saved}
           lastHour={v.lastHour}
-          friends={e.friends && e.friends.length ? e.friends : null}
+          friendsPeople={e.friends && e.friends.length ? e.friends.map((f) => ({ name: f, image: friendPhoto(f) })) : null}
           friendsTotal={e.nFriends}
         />
         <p className="meta" style={{ margin: 0 }}>
@@ -224,10 +235,6 @@ export function EventScreen(p) {
           >
             {icon('share', 20)}
             <span>Share this night</span>
-          </button>
-          <button type="button" className="rule-link" onClick={() => c.go('venue')}>
-            {icon('map-pin', 20)}
-            <span>{v.name}</span>
           </button>
           <button type="button" className="rule-link" onClick={() => Share.directions(v)}>
             {icon('navigation', 20)}

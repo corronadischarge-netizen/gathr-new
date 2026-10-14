@@ -161,11 +161,11 @@ export function Group(p) {
           ) : null}
           {voting ? (
             <Button variant="primary" size="lg" block disabled={!S.vote} onClick={c.planBook}>
-              {S.vote && we ? 'Close vote · book ' + VENUES[we.venue].name + ' for ' + all.length : 'Vote to close the plan'}
+              {S.vote && we ? 'Close and book for ' + all.length : 'Vote to close the plan'}
             </Button>
           ) : gp.winner ? (
             <Button variant="primary" size="lg" block icon="ticket" onClick={c.planBook}>
-              {'Book ' + all.length + ' passes · ' + VENUES[we.venue].name}
+              {'Book ' + all.length + ' passes'}
             </Button>
           ) : null}
           <Button variant="ghost" onClick={c.planCancel}>

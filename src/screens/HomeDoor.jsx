@@ -13,11 +13,11 @@ import { gpVoted } from '../data/sample';
 import {
   Button,
   DoorVerdict,
+  EchoPattern,
   GroupPill,
   MoodTile,
   NightRail,
   NightTile,
-  Sticker,
   Stop,
   IconButton,
   VenueCard
@@ -122,7 +122,8 @@ function groupPill(c, group, pl) {
       title: mine.title + ' · ' + WD[new Date(mine.iso).getDay()].slice(0, 3),
       // r25: who you're going with ("You're in with Dev, Arjun + 1")
       line: inWithLine(mine.rsvp ? "You're on the list" : "You're in", crew, S.guests || bk.passes),
-      onOpen: () => c.go('pass')
+      // your booking is a row in the sheet; the sheet is also where you set up the next night (Shubh, 15 Oct)
+      onOpen: () => c.set({ sheet: 'goingas', gaFrom: 'home' })
     };
   if (isSet(group))
     return {
@@ -515,9 +516,9 @@ export function HomeDoor(p) {
 
         {week.length ? (
           <div className="px">
-            <section className="home-end">
-              {/* the screen's one bob; it rests while a sound tile is selected, since that tile's sticker bobs then */}
-              <Sticker src={IMAGES_3D['disco-ball']} size={96} tilt={-8} bob={!picked} />
+            {/* the end of the week: gathr's brand pattern (EchoPattern is for end slides), short words in the middle */}
+            <EchoPattern recipe="uv" rings={3} logo={false} className="home-end">
+              <section className="home-end-inner">
               <h2 className="home-end-title">
                 {week.length + (week.length === 1 ? ' night this week' : ' nights this week')}
                 <Stop />
@@ -533,7 +534,8 @@ export function HomeDoor(p) {
               >
                 See them all
               </Button>
-            </section>
+              </section>
+            </EchoPattern>
           </div>
         ) : null}
       </div>

@@ -10,6 +10,8 @@ export function VenueCard(p) {
   return (
     <article className={cx('g-card', 'g-venue', p.className)}>
       <Media image={p.image} neutral className="g-venue-media">
+        {/* the gathr touch on organiser art: grain, and a fade into the card over the bottom 60% (imagery guide) */}
+        {p.image ? <span className="g-grain" aria-hidden="true" /> : null}
         <div className="g-venue-top">
           <div className="g-venue-badges">
             {p.live ? (

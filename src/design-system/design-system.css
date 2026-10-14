@@ -111,7 +111,7 @@ body { margin: 0; font-family: var(--font-sans); background: var(--bg); color: v
 .g-cb-dots { display: grid; grid-template-columns: repeat(10, 8px); gap: var(--space-1); }
 .g-cb-dots i { width: 8px; height: 8px; border-radius: var(--radius-full); background: color-mix(in srgb, var(--ink) 12%, transparent); }
 .g-cb-dots i.is-on { background: var(--cm); }
-.g-cb-trust { grid-column: 1 / -1; display: flex; gap: var(--space-2); align-items: flex-start; margin: 0; padding-top: 14px; box-shadow: inset 0 1px 0 color-mix(in srgb, var(--ink) 8%, transparent); font-size: 13px; line-height: 18px; color: var(--ink-muted); }
+.g-cb-trust { grid-column: 1 / -1; display: flex; gap: var(--space-2); align-items: flex-start; margin: 0; padding-top: 14px; border-top: 1px solid color-mix(in srgb, var(--ink) 8%, transparent); font-size: 13px; line-height: 18px; color: var(--ink-muted); }
 .g-cb-trust b { color: var(--ink); font-weight: 600; }
 .g-cb-trust .g-icon { flex: none; margin-top: 1px; }
 /* CrowdMeter widget: the dot-grid card */
@@ -133,6 +133,8 @@ body { margin: 0; font-family: var(--font-sans); background: var(--bg); color: v
 
 /* TopBar */
 .g-topbar { position: relative; z-index: 1; display: flex; align-items: center; gap: var(--space-3); padding: var(--space-2) var(--space-4); border-radius: var(--radius-full); }
+/* the glass bar (sticky over a scrolled screen): the same space above, below and beside its buttons */
+.g-topbar.g-topbar-glass { padding: var(--space-2); }
 .g-topbar-title { flex: 1; font-size: 16px; font-weight: 700; text-align: center; }
 .g-topbar-actions { display: flex; gap: var(--space-2); margin-left: auto; }
 .g-topbar-avatar { box-shadow: 0 0 0 2px var(--bg), 0 0 0 3.5px var(--glass-edge); }
@@ -163,6 +165,12 @@ body { margin: 0; font-family: var(--font-sans); background: var(--bg); color: v
 .g-venue-top { display: flex; justify-content: space-between; align-items: flex-start; }
 .g-venue-badges { display: flex; gap: var(--space-2); padding-top: var(--space-1); }
 .g-venue-media .g-crowd { align-self: flex-start; }
+/* the gathr touch on organiser art (imagery guide): grain, and a fade to the card's black over the bottom 60%, so a
+   bright poster settles into the card; the badges, heart and crowd chip sit above it */
+.g-venue-media { position: relative; }
+.g-venue-media:not(.g-media-empty)::after { content: ""; position: absolute; inset: 40% 0 0; background: linear-gradient(180deg, transparent, var(--surface)); pointer-events: none; }
+.g-venue-media > * { position: relative; z-index: 1; }
+.g-venue-media > .g-grain { position: absolute; z-index: 0; }
 .g-save { background: var(--glass-scrim); color: var(--night-50); -webkit-backdrop-filter: blur(var(--blur-sm)); backdrop-filter: blur(var(--blur-sm)); box-shadow: inset 0 0 0 1px var(--glass-edge); }
 .g-save.is-active { color: var(--night-50); }
 .g-venue-body { padding: var(--space-4); display: flex; flex-direction: column; gap: var(--space-2); }
@@ -344,12 +352,16 @@ body { margin: 0; font-family: var(--font-sans); background: var(--bg); color: v
 /* VenueHero (release 18, option A): photo, name, one card (Booked so far + facts + trust line), the booking button */
 .g-vh2 { position: relative; width: 100%; height: 812px; overflow: hidden; background: var(--night-950); color: var(--night-50); }
 .g-vh2-media { position: absolute; left: 0; right: 0; top: 0; height: 380px; overflow: hidden; }
+/* the photo fades out itself (not only under a black overlay), so it melts into the screen glow behind it with no edge line */
+.g-vh2-media { -webkit-mask-image: linear-gradient(180deg, #000 55%, transparent); mask-image: linear-gradient(180deg, #000 55%, transparent); }
 .g-vh2-media > .g-media { position: absolute; inset: 0; width: 100%; height: 100%; border-radius: 0; }
 .g-vh2 .g-media-icon { top: 40%; }
 .g-vh2-fade { position: absolute; left: 0; right: 0; bottom: 0; height: 60%; background: linear-gradient(180deg, transparent, var(--night-950) 92%); pointer-events: none; }
 .g-vh2-top { position: absolute; left: var(--space-4); right: var(--space-4); top: 52px; z-index: 2; display: flex; justify-content: space-between; }
 .g-vh2-head { position: absolute; left: var(--space-5); right: var(--space-5); top: 292px; z-index: 2; }
 .g-vh2-name { margin: 0; font-family: var(--font-display); font-size: 32px; line-height: 36px; font-weight: 700; letter-spacing: -0.04em; }
+.g-vh2-head.has-when { top: 268px; }
+.g-vh2-when { margin: 0 0 var(--space-1); font-size: 15px; line-height: 20px; font-weight: 600; color: var(--ink); }
 .g-vh2-sub { margin: 6px 0 0; font-size: 13px; line-height: 16px; font-weight: 500; color: var(--ink-muted); }
 .g-vh2-card { position: absolute; left: var(--space-3); right: var(--space-3); top: 384px; z-index: 2; box-sizing: border-box; padding: var(--space-5); border-radius: var(--radius-lg); background: var(--night-900); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--white) 6%, transparent);
   display: grid; grid-template-columns: 124px minmax(0, 1fr); column-gap: var(--space-5); row-gap: var(--space-4); --ink: var(--night-50); --ink-muted: var(--night-500); --surface-raised: var(--night-800); }
@@ -358,7 +370,7 @@ body { margin: 0; font-family: var(--font-sans); background: var(--bg); color: v
 /* FactList: icon circle, 13px label, 16px value on the right edge */
 .g-facts { display: flex; flex-direction: column; min-width: 0; }
 .g-fact { display: grid; grid-template-columns: 32px minmax(0, 1fr) auto; align-items: center; gap: var(--space-3); min-height: 52px; }
-.g-fact + .g-fact { box-shadow: inset 0 1px 0 color-mix(in srgb, var(--ink) 8%, transparent); }
+.g-fact + .g-fact { border-top: 1px solid color-mix(in srgb, var(--ink) 8%, transparent); }
 .g-fact-ic { width: 32px; height: 32px; border-radius: var(--radius-full); background: var(--surface-raised); display: grid; place-items: center; color: var(--ink); }
 .g-fact-label { min-width: 0; overflow: hidden; text-overflow: ellipsis; font-size: 13px; line-height: 16px; font-weight: 500; color: var(--ink-muted); white-space: nowrap; }
 .g-fact-value { font-family: var(--font-display); font-size: 16px; line-height: 20px; font-weight: 600; letter-spacing: -0.02em; text-align: right; white-space: nowrap; color: var(--ink); }
@@ -368,12 +380,12 @@ body { margin: 0; font-family: var(--font-sans); background: var(--bg); color: v
 
 /* TonightSoFar: booked, saved, the pace, then the friends who booked */
 .g-tsf { padding: var(--space-5); }
-.g-tsf-stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); margin-top: 4px; }
+.g-tsf-stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); margin-top: var(--space-3); }
 .g-tsf-stat { display: flex; flex-direction: column; gap: 2px; }
-.g-tsf-stat + .g-tsf-stat { padding-left: var(--space-4); box-shadow: inset 1px 0 0 color-mix(in srgb, var(--ink) 8%, transparent); }
+.g-tsf-stat + .g-tsf-stat { padding-left: var(--space-4); border-left: 1px solid color-mix(in srgb, var(--ink) 8%, transparent); }
 .g-tsf-stat b { font-family: var(--font-display); font-size: 20px; line-height: 24px; font-weight: 700; letter-spacing: -0.02em; }
 .g-tsf-stat span { font-size: 13px; line-height: 16px; font-weight: 500; color: var(--ink-muted); }
-.g-tsf-friends { margin-top: var(--space-4); padding-top: 14px; box-shadow: inset 0 1px 0 color-mix(in srgb, var(--ink) 8%, transparent); }/* a price in a fact row is type: Jakarta 700 at 20px */
+.g-tsf-friends { margin-top: var(--space-4); padding-top: 14px; border-top: 1px solid color-mix(in srgb, var(--ink) 8%, transparent); }/* a price in a fact row is type: Jakarta 700 at 20px */
 .g-fact-value.is-strong { font-size: 20px; line-height: 24px; font-weight: 700; }
 
 /* Price is type, never a pill: Jakarta 700, 20px */
@@ -508,7 +520,10 @@ body { margin: 0; font-family: var(--font-sans); background: var(--bg); color: v
 /* r25: the verdict alone in the pill ("Ask the venue" beside it), the short source line under it */
 .g-dv-pill { display: flex; align-items: center; justify-content: space-between; gap: var(--space-3); min-width: 0; } /* r25.1: source beside the pill, right-aligned */
 .g-dv-tag { flex: none; min-width: 0; max-width: 100%; }
-.g-dv-tag > span:last-child { overflow: hidden; text-overflow: ellipsis; }
+.g-dv-tag > span:last-child { overflow: hidden; text-overflow: ellipsis; padding-block: 0.3em; margin-block: -0.3em; } /* room for descenders under the clip */
+/* the door pill sits flat on cards and the page: no float shadow (status badges are flat); the dark one keeps its edge */
+.g-dv-pill .g-dv-tag { box-shadow: none; }
+.g-dv-pill .g-dv-tag.g-tag-dark { box-shadow: inset 0 0 0 1px var(--night-700); }
 .g-dv-pill.is-no .g-dv-tag { color: var(--limit-text); }
 .g-dv-src { flex: 0 1 auto; min-width: 0; font-size: 11px; line-height: 14px; color: var(--ink-faint); text-align: right; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .g-dv-line { display: inline-flex; align-items: center; gap: var(--space-1); max-width: 100%; min-width: 0; font-size: 13px; line-height: 18px; font-weight: 600; }
@@ -527,6 +542,8 @@ body { margin: 0; font-family: var(--font-sans); background: var(--bg); color: v
 .g-nt-grain { opacity: .16; }
 /* the gathr touch's fade to night-950 under the photo, so the crowd chip reads on any poster */
 .g-nt-tile .g-media.g-nt-img:not(.g-media-empty)::after { content: ""; position: absolute; inset: 50% 0 0; background: linear-gradient(180deg, transparent, color-mix(in srgb, var(--night-950) 70%, transparent)); pointer-events: none; }
+/* rows: the same fade on the thumbnail (the gathr touch on every organiser image) */
+.g-nt-row .g-media.g-nt-img:not(.g-media-empty)::after { content: ""; position: absolute; inset: 40% 0 0; background: linear-gradient(180deg, transparent, color-mix(in srgb, var(--night-950) 70%, transparent)); pointer-events: none; }
 .g-nt-badge { position: absolute; left: var(--space-2); top: var(--space-2); z-index: 1; }
 .g-nt-crowd { position: absolute; left: var(--space-2); bottom: var(--space-2); z-index: 1; }
 .g-nt-body { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
@@ -537,7 +554,7 @@ body { margin: 0; font-family: var(--font-sans); background: var(--bg); color: v
 .g-nt-meta { min-width: 0; font-size: 13px; line-height: 18px; color: var(--ink-muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .g-nt-price { flex: none; font-family: var(--font-display); font-weight: 700; font-size: 16px; line-height: 20px; letter-spacing: -0.02em; white-space: nowrap; }
 .g-nt-noprice { flex: none; font-size: 13px; line-height: 18px; color: var(--ink-faint); white-space: nowrap; }
-.g-nt-row { display: flex; align-items: center; gap: var(--space-3); padding: var(--space-3) 0; border-radius: 0; box-shadow: inset 0 -1px 0 var(--line); }
+.g-nt-row { display: flex; align-items: center; gap: var(--space-3); padding: var(--space-3) 0; border-radius: 0; border-bottom: 1px solid var(--line); }
 .g-nt-row:focus-visible { box-shadow: var(--focus-ring); border-radius: var(--radius-sm); }
 .g-nt-row .g-nt-img { flex: none; width: 64px; height: 80px; border-radius: var(--radius-sm); background-position: center 30%; }
 .g-nt-row .g-nt-body { flex: 1; }
@@ -545,7 +562,7 @@ body { margin: 0; font-family: var(--font-sans); background: var(--bg); color: v
 /* r25: All nights rows keep price + crowd in a fixed column, left-aligned, so the crowd bars line up on every row */
 .g-nt-row .g-nt-end { width: 120px; align-items: flex-start; }
 /* r25: on a tile the door line, when shown, closes the block */
-.g-nt-tile .g-nt-body > .g-dv-line { margin-top: 2px; }
+.g-nt-tile .g-nt-body > .g-dv-line, .g-nt-row .g-nt-body > .g-dv-line { margin-top: 2px; }
 .g-nt-row .g-nt-price { font-size: 20px; line-height: 24px; }
 .g-nt-skel { display: block; background: var(--night-800); }
 .g-nt-tile .g-nt-skel.g-nt-img { width: 156px; height: 195px; border-radius: var(--radius-md); }
@@ -640,3 +657,9 @@ body { margin: 0; font-family: var(--font-sans); background: var(--bg); color: v
 .g-deck-item.is-right { margin-left: -36px; }
 .g-deck-item.is-active { position: relative; z-index: 1; }
 @media (prefers-reduced-motion: reduce) { .g-deck, .g-deck-item { transition: none; } }
+
+/* EchoPattern (app build of the live component): the brand pattern for end slides, share cards and splash */
+.g-echo { position: relative; overflow: hidden; isolation: isolate; color: var(--night-50); --ink: var(--night-50); --ink-muted: var(--night-500); }
+.g-echo-svg { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.g-echo .g-grain { opacity: .18; }
+.g-echo-content { position: absolute; inset: 0; display: flex; flex-direction: column; }

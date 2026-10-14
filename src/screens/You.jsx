@@ -1,12 +1,12 @@
 import { ModeSwitchCard } from '../cards/ModeSwitchCard';
 import { StatusCard } from '../cards/StatusCard';
 import { friendRequest, friendsOf } from '../data/friends';
-import { VENUES } from '../data/listings';
+import { EVENTS, VENUES } from '../data/listings';
 import { AREA_LIST } from '../data/options';
 import { REC, levelOf, nightsCount } from '../data/sample';
 import { pickName } from '../data/taxonomy';
 import { Button } from '../design-system';
-import { eyebrow, icon, meAvatar, meta, nameTitle, note, sec, rowIcon, statusChip, stop } from '../ui/helpers';
+import { eyebrow, icon, meAvatar, meta, nameTitle, note, sec, rowIcon, statusChip, stop, thumb } from '../ui/helpers';
 import { Tap } from '../ui/Tap';
 
 /* You: status, perks, record, credit */
@@ -63,7 +63,7 @@ export function You(p) {
     'Promoter invite',
     'Got a code from a host? Enter it here',
     () => c.go('promoinvite', { piCode: null }),
-    ['lanyard-pass', 'yellow']
+    'ticket-check'
   ]);
   // promoters: the nights hosts invited them to, with their own guest lists
   if ((S.promoting || []).length)
@@ -72,7 +72,7 @@ export function You(p) {
       S.promoting.length +
         (S.promoting.length === 1 ? ' night · your guest list' : ' nights · your guest lists'),
       () => c.go('promoting'),
-      ['lanyard-pass', 'green']
+      'ticket'
     ]);
   // gathr admins (and only them) get a way in to approvals
   if (S.isAdmin)
@@ -80,7 +80,7 @@ export function You(p) {
       'gathr admin',
       'Verify organisers and put nights live',
       () => c.go('admin'),
-      ['megaphone', 'violet']
+      'shield-check'
     ]);
   return (
     <div className="px col" style={{ padding: '52px 16px 140px', gap: '26px' }}>
@@ -123,7 +123,7 @@ export function You(p) {
           var v = VENUES[r[0]];
           return (
             <div key={r[1] + r[2]} className="rowc list-row" style={{ gap: '14px' }}>
-              {rowIcon('calendar-check')}
+              {EVENTS[r[4]] && EVENTS[r[4]].img ? thumb(EVENTS[r[4]], 44) : rowIcon('calendar')}
               <div className="col" style={{ gap: '2px', flexGrow: 1 }}>
                 <span className="title15">{r[1]}</span>
                 {meta(v.name + ' · ' + r[2] + (r[3] ? ' · with ' + r[3] : ''))}

@@ -45,7 +45,9 @@ export function VenueHero(p) {
         <IconButton icon="arrow-left" label="Back" />
         <IconButton icon="heart" label={p.saved ? 'Saved' : 'Save'} active={p.saved} />
       </div>
-      <div className="g-vh2-head">
+      <div className={cx('g-vh2-head', p.when && 'has-when')}>
+        {/* app addition: when the night is on, the first thing read ("Tonight · Wed 14 Oct · 9 pm") */}
+        {p.when ? <p className="g-vh2-when">{p.when}</p> : null}
         {/* venue names keep their own spelling; the yellow full stop is only for gathr's own occasions */}
         <h1 className="g-vh2-name">
           {p.name}

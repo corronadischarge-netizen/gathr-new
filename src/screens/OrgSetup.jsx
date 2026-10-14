@@ -118,17 +118,20 @@ export function OrgSetup(p) {
           ))}
         </div>
       </div>
-      <VenuePicker
-        label={F.type === 'venue' ? 'Your venues' : 'Venues you look after'}
-        ids={F.venueIds}
-        custom={F.customVenues}
-        onChange={(ids, custom) => upd({ venueIds: ids, customVenues: custom })}
-      />
-      {note(
-        pr.name
-          ? 'Add or remove venues here any time'
-          : 'You can add more venues later from your profile: Host · profile → Edit organiser profile'
-      )}
+      {/* the venues and their helper line read as one group */}
+      <div className="col" style={{ gap: '8px' }}>
+        <VenuePicker
+          label={F.type === 'venue' ? 'Your venues' : 'Venues you look after'}
+          ids={F.venueIds}
+          custom={F.customVenues}
+          onChange={(ids, custom) => upd({ venueIds: ids, customVenues: custom })}
+        />
+        {note(
+          pr.name
+            ? 'Add or remove venues here any time'
+            : 'You can add more venues later from your profile: Host · profile → Edit organiser profile'
+        )}
+      </div>
       <div className="col" style={{ gap: '8px' }}>
         <label className="meta" htmlFor="og-insta">
           Instagram · you or your brand, kept on your profile
